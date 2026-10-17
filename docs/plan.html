@@ -29,12 +29,13 @@
     <section>
       <h2>Fasene</h2>
       <div class="fase ferdig">
-        <h3>Fase 0 – Plan og struktur <span class="merke">nå</span></h3>
+        <h3>Fase 0 – Plan og struktur <span class="merke">ferdig</span></h3>
         <p>Mapper, felles stil, mal for nye modeller, "gjett først"-komponent, tilstand for KI-tutor, lokal server, git.</p>
       </div>
-      <div class="fase">
-        <h3>Fase 1 – Felles varmemotor</h3>
-        <p><code>felles/js/varmegitter.js</code>: ren fysikk, ingen tegning. Fem fysiske tester som må bestå før vi går videre.</p>
+      <div class="fase ferdig">
+        <h3>Fase 1 – Felles varmemotor <span class="merke">venter på godkjenning</span></h3>
+        <p><code>felles/js/varmegitter.js</code>: ren fysikk, ingen tegning. Alle fysiske tester i <code>felles/tester/</code> består.</p>
+        <p><strong>Funn som påvirker fase 2:</strong> Kontakttemperaturen blir riktig (avvik under 0,05 °C) med celler på 0,2 mm. Med celler på 1 mm havner den 0,2–1,3 °C for nær klossens temperatur det første sekundet, fordi varmen ennå ikke har trengt gjennom én hel hudcelle. "Ta på"-fanen må derfor bruke små celler nær hånda (0,2–0,5 mm). Isbit-fanen bør bruke ca. 2 mm celler, ellers blir den for tung på en treg Chromebook.</p>
       </div>
       <div class="fase">
         <h3>Fase 2 – Modell A: varmeledning med partikler</h3>
@@ -63,20 +64,14 @@
     </section>
 
     <section>
-      <h2>Trenger ditt svar før fase 1 <span class="merke">åpne valg</span></h2>
+      <h2>Bestemt</h2>
+      <ul>
+        <li><strong>17. okt.:</strong> Vann (k = 0,60, ρ = 1000, c = 4180) og h = 10 W/m²·K mot stille luft er lagt inn i <code>materialer.json</code>. Is, nysnø og pakket snø er merket med <code>smelter_til: "vann"</code>.</li>
+      </ul>
 
+      <h2>Åpne valg <span class="merke">senere</span></h2>
       <div class="apen">
-        <h3>1. Verdier for vann (mangler i materialer.json)</h3>
-        <p>Når is og snø smelter, blir det vann. Forslag (standard tabellverdier): k = 0,60 W/m·K, ρ = 1000 kg/m³, c = 4180 J/kg·K. Skal jeg legge dem inn med kilde "standard tabellverdi"?</p>
-      </div>
-
-      <div class="apen">
-        <h3>2. Varmeovergangstall h mot stille luft (mangler)</h3>
-        <p>Forslag: h = 10 W/m²·K (ca. halvparten fra lufta som beveger seg litt langs flaten, halvparten fra varmestråling). Ekte verdier ligger mellom ca. 5 og 25 avhengig av trekk. Tallet avgjør hvor fort snøen smelter i fase 3, men ikke hvilken bit som smelter først.</p>
-      </div>
-
-      <div class="apen">
-        <h3>3. Senere (ikke nødvendig nå)</h3>
+        <h3>Før fase 2 og 3</h3>
         <ul>
           <li>Fase 2: isbitens starttemperatur (rett fra fryseren, ca. −18 °C, eller 0 °C?).</li>
           <li>Fase 2: hånda. Forslag: baksiden av hudlaget holdes på 33 °C fordi blodet varmer.</li>

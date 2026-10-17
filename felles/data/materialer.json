@@ -1,0 +1,26 @@
+{
+  "_om": "Typiske verdier ved romtemperatur. Ekte materialer varierer (tre etter treslag og fukt, snø etter tetthet). Modellene skal bruke forholdet mellom verdiene; de trenger ikke være eksakte. k = varmeledningsevne (W/m·K), rho = tetthet (kg/m³), c = spesifikk varmekapasitet (J/kg·K). Effusivitet e = sqrt(k·rho·c) avgjør hvor kaldt noe kjennes ved berøring. Kontakttemperatur ved berøring: T = (e_hud·T_hud + e_mat·T_mat) / (e_hud + e_mat). smelter_til: materialet smelter ved 0 °C (smeltevarme_is) og blir til det oppgitte materialet.",
+  "materialer": {
+    "kobber":        { "navn": "Kobber",          "k": 400,   "rho": 8960, "c": 385,  "kilde": "standard tabellverdi" },
+    "aluminium":     { "navn": "Aluminium",       "k": 237,   "rho": 2700, "c": 900,  "kilde": "ESPCI Transport Phenomena, Simple problems" },
+    "rustfritt_stal":{ "navn": "Rustfritt stål",  "k": 15,    "rho": 8000, "c": 500,  "kilde": "standard tabellverdi (ca. 14–16)" },
+    "glass":         { "navn": "Glass",           "k": 1.0,   "rho": 2500, "c": 840,  "kilde": "standard tabellverdi; effusivitet ca. 1450, jf. Marin 2007" },
+    "is":            { "navn": "Is",              "k": 2.2,   "rho": 917,  "c": 2100, "smelter_til": "vann", "kilde": "standard tabellverdi" },
+    "vann":          { "navn": "Vann",            "k": 0.60,  "rho": 1000, "c": 4180, "kilde": "standard tabellverdi (ved ca. 0–20 °C)" },
+    "tre":           { "navn": "Tre (furu)",      "k": 0.15,  "rho": 600,  "c": 1700, "kilde": "ESPCI Transport Phenomena, Simple problems" },
+    "nysno":         { "navn": "Nysnø",           "k": 0.08,  "rho": 120,  "c": 2100, "smelter_til": "vann", "kilde": "Aggarwal 2009, Defence Science Journal 59(2): 0,08 W/mK for nysnø 120 kg/m³" },
+    "pakket_sno":    { "navn": "Pakket snø",      "k": 0.32,  "rho": 420,  "c": 2100, "smelter_til": "vann", "kilde": "Aggarwal 2009: 0,32 W/mK ved 420 kg/m³" },
+    "isopor":        { "navn": "Isopor",          "k": 0.033, "rho": 30,   "c": 1300, "kilde": "standard tabellverdi" },
+    "luft":          { "navn": "Luft",            "k": 0.026, "rho": 1.2,  "c": 1005, "kilde": "standard tabellverdi" },
+    "hud":           { "navn": "Hud",             "k": 0.37,  "rho": 1000, "c": 3500, "kilde": "Marin 2007, Lat. Am. J. Phys. Educ.: effusivitet ca. 1120" }
+  },
+  "konstanter": {
+    "smeltevarme_is": { "verdi": 334000, "enhet": "J/kg", "kilde": "standard tabellverdi" },
+    "hudtemperatur":  { "verdi": 33,     "enhet": "°C",   "kilde": "typisk overflatetemperatur på hånd" },
+    "h_stille_luft":  { "verdi": 10,     "enhet": "W/m²·K", "kilde": "varmeovergangstall mot stille luft innendørs: ca. 5 fra naturlig konveksjon + ca. 5 fra varmestråling; ekte verdier ca. 5–25 avhengig av trekk. Valgt 2026-10-17." }
+  },
+  "valideringsmal": {
+    "_om": "Beregnet kontakttemperatur når hud (33 °C) berører materiale på 20 °C. Partikkel-/gittermodellen bør havne nær disse tallene like etter berøring.",
+    "kobber": 20.4, "aluminium": 20.6, "rustfritt_stal": 21.7, "glass": 25.7, "is_ved_20C_teoretisk": 24.6, "tre": 29.7, "nysno_ved_20C_teoretisk": 31.6, "isopor": 32.6
+  }
+}

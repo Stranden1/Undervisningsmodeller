@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ny modell</title>
+  <link rel="stylesheet" href="../../felles/stil.css">
+</head>
+<body>
+  <header class="topp">
+    <a class="tilbake" href="../../index.html">← Alle modeller</a>
+    <h1>Ny modell</h1>
+    <p class="ingress">Ett spørsmål eleven skal undre seg over.</p>
+  </header>
+
+  <main class="modell">
+    <section class="scene kort">
+      <canvas id="lerret" width="640" height="400" role="img"
+              aria-label="Søyle som viser temperaturen til en gjenstand"></canvas>
+      <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+    </section>
+
+    <aside class="panel">
+      <div id="forutsi"></div>
+
+      <section class="kort">
+        <div class="kontroll">
+          <label for="starttemperatur">Starttemperatur <output id="starttemperatur-verdi"></output></label>
+          <input id="starttemperatur" type="range" min="30" max="90" step="5" value="80">
+        </div>
+        <div class="knapperad">
+          <button id="start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="nullstill" class="knapp">Nullstill</button>
+        </div>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li>Skriv hver forenkling her, kort og ærlig.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <script type="module" src="kontroller.js"></script>
+</body>
+</html>

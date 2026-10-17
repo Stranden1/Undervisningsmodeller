@@ -1,0 +1,2 @@
+# Lagre all tekst med Unix-linjeskift, så filene er like på alle maskiner.
+* text=auto eol=lf

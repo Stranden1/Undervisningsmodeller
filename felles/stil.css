@@ -1,0 +1,377 @@
+/* Felles utseende for alle naturfagsmodeller.
+   Rolig og rent: modellen skal få oppmerksomheten, ikke pynten.
+   Fargene er valgt slik at de kan skilles også ved fargeblindhet
+   (blå–oransje i stedet for rød–grønn). */
+
+:root {
+  /* Flater og tekst */
+  --bakgrunn: #f7f6f2;
+  --flate: #ffffff;
+  --flate-dempet: #efede6;
+  --tekst: #1f2328;
+  --tekst-dempet: #5b616b;
+  --linje: #d8d5cc;
+
+  /* Handling og fokus */
+  --aksent: #1f5fa8;
+  --aksent-mork: #17487f;
+  --aksent-lys: #e3ecf7;
+  --fokus: #f2a900;
+
+  /* Betydningsfarger (fargeblind-vennlige) */
+  --kald: #2b6cb0;      /* blå */
+  --varm: #d9730d;      /* oransje */
+  --noytral: #7a7f87;
+  --advarsel-bg: #fff6e0;
+  --advarsel-linje: #e0b44a;
+
+  /* Typografi – systemfonter, ingen nedlasting */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-tall: ui-monospace, "SF Mono", Consolas, "Roboto Mono", monospace;
+
+  /* Avstand og form */
+  --rom-1: 4px;
+  --rom-2: 8px;
+  --rom-3: 12px;
+  --rom-4: 16px;
+  --rom-5: 24px;
+  --rom-6: 32px;
+  --radius: 8px;
+  --skygge: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 17px;
+}
+
+body {
+  margin: 0;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0 0 var(--rom-3);
+}
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1rem; }
+
+p { margin: 0 0 var(--rom-3); }
+
+a { color: var(--aksent); }
+
+/* ---------- Sideoppsett ---------- */
+
+.topp {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rom-4) var(--rom-4) var(--rom-3);
+}
+
+.topp .tilbake {
+  display: inline-block;
+  margin-bottom: var(--rom-2);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+  text-decoration: none;
+}
+.topp .tilbake:hover { text-decoration: underline; }
+
+.ingress {
+  font-size: 1.1rem;
+  color: var(--tekst-dempet);
+  max-width: 60ch;
+}
+
+/* Modellside: scene til venstre, panel til høyre. Stables på smal skjerm. */
+.modell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--rom-4) var(--rom-6);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--rom-4);
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .modell { grid-template-columns: minmax(0, 1fr); }
+}
+
+.kort {
+  background: var(--flate);
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  box-shadow: var(--skygge);
+  padding: var(--rom-4);
+}
+
+.scene canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--flate);
+  border-radius: calc(var(--radius) - 2px);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rom-4);
+}
+
+/* Tekstbeskrivelse av hva som skjer (leses også av skjermleser) */
+.beskrivelse {
+  margin: var(--rom-3) 0 0;
+  color: var(--tekst-dempet);
+  font-size: 0.95rem;
+  min-height: 1.5em;
+}
+
+/* Skjult for øynene, men lest av skjermleser */
+.kun-skjermleser {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Knapper ---------- */
+
+.knapp {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: var(--rom-2) var(--rom-4);
+  min-height: 44px; /* stort nok for fingre på iPad */
+  border-radius: var(--radius);
+  border: 1px solid var(--linje);
+  background: var(--flate);
+  color: var(--tekst);
+  cursor: pointer;
+}
+.knapp:hover { background: var(--flate-dempet); }
+
+.knapp-hoved {
+  background: var(--aksent);
+  border-color: var(--aksent);
+  color: #fff;
+}
+.knapp-hoved:hover { background: var(--aksent-mork); }
+
+.knapp:disabled,
+.knapp[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.knapperad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rom-2);
+}
+
+:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 2px;
+}
+
+/* ---------- Glidebrytere og valg ---------- */
+
+.kontroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rom-1);
+  margin-bottom: var(--rom-3);
+}
+
+.kontroll label,
+.kontroll .etikett {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rom-2);
+}
+
+.kontroll output {
+  font-family: var(--font-tall);
+  font-weight: 400;
+  color: var(--tekst-dempet);
+}
+
+input[type="range"] {
+  width: 100%;
+  min-height: 32px;
+  accent-color: var(--aksent);
+}
+
+select {
+  font: inherit;
+  padding: var(--rom-2);
+  min-height: 44px;
+  border-radius: var(--radius);
+  border: 1px solid var(--linje);
+  background: var(--flate);
+}
+
+/* Avanserte valg skjules bak "Mer" */
+.mer > summary {
+  cursor: pointer;
+  color: var(--tekst-dempet);
+  font-size: 0.95rem;
+}
+
+/* ---------- Faner ---------- */
+
+.faner {
+  display: flex;
+  gap: var(--rom-1);
+  border-bottom: 1px solid var(--linje);
+  max-width: 1200px;
+  margin: 0 auto var(--rom-4);
+  padding: 0 var(--rom-4);
+}
+
+.faner [role="tab"] {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--rom-2) var(--rom-4);
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--tekst-dempet);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.faner [role="tab"][aria-selected="true"] {
+  background: var(--flate);
+  border-color: var(--linje);
+  color: var(--tekst);
+}
+
+/* ---------- Forutsi først ---------- */
+
+.forutsi {
+  background: var(--aksent-lys);
+  border: 1px solid #c3d4ea;
+  border-radius: var(--radius);
+  padding: var(--rom-4);
+}
+
+.forutsi fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.forutsi legend {
+  font-weight: 700;
+  margin-bottom: var(--rom-2);
+  padding: 0;
+}
+
+.forutsi .valg {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  padding: var(--rom-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.forutsi .valg:hover { background: rgba(255, 255, 255, 0.6); }
+
+.forutsi input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--aksent);
+}
+
+.forutsi .laast {
+  font-weight: 600;
+}
+
+.sammenligning {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--rom-1) var(--rom-3);
+  margin-top: var(--rom-3);
+}
+.sammenligning dt { color: var(--tekst-dempet); }
+.sammenligning dd { margin: 0; font-weight: 600; }
+
+/* ---------- Tall ---------- */
+
+.tall {
+  font-family: var(--font-tall);
+  font-variant-numeric: tabular-nums;
+}
+
+.tallrad {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rom-3);
+  padding: var(--rom-1) 0;
+  border-bottom: 1px dashed var(--linje);
+}
+.tallrad:last-child { border-bottom: none; }
+
+/* Simulert tid i forhold til ekte tid */
+.tidsmaler {
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
+/* ---------- Hva modellen forenkler ---------- */
+
+.forenkler {
+  background: var(--advarsel-bg);
+  border: 1px solid var(--advarsel-linje);
+  border-radius: var(--radius);
+  padding: var(--rom-3) var(--rom-4);
+}
+.forenkler > summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+.forenkler ul {
+  margin: var(--rom-2) 0 0;
+  padding-left: 1.2em;
+}
+.forenkler li { margin-bottom: var(--rom-1); }
+
+/* ---------- Katalog (index.html) ---------- */
+
+.katalog {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--rom-4) var(--rom-6);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--rom-4);
+}
+
+.katalog .kort h2 { margin-bottom: var(--rom-2); }
+.katalog .kort p { color: var(--tekst-dempet); }
+
+/* Mindre bevegelse for dem som har bedt om det */
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}

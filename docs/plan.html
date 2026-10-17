@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plan: varme og smelting</title>
+  <link rel="stylesheet" href="../felles/stil.css">
+  <style>
+    .plan { max-width: 820px; margin: 0 auto; padding: 0 var(--rom-4) var(--rom-6); }
+    .plan section { margin-bottom: var(--rom-5); }
+    .plan li { margin-bottom: var(--rom-2); }
+    .fase { border-left: 4px solid var(--aksent); padding-left: var(--rom-3); margin-bottom: var(--rom-4); }
+    .fase.ferdig { border-color: var(--noytral); }
+    .merke { font-size: 0.8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--aksent-lys); color: var(--aksent-mork); }
+    .apen { background: var(--advarsel-bg); border: 1px solid var(--advarsel-linje); border-radius: var(--radius); padding: var(--rom-3) var(--rom-4); margin-bottom: var(--rom-3); }
+    .apen h3 { margin-bottom: var(--rom-2); }
+    table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+    th, td { text-align: left; padding: var(--rom-2); border-bottom: 1px solid var(--linje); vertical-align: top; }
+  </style>
+</head>
+<body>
+  <header class="topp plan">
+    <a class="tilbake" href="../index.html">← Alle modeller</a>
+    <h1>Plan: to modeller med felles varmemotor</h1>
+    <p class="ingress">Modell A (metall kjennes kaldt) og modell B (snø smelter fra kanten) bygger på samme regnemotor for varme. Vi jobber i faser og stopper etter hver.</p>
+  </header>
+
+  <main class="plan">
+    <section>
+      <h2>Fasene</h2>
+      <div class="fase ferdig">
+        <h3>Fase 0 – Plan og struktur <span class="merke">nå</span></h3>
+        <p>Mapper, felles stil, mal for nye modeller, "gjett først"-komponent, tilstand for KI-tutor, lokal server, git.</p>
+      </div>
+      <div class="fase">
+        <h3>Fase 1 – Felles varmemotor</h3>
+        <p><code>felles/js/varmegitter.js</code>: ren fysikk, ingen tegning. Fem fysiske tester som må bestå før vi går videre.</p>
+      </div>
+      <div class="fase">
+        <h3>Fase 2 – Modell A: varmeledning med partikler</h3>
+        <p>Fane "Ta på" (hånd mot to klosser) og fane "Isbit på kloss" (aluminium mot tre). Partikler, graf og "føles som"-måler.</p>
+      </div>
+      <div class="fase">
+        <h3>Fase 3 – Modell B: overflate og volum</h3>
+        <p>Samme snømengde delt i 1, 4, 16 eller 64 biter, eller spredt utover. Graf over andel smeltet, overflate/volum-tall.</p>
+      </div>
+      <div class="fase">
+        <h3>Fase 4 – Ferdigstilling</h3>
+        <p>Katalogside, verktøy som pakker en modell til én fil, eksport av begge.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>De viktigste fysikkvalgene (fase 1)</h2>
+      <ol>
+        <li><strong>Et rutenett av celler, sett som et snitt (2D).</strong> Hver celle er f.eks. 1 mm × 1 mm og har ett materiale. Et 2D-snitt er raskt nok for en billig Chromebook, og vi ser rett inn i materialet.</li>
+        <li><strong>Hver celle lagrer energi, ikke temperatur.</strong> Temperaturen regnes ut fra energien. Det gjør smelting riktig av seg selv: når is når 0 °C, går tilført energi med til å smelte (334 000 J per kg), og temperaturen står stille til all isen i cellen er smeltet. Først da blir det vann som varmes videre.</li>
+        <li><strong>Varme flyter etter temperaturforskjell og varmeledningsevne</strong> (Fouriers lov: varmestrøm = k · areal · temperaturforskjell / avstand). Mellom to ulike materialer bruker jeg <em>harmonisk snitt</em>, 2·k₁·k₂ / (k₁ + k₂). Det er det samme som to lag etter hverandre: det dårligste laget bestemmer. Tre mot aluminium gir 0,30 W/m·K. Vanlig gjennomsnitt ville gitt 119 W/m·K – ca. 400 ganger for mye varme gjennom grenseflaten.</li>
+        <li><strong>Luft simuleres ikke celle for celle.</strong> Stille luft leder nesten ingenting. I stedet får hver overflatecelle en varmeovergang mot lufta: varmestrøm = h · areal · (overflatetemperatur − lufttemperatur). Dette står i "Hva modellen forenkler".</li>
+        <li><strong>Stabilitet med små delsteg.</strong> Motoren regner fra ett øyeblikk til det neste (eksplisitt metode). Det er enkelt og raskt, men bare stabilt hvis tidssteget er lite nok: under avstand² / (4 · α), der α = k / (ρ · c) sier hvor fort temperatur sprer seg. Kobber med 1 mm celler tåler ca. 2 ms per steg, så motoren deler hvert skjermbilde i nok små delsteg av seg selv. Skjermen viser "1 s ekte tid = X s simulert".</li>
+        <li><strong>Test av kontakttemperatur.</strong> Formelen i <code>valideringsmal</code> gjelder to tykke klosser i perfekt kontakt. Gitteret har celler med en viss tykkelse, så de aller første millisekundene blir litt utjevnet. Jeg forventer avvik på noen tideler grader og forklarer det tallet vi får.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Trenger ditt svar før fase 1 <span class="merke">åpne valg</span></h2>
+
+      <div class="apen">
+        <h3>1. Verdier for vann (mangler i materialer.json)</h3>
+        <p>Når is og snø smelter, blir det vann. Forslag (standard tabellverdier): k = 0,60 W/m·K, ρ = 1000 kg/m³, c = 4180 J/kg·K. Skal jeg legge dem inn med kilde "standard tabellverdi"?</p>
+      </div>
+
+      <div class="apen">
+        <h3>2. Varmeovergangstall h mot stille luft (mangler)</h3>
+        <p>Forslag: h = 10 W/m²·K (ca. halvparten fra lufta som beveger seg litt langs flaten, halvparten fra varmestråling). Ekte verdier ligger mellom ca. 5 og 25 avhengig av trekk. Tallet avgjør hvor fort snøen smelter i fase 3, men ikke hvilken bit som smelter først.</p>
+      </div>
+
+      <div class="apen">
+        <h3>3. Senere (ikke nødvendig nå)</h3>
+        <ul>
+          <li>Fase 2: isbitens starttemperatur (rett fra fryseren, ca. −18 °C, eller 0 °C?).</li>
+          <li>Fase 2: hånda. Forslag: baksiden av hudlaget holdes på 33 °C fordi blodet varmer.</li>
+          <li>Fase 3: snøens starttemperatur (må være under 0 °C for å se at hjørnene når 0 °C først), solinnstråling og hvor mye av den snøen tar opp, bakkens temperatur.</li>
+          <li>Fase 3: simuleringen er et snitt, så bitene er egentlig lange staver. Forslag: tallpanelet viser overflate og volum for terninger, og forenkler-boksen sier at bildet er et snitt. Forholdet oppfører seg likt: halv sidekant gir dobbelt så mye overflate per volum.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Ikke med (med vilje)</h2>
+      <p>Strømning i vann og luft, fordamping, stråling mellom klossene, og at snø pakker seg sammen når den smelter.</p>
+    </section>
+  </main>
+</body>
+</html>

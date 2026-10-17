@@ -1,0 +1,10 @@
+{
+  "name": "naturfagsmodeller",
+  "private": true,
+  "description": "Interaktive modeller for naturfag. Ingen avhengigheter og ingen build-steg.",
+  "type": "module",
+  "scripts": {
+    "start": "node verktoy/server.js",
+    "test": "node --test"
+  }
+}

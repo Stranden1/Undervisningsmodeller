@@ -33,13 +33,14 @@
         <p>Mapper, felles stil, mal for nye modeller, "gjett først"-komponent, tilstand for KI-tutor, lokal server, git.</p>
       </div>
       <div class="fase ferdig">
-        <h3>Fase 1 – Felles varmemotor <span class="merke">venter på godkjenning</span></h3>
+        <h3>Fase 1 – Felles varmemotor <span class="merke">ferdig</span></h3>
         <p><code>felles/js/varmegitter.js</code>: ren fysikk, ingen tegning. Alle fysiske tester i <code>felles/tester/</code> består.</p>
         <p><strong>Funn som påvirker fase 2:</strong> Kontakttemperaturen blir riktig (avvik under 0,05 °C) med celler på 0,2 mm. Med celler på 1 mm havner den 0,2–1,3 °C for nær klossens temperatur det første sekundet, fordi varmen ennå ikke har trengt gjennom én hel hudcelle. "Ta på"-fanen må derfor bruke små celler nær hånda (0,2–0,5 mm). Isbit-fanen bør bruke ca. 2 mm celler, ellers blir den for tung på en treg Chromebook.</p>
       </div>
-      <div class="fase">
-        <h3>Fase 2 – Modell A: varmeledning med partikler</h3>
-        <p>Fane "Ta på" (hånd mot to klosser) og fane "Isbit på kloss" (aluminium mot tre). Partikler, graf og "føles som"-måler.</p>
+      <div class="fase ferdig">
+        <h3>Fase 2 – Modell A: varmeledning med partikler <span class="merke">venter på godkjenning</span></h3>
+        <p>Fane "Ta på" (finger mot to klosser, 0,5 mm celler) og fane "Isbit på kloss" (aluminium mot tre, 2 mm celler). Partikler, graf, "føles som"-måler, gjett først, lærerveiledning. 6 fysiske tester for modellen består.</p>
+        <p><strong>Funn:</strong> Smeltevann som blir liggende, isolerer isen fra aluminiumen (vann leder ca. 4 ganger dårligere enn is). Derfor renner vannet bort og isen synker ned mot klossen. Da smelter isbiten på aluminium på ca. 8,5 min og på tre på ca. 2,8 t i modellen. Ekte isbiter smelter raskere fordi et 2D-snitt mangler endeflatene.</p>
       </div>
       <div class="fase">
         <h3>Fase 3 – Modell B: overflate og volum</h3>
@@ -66,6 +67,7 @@
     <section>
       <h2>Bestemt</h2>
       <ul>
+        <li><strong>17. okt.:</strong> Isbiten starter på −18 °C (fra fryseren). Fingeren er et 2 mm hudlag der blodet holder baksiden på 33 °C.</li>
         <li><strong>17. okt.:</strong> Vann (k = 0,60, ρ = 1000, c = 4180) og h = 10 W/m²·K mot stille luft er lagt inn i <code>materialer.json</code>. Is, nysnø og pakket snø er merket med <code>smelter_til: "vann"</code>.</li>
       </ul>
 
@@ -73,8 +75,6 @@
       <div class="apen">
         <h3>Før fase 2 og 3</h3>
         <ul>
-          <li>Fase 2: isbitens starttemperatur (rett fra fryseren, ca. −18 °C, eller 0 °C?).</li>
-          <li>Fase 2: hånda. Forslag: baksiden av hudlaget holdes på 33 °C fordi blodet varmer.</li>
           <li>Fase 3: snøens starttemperatur (må være under 0 °C for å se at hjørnene når 0 °C først), solinnstråling og hvor mye av den snøen tar opp, bakkens temperatur.</li>
           <li>Fase 3: simuleringen er et snitt, så bitene er egentlig lange staver. Forslag: tallpanelet viser overflate og volum for terninger, og forenkler-boksen sier at bildet er et snitt. Forholdet oppfører seg likt: halv sidekant gir dobbelt så mye overflate per volum.</li>
         </ul>

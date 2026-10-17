@@ -1,0 +1,86 @@
+/* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
+
+.graf-tittel {
+  font-size: 0.95rem;
+  margin: var(--rom-4) 0 var(--rom-2);
+  color: var(--tekst-dempet);
+}
+
+#tapaa-graf,
+#isbit-graf {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.forhold {
+  font-size: 0.95rem;
+  background: var(--flate-dempet);
+  border-radius: var(--radius);
+  padding: var(--rom-2) var(--rom-3);
+}
+.forhold:empty { display: none; }
+
+.hjelpetekst {
+  color: var(--tekst-dempet);
+  font-size: 0.9rem;
+}
+
+.avkrysning {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  margin: var(--rom-2) 0;
+}
+.avkrysning input { width: 20px; height: 20px; }
+
+.verditabell {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: var(--rom-2);
+}
+.verditabell th,
+.verditabell td {
+  text-align: right;
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--linje);
+}
+.verditabell th:first-child,
+.verditabell td:first-child { text-align: left; }
+
+/* "Føles som"-måler */
+.foles {
+  margin-bottom: var(--rom-3);
+}
+.foles .navn {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+.foles .spor {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  margin: var(--rom-1) 0;
+  /* fargen settes i kontroller.js med samme fargeskala som lerretet */
+  border: 1px solid var(--linje);
+}
+.foles .merke {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 22px;
+  margin-left: -2px;
+  background: var(--tekst);
+  border-radius: 2px;
+}
+.foles .ender {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--tekst-dempet);
+}
+.foles .ord {
+  font-size: 0.95rem;
+}

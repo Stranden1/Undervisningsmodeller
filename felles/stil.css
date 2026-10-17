@@ -46,6 +46,11 @@
   box-sizing: border-box;
 }
 
+/* hidden skal alltid skjule, også elementer som har display: grid fra en klasse */
+[hidden] {
+  display: none !important;
+}
+
 html {
   font-size: 17px;
 }

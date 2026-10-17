@@ -270,6 +270,36 @@ test("stegMedBudsjett simulerer mindre tid når delstegene ikke rekker", () => {
   assert.ok(Math.abs(helt - 5 * grense) < 1e-12);
 });
 
+test("flyttCelle tar med seg energien, fjernCelle fører den i regnskapet", () => {
+  const g = lagVarmegitter({ nx: 4, ny: 4, dx: 1e-3, data, h: 0 });
+  g.fyllRektangel(0, 2, 4, 2, "aluminium", 20);
+  g.settCelle(1, 0, "is", -5);
+  const start = g.totalEnergi();
+  const energiIs = g.energi(1, 0);
+
+  g.flyttCelle(1, 0, 1, 1);
+  assert.equal(g.erTom(1, 0), true);
+  assert.equal(g.materiale(1, 1), "is");
+  assert.equal(g.energi(1, 1), energiIs);
+  assert.equal(g.totalEnergi(), start);
+  assert.equal(g.antallLuftflater(1, 2), 0, "aluminiumcellen under isen vender ikke lenger mot luft");
+
+  const ut = g.fjernCelle(1, 1);
+  assert.equal(ut.energi, energiIs);
+  assert.ok(Math.abs(ut.masse - M.is.rho * 1e-9) < 1e-15);
+  assert.ok(Math.abs(g.totalEnergi() + g.energiregnskap.fjernet - start) < 1e-12);
+});
+
+test("varmestromMellom gir k-snitt · temperaturforskjell, fra varm til kald", () => {
+  const dx = 1e-3;
+  const g = lagVarmegitter({ nx: 2, ny: 1, dx, data, h: 0 });
+  g.settCelle(0, 0, "hud", 33);
+  g.settCelle(1, 0, "tre", 20);
+  const k = (2 * M.hud.k * M.tre.k) / (M.hud.k + M.tre.k);
+  assert.ok(Math.abs(g.varmestromMellom(0, 0, 1, 0) - k * dx * 13) < 1e-12);
+  assert.ok(g.varmestromMellom(1, 0, 0, 0) < 0);
+});
+
 test("Ukjent materiale gir tydelig feil", () => {
   const g = lagVarmegitter({ nx: 2, ny: 2, dx: 1e-3, data });
   assert.throws(() => g.settCelle(0, 0, "unobtainium", 20), /Ukjent materiale/);

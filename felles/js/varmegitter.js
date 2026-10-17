@@ -92,8 +92,9 @@ export function lagVarmegitter({
 
   let tid = 0;
   let dtMaksCache = null;
-  // Energiregnskap: hvor mye energi som har kommet inn utenfra, for å kunne sjekke bevaring.
-  const regnskap = { luft: 0, effekt: 0, laast: 0 };
+  // Energiregnskap: energi inn utenfra (luft, effekt, låste celler) og energi i fjernede
+  // celler, for å kunne sjekke bevaring.
+  const regnskap = { luft: 0, effekt: 0, laast: 0, fjernet: 0 };
 
   // ---------- Hjelpefunksjoner ----------
 
@@ -333,6 +334,49 @@ export function lagVarmegitter({
       geometriEndret();
     },
 
+    /**
+     * Fjern en celle (f.eks. smeltevann som renner bort). Energien og massen den hadde,
+     * føres i energiregnskapet som "fjernet", så bevaring fortsatt kan sjekkes.
+     * @returns {{ energi: number, masse: number }}
+     */
+    fjernCelle(x, y) {
+      const i = idx(x, y);
+      if (mat[i] === TOM) return { energi: 0, masse: 0 };
+      const ut = { energi: H[i], masse: rho[mat[i]] * volum };
+      regnskap.fjernet += H[i];
+      settCelleUtenGeometri(i, null);
+      geometriEndret();
+      return ut;
+    },
+
+    /**
+     * Flytt en celle med alt innhold til en tom plass (f.eks. is som synker ned når
+     * cellen under har smeltet). Energien følger med, så ingenting går tapt.
+     */
+    flyttCelle(xFra, yFra, xTil, yTil) {
+      const a = idx(xFra, yFra);
+      const b = idx(xTil, yTil);
+      if (mat[b] !== TOM) throw new Error(`Celle (${xTil}, ${yTil}) er ikke tom`);
+      mat[b] = mat[a];
+      H[b] = H[a];
+      k[b] = k[a];
+      Cfast[b] = Cfast[a];
+      Cflyt[b] = Cflyt[a];
+      Lcelle[b] = Lcelle[a];
+      laast[b] = laast[a];
+      laastT[b] = laastT[a];
+      effekt[b] = effekt[a];
+      settCelleUtenGeometri(a, null);
+      regnUt(b);
+      geometriEndret();
+    },
+
+    /** Massen i en celle (kg). */
+    masse(x, y) {
+      const i = idx(x, y);
+      return mat[i] === TOM ? 0 : rho[mat[i]] * volum;
+    },
+
     /** Hold en celle på fast temperatur (null slipper den). */
     holdTemperatur(x, y, temperatur) {
       const i = idx(x, y);
@@ -382,6 +426,14 @@ export function lagVarmegitter({
       return (k[a] * T[a] + k[b] * T[b]) / (k[a] + k[b]);
     },
 
+    /** Varme per sekund (W) som strømmer fra celle a til nabocelle b akkurat nå. */
+    varmestromMellom(xa, ya, xb, yb) {
+      const a = idx(xa, ya);
+      const b = idx(xb, yb);
+      if (mat[a] === TOM || mat[b] === TOM) return 0;
+      return ledningstall(k[a], k[b]) * (T[a] - T[b]);
+    },
+
     /** Direkte tilgang for tegning (les, ikke skriv). Tomme celler har NaN. */
     get temperaturFelt() {
       return T;
@@ -403,7 +455,7 @@ export function lagVarmegitter({
       return sum;
     },
 
-    /** Energi som har kommet inn utenfra siden start (J): luft, effekt og låste celler. */
+    /** Energi inn utenfra siden start (J): luft, effekt, låste celler – og energi i fjernede celler (fjernet). */
     get energiregnskap() {
       return { ...regnskap };
     },

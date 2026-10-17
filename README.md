@@ -28,7 +28,7 @@ node --test
 
 | Modell | Fenomen | Status |
 |---|---|---|
-| `modeller/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Fase 2 |
+| `modeller/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Klar til testing |
 | `modeller/overflate-og-volum/` | Hvorfor smelter snø raskest på kanten? | Fase 3 |
 
 Planen ligger i [`docs/plan.html`](docs/plan.html).

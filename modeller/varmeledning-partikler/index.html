@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Varmeledning med partikler</title>
+  <link rel="stylesheet" href="../../felles/stil.css">
+  <link rel="stylesheet" href="stil.css">
+</head>
+<body>
+  <header class="topp">
+    <a class="tilbake" href="../../index.html">← Alle modeller</a>
+    <h1>Varmeledning med partikler</h1>
+    <p class="ingress">Hvorfor kjennes metall kaldere enn tre, selv om de har samme temperatur?</p>
+  </header>
+
+  <div class="faner" role="tablist" aria-label="Velg forsøk">
+    <button role="tab" id="fane-tapaa" aria-selected="true" aria-controls="panel-tapaa">Ta på</button>
+    <button role="tab" id="fane-isbit" aria-selected="false" aria-controls="panel-isbit" tabindex="-1">Isbit på kloss</button>
+  </div>
+
+  <!-- ================= Ta på ================= -->
+  <section id="panel-tapaa" role="tabpanel" aria-labelledby="fane-tapaa" class="modell">
+    <div class="scene kort">
+      <canvas id="tapaa-lerret" role="img"
+              aria-label="En finger legges på to klosser. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
+      <p id="tapaa-tid" class="tidsmaler"></p>
+      <p id="tapaa-beskrivelse" class="beskrivelse" aria-live="polite"></p>
+      <h2 class="graf-tittel">Temperaturen i huden der fingeren berører klossen</h2>
+      <canvas id="tapaa-graf" role="img" aria-label="Graf over hudtemperaturen i kontaktflaten over tid"></canvas>
+    </div>
+
+    <aside class="panel">
+      <div id="tapaa-forutsi"></div>
+
+      <section class="kort">
+        <div class="kontroll">
+          <label for="tapaa-venstre">Venstre kloss</label>
+          <select id="tapaa-venstre"></select>
+        </div>
+        <div class="kontroll">
+          <label for="tapaa-hoyre">Høyre kloss</label>
+          <select id="tapaa-hoyre"></select>
+        </div>
+        <p id="tapaa-forhold" class="forhold"></p>
+        <div class="knapperad">
+          <button id="tapaa-start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="tapaa-nullstill" class="knapp">Nullstill</button>
+        </div>
+        <details class="mer">
+          <summary>Mer</summary>
+          <label class="avkrysning"><input type="checkbox" id="tapaa-sakte"> Sakte film (¼ fart)</label>
+          <table class="verditabell" id="tapaa-verdier"></table>
+        </details>
+      </section>
+
+      <section class="kort" aria-labelledby="foles-tittel">
+        <h2 id="foles-tittel">Føles som</h2>
+        <p class="hjelpetekst">Huden kjenner sin egen temperatur – ikke klossens.</p>
+        <div id="tapaa-foles"></div>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom −18 °C og 33 °C er bare ca. 10 %.</li>
+          <li>Alle materialer har like partikler. I metall er det frie elektroner som leder varmen så godt – de vises ikke.</li>
+          <li>Modellen er et snitt (2D) gjennom fingeren og klossene.</li>
+          <li>Fingeren er et 2 mm hudlag. Blodet holder baksiden på 33 °C. Kontakten er perfekt, uten luftlommer.</li>
+          <li>Lufta regnes ikke ut i detalj. Overflatene mister eller får varme med et fast tall for stille luft.</li>
+          <li>"Føles som" er en tolkning. Følelsen avhenger også av hvor fort varmen forsvinner.</li>
+        </ul>
+      </details>
+    </aside>
+  </section>
+
+  <!-- ================= Isbit på kloss ================= -->
+  <section id="panel-isbit" role="tabpanel" aria-labelledby="fane-isbit" class="modell" hidden>
+    <div class="scene kort">
+      <canvas id="isbit-lerret" role="img"
+              aria-label="To isbiter fra fryseren ligger på en aluminiumskloss og en treplate. Fargene viser temperatur."></canvas>
+      <p id="isbit-tid" class="tidsmaler"></p>
+      <p id="isbit-beskrivelse" class="beskrivelse" aria-live="polite"></p>
+      <h2 class="graf-tittel">Hvor mye av isen som har smeltet</h2>
+      <canvas id="isbit-graf" role="img" aria-label="Graf over andel smeltet is over tid"></canvas>
+    </div>
+
+    <aside class="panel">
+      <div id="isbit-forutsi"></div>
+
+      <section class="kort">
+        <p>To like isbiter rett fra fryseren (−18 °C). Begge klossene har ligget i rommet og er 20 °C.</p>
+        <p id="isbit-forhold" class="forhold"></p>
+        <div class="knapperad">
+          <button id="isbit-start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="isbit-nullstill" class="knapp">Nullstill</button>
+        </div>
+        <details class="mer">
+          <summary>Mer</summary>
+          <div class="kontroll">
+            <label for="isbit-fart">Fart</label>
+            <select id="isbit-fart">
+              <option value="10">10 ganger raskere</option>
+              <option value="30" selected>30 ganger raskere</option>
+              <option value="120">120 ganger raskere</option>
+              <option value="600">600 ganger raskere</option>
+            </select>
+          </div>
+        </details>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom −18 °C og 33 °C er bare ca. 10 %.</li>
+          <li>Modellen er et snitt (2D), så isbiten er egentlig en lang isstav. Den mangler endeflater og smelter derfor saktere enn en ekte isbit.</li>
+          <li>Smeltevannet renner bort med en gang, og isen synker ned mot klossen.</li>
+          <li>Lufta regnes ikke ut i detalj. Overflatene får varme med et fast tall for stille luft.</li>
+          <li>Tiden går raskere enn i virkeligheten.</li>
+        </ul>
+      </details>
+    </aside>
+  </section>
+
+  <script type="module" src="kontroller.js"></script>
+</body>
+</html>

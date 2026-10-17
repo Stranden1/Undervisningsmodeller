@@ -18,7 +18,7 @@ const TYPER = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8",
+  ".md": "text/plain; charset=utf-8", // vises som tekst i nettleseren i stedet for å lastes ned
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".jpg": "image/jpeg",

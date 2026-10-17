@@ -5,29 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Naturfagsmodeller</title>
   <link rel="stylesheet" href="felles/stil.css">
+  <style>
+    .katalog .kort { display: flex; flex-direction: column; }
+    .katalog .sporsmal { font-size: 1.05rem; color: var(--tekst); }
+    .katalog dl { margin: 0 0 var(--rom-3); font-size: 0.95rem; }
+    .katalog dt { font-weight: 700; margin-top: var(--rom-2); }
+    .katalog dd { margin: 0; color: var(--tekst-dempet); }
+    .katalog .lenker { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--rom-2); }
+    .katalog .lenker a { text-decoration: none; display: inline-flex; align-items: center; }
+    .utviklere { max-width: 1200px; margin: 0 auto; padding: 0 var(--rom-4) var(--rom-6); color: var(--tekst-dempet); font-size: 0.95rem; }
+  </style>
 </head>
 <body>
   <header class="topp">
     <h1>Naturfagsmodeller</h1>
-    <p class="ingress">Interaktive modeller for naturfag. Gjett først, se hva som skjer, og forklar hvorfor.</p>
+    <p class="ingress">Interaktive modeller for naturfag på ungdomsskolen og Vg1. Gjett først, se hva som skjer, og forklar hvorfor.</p>
   </header>
 
   <main class="katalog">
     <article class="kort">
       <h2>Varmeledning med partikler</h2>
-      <p>Hvorfor kjennes metall kaldere enn tre, selv om de har samme temperatur?</p>
-      <p><a href="modeller/varmeledning-partikler/">Åpne modellen</a></p>
+      <p class="sporsmal">Hvorfor kjennes metall kaldere enn tre, selv om de har samme temperatur?</p>
+      <dl>
+        <dt>Eleven gjør</dt>
+        <dd>Legger en finger på to klosser og ser varmen strømme ut av fingeren. Legger en isbit på aluminium og tre.</dd>
+        <dt>Misoppfatninger</dt>
+        <dd>«Metall er kaldere». «Kulde strømmer inn i hånda». «Varme og temperatur er det samme».</dd>
+      </dl>
+      <p class="lenker">
+        <a class="knapp knapp-hoved" href="modeller/varmeledning-partikler/">Åpne modellen</a>
+        <a class="knapp" href="modeller/varmeledning-partikler/README.md">Lærerveiledning</a>
+        <a class="knapp" href="eksport/varmeledning-partikler.html" download>Last ned som én fil</a>
+      </p>
     </article>
+
     <article class="kort">
       <h2>Overflate og volum</h2>
-      <p>Hvorfor smelter snø raskest på kanten, og raskere når den spres utover?</p>
-      <p><a href="modeller/overflate-og-volum/">Åpne modellen</a></p>
-    </article>
-    <article class="kort">
-      <h2>Mal for ny modell</h2>
-      <p>For utviklere: utgangspunktet hver ny modell kopieres fra.</p>
-      <p><a href="maler/ny-modell/">Åpne malen</a></p>
+      <p class="sporsmal">Hvorfor smelter snø raskest på kanten, og raskere når den deles opp eller spres utover?</p>
+      <dl>
+        <dt>Eleven gjør</dt>
+        <dd>Deler samme snømengde i flere biter eller sprer den, slår på sol eller varmt underlag, og sammenligner kurver.</dd>
+        <dt>Misoppfatninger</dt>
+        <dd>«Det er mengden som bestemmer tiden». «Varme går inn overalt like mye». «Kanten smelter fordi den er tynnere».</dd>
+      </dl>
+      <p class="lenker">
+        <a class="knapp knapp-hoved" href="modeller/overflate-og-volum/">Åpne modellen</a>
+        <a class="knapp" href="modeller/overflate-og-volum/README.md">Lærerveiledning</a>
+        <a class="knapp" href="eksport/overflate-og-volum.html" download>Last ned som én fil</a>
+      </p>
     </article>
   </main>
+
+  <footer class="utviklere">
+    <p>Ingen innlogging, ingen sporing og ingen kall til nettet. "Last ned som én fil" gir en fil som virker ved dobbeltklikk, også uten internett.</p>
+    <p>For utviklere: <a href="maler/ny-modell/">mal for ny modell</a> · <a href="docs/plan.html">plan</a> · <a href="docs/designprinsipper.md">designprinsipper</a></p>
+  </footer>
 </body>
 </html>

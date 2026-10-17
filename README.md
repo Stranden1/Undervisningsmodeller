@@ -24,12 +24,22 @@ Kjør de fysiske testene:
 node --test
 ```
 
+Lag enkeltfiler som kan deles, legges i Teams/Classroom eller åpnes uten internett
+(havner i `eksport/`):
+
+```bash
+node verktoy/lag-enkeltfil.js
+```
+
+Kjør dette på nytt hver gang en modell er endret. Filene i `eksport/` skal ikke
+redigeres for hånd.
+
 ## Modeller
 
 | Modell | Fenomen | Status |
 |---|---|---|
-| `modeller/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Klar til testing |
-| `modeller/overflate-og-volum/` | Hvorfor smelter snø raskest på kanten? | Klar til testing |
+| `modeller/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Klar til elevtesting |
+| `modeller/overflate-og-volum/` | Hvorfor smelter snø raskest på kanten? | Klar til elevtesting |
 
 Planen ligger i [`docs/plan.html`](docs/plan.html).
 
@@ -38,7 +48,7 @@ Planen ligger i [`docs/plan.html`](docs/plan.html).
 - `felles/` – stil, felles JavaScript og materialverdier (`felles/data/materialer.json`)
 - `modeller/` – én mappe per modell, med lærerveiledning i `README.md`
 - `maler/ny-modell/` – kopieres når en ny modell startes
-- `verktoy/` – lokal server og (senere) verktøy for å lage enkeltfiler
+- `verktoy/` – lokal server og verktøyet som lager enkeltfiler
 - `eksport/` – ferdige enkeltfiler som kan deles (lages av verktøyet)
 - `docs/` – plan og designprinsipper
 

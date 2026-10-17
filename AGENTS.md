@@ -65,15 +65,24 @@ Naturfagsmodeller/
 ├── felles/
 │   ├── stil.css            ← felles utseende (farger, typografi, knapper)
 │   ├── js/
+│   │   ├── varmegitter.js  ← felles varmemotor (ren fysikk, testes i Node)
+│   │   ├── data.js         ← henter materialer.json (eller innebygd kopi i enkeltfiler)
 │   │   ├── partikler.js    ← tegning av vibrerende partikler
+│   │   ├── gittertegning.js ← tegner et varmegitter: celler etter temperatur + partikler
+│   │   ├── fargeskala.js   ← temperatur → farge (blå–oransje, fargeblind-vennlig)
+│   │   ├── lerret.js       ← skarpt canvas på skjermer med høy oppløsning
 │   │   ├── graf.js         ← enkel sanntidsgraf
+│   │   ├── format.js       ← tall og tid med norsk desimalkomma
 │   │   ├── forutsi.js      ← "gjett først"-komponent
 │   │   └── tilstand.js     ← tilstand ut/inn for KI-tutor
+│   ├── tester/
+│   │   └── varmegitter.test.js ← fysiske tester for varmemotoren
 │   └── data/
 │       └── materialer.json ← materialverdier med kilder
 ├── modeller/
 │   └── <modellnavn>/
 │       ├── index.html
+│       ├── stil.css        ← bare det som gjelder denne modellen
 │       ├── modell.js
 │       ├── visning.js
 │       ├── kontroller.js
@@ -82,9 +91,13 @@ Naturfagsmodeller/
 │           └── fysikk.test.js
 ├── maler/ny-modell/        ← kopieres når en ny modell startes
 ├── verktoy/
-│   └── lag-enkeltfil.js    ← pakker en modell til én HTML-fil
+│   ├── server.js           ← lokal webserver for utvikling (node verktoy/server.js)
+│   ├── lag-enkeltfil.js    ← pakker en modell til én HTML-fil
+│   └── tester/
+│       └── lag-enkeltfil.test.js
 ├── eksport/                ← ferdige enkeltfiler (genereres, ikke rediger for hånd)
 └── docs/
+    ├── plan.html           ← plan og beslutninger
     └── designprinsipper.md
 ```
 

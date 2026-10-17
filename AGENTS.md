@@ -26,7 +26,7 @@ begreper og forkortelser kort første gang de dukker opp i en økt.
   importerer hverandre direkte i nettleseren. Build-steg = et ekstra verktøy som må kjøres
   før siden virker – det vil vi unngå.)
 - Nettlesere blokkerer ES-moduler når en fil åpnes direkte fra disken (`file://`). Under
-  utvikling kjøres derfor en enkel lokal server (f.eks. `python -m http.server` i
+  utvikling kjøres derfor en enkel lokal server (`node verktoy/server.js` i
   rotmappa, så `http://localhost:8000`). For deling og innbaking finnes et lite skript,
   `verktoy/lag-enkeltfil.js`, som pakker én modell til én selvstendig HTML-fil som
   virker ved dobbeltklikk og kan legges hvor som helst.

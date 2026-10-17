@@ -1,0 +1,77 @@
+/* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
+
+.graf-tittel {
+  font-size: 0.95rem;
+  margin: var(--rom-4) 0 var(--rom-2);
+  color: var(--tekst-dempet);
+}
+
+#graf {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.graf-knapper {
+  margin-top: var(--rom-2);
+  justify-content: flex-end;
+}
+
+.skala {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--tekst-dempet);
+  margin-top: -2px;
+}
+
+.hjelpetekst {
+  color: var(--tekst-dempet);
+  font-size: 0.9rem;
+  margin-top: var(--rom-2);
+}
+
+.kilder {
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  padding: var(--rom-2) var(--rom-3);
+  margin: 0 0 var(--rom-3);
+}
+.kilder legend {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0 var(--rom-1);
+}
+
+.avkrysning {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  margin: var(--rom-1) 0;
+}
+.avkrysning input { width: 20px; height: 20px; }
+
+.tall-hoved {
+  font-size: 1.05rem;
+  background: var(--flate-dempet);
+  border-radius: var(--radius);
+  padding: var(--rom-2) var(--rom-3);
+}
+
+.verditabell {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.verditabell th,
+.verditabell td {
+  text-align: right;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--linje);
+}
+.verditabell th:first-child,
+.verditabell td:first-child { text-align: left; }
+.verditabell tr.valgt td {
+  background: var(--aksent-lys);
+  font-weight: 700;
+}

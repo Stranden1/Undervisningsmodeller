@@ -1,0 +1,358 @@
+// Overflate og volum – knapper, valg og løkka som driver modellen.
+// Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
+
+import { lagSnoforsok, overflateOgVolum, OPPDELINGER, SNO } from "./modell.js";
+import { lagVisning, beskriv, STORRELSE } from "./visning.js";
+import { hentMaterialer } from "../../felles/js/data.js";
+import { lagForutsi } from "../../felles/js/forutsi.js";
+import { koblTilTutor } from "../../felles/js/tilstand.js";
+import { lagGraf } from "../../felles/js/graf.js";
+import { klargjorLerret } from "../../felles/js/lerret.js";
+import { formaterTid, formaterTall } from "../../felles/js/format.js";
+
+const data = await hentMaterialer();
+const $ = (id) => document.getElementById(id);
+
+const MAKS_DELSTEG = 200; // per skjermbilde
+const MAKS_KJORINGER = 6; // så mange kurver beholdes i grafen
+const MAALING_HVER = 300; // s modelltid mellom punktene i grafen
+// Fargeblind-vennlige farger (Okabe–Ito), én per oppdeling. Varmekildene vises med strek.
+const FARGE = { 1: "#0072B2", 4: "#009E73", 16: "#E69F00", 64: "#CC79A7", spredt: "#D55E00" };
+const strekFor = (sol, underlag) => (sol && underlag ? [10, 3, 2, 3] : sol ? [7, 4] : underlag ? [2, 3] : []);
+
+const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
+const visning = lagVisning(data);
+const graf = lagGraf($("graf"), {
+  xMaks: 16,
+  xFormat: (x) => formaterTall(x, 1),
+  yMin: 0,
+  yMaks: 100,
+  xTekst: "tid i modellen (timer)",
+  yTekst: "smeltet (%)",
+  serier: [],
+});
+
+const glider = $("oppdeling");
+const solValg = $("sol");
+const underlagValg = $("underlag");
+const startKnapp = $("start");
+
+const t = {
+  forsok: null,
+  forutsi: null,
+  referanse: null, // én blokk med samme varmekilder, til fasit
+  kjorer: false,
+  startet: false,
+  ferdig: false,
+  resultatVist: false,
+  fart: 3600,
+  maaltFart: 3600,
+  sisteMaaling: -Infinity,
+  serie: null, // navnet på kurven for denne kjøringen
+};
+const serieNavn = []; // i samme rekkefølge som seriene i grafen
+const kjoringer = []; // ferdige kjøringer, for tutoren
+
+function valgt() {
+  return OPPDELINGER[Number(glider.value)];
+}
+
+function kjoringsNavn() {
+  let navn = valgt().navn;
+  if (solValg.checked) navn += " + sol";
+  if (underlagValg.checked) navn += " + underlag";
+  return navn;
+}
+
+// ---------------------------------------------------------------------------
+// Tall: overflate og volum
+// ---------------------------------------------------------------------------
+
+function oppdaterTall() {
+  const id = valgt().id;
+  const blokk = overflateOgVolum("1");
+  const n = overflateOgVolum(id);
+  const forhold = n.perVolum / blokk.perVolum;
+  const perVolum = `${formaterTall(n.perVolum, 3)} cm² per cm³`;
+  let tekst;
+  if (id === "1") tekst = `Én terning med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum}.`;
+  else if (id === "spredt")
+    tekst = `Et lag som er ${n.tykkelse} cm tykt. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+  else
+    tekst = `${formaterTall(n.antall)} terninger med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+  $("tall-hoved").textContent = tekst;
+
+  const rader = OPPDELINGER.map((o) => {
+    const v = overflateOgVolum(o.id);
+    const side = v.sidekant !== null ? `${v.sidekant} cm` : `lag ${v.tykkelse} cm`;
+    const antall = o.deling !== null ? formaterTall(v.antall) : "–";
+    const kort = o.deling !== null ? String(o.deling ** 2) : "Spredt";
+    return `<tr class="${o.id === id ? "valgt" : ""}"><td>${kort}</td><td>${antall}</td><td>${side}</td><td>${formaterTall(v.overflate, 0)}</td><td>${formaterTall(v.perVolum, 3)}</td></tr>`;
+  });
+  const masse = (blokk.volum * 1e-6 * data.materialer[SNO].rho).toFixed(1).replace(".", ",");
+  $("tall-tabell").innerHTML =
+    `<caption class="kun-skjermleser">Overflate og volum for hver oppdeling</caption>` +
+    `<tr><th>Biter i snittet</th><th>Terninger</th><th>Sidekant</th><th>Overflate (cm²)</th><th>Per volum</th></tr>` +
+    rader.join("") +
+    `<tr><td colspan="5">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
+}
+
+// ---------------------------------------------------------------------------
+// Bygg et nytt forsøk
+// ---------------------------------------------------------------------------
+
+function bygg() {
+  const o = valgt();
+  t.forsok = lagSnoforsok(data, { oppdeling: o.id, sol: solValg.checked, underlag: underlagValg.checked });
+  t.referanse = null;
+  t.kjorer = t.startet = t.ferdig = t.resultatVist = false;
+  t.sisteMaaling = -Infinity;
+  t.serie = null;
+  $("oppdeling-verdi").textContent = o.navn;
+  glider.setAttribute("aria-valuetext", o.navn);
+  for (const el of [glider, solValg, underlagValg]) el.disabled = false;
+  startKnapp.disabled = true;
+  startKnapp.textContent = "Start";
+  oppdaterTall();
+
+  const sporsmal =
+    o.id === "1"
+      ? "Snøblokken er −5 °C og ligger i luft på +5 °C. Hvor begynner den å smelte?"
+      : `Samme mengde snø som én blokk, men ${o.id === "spredt" ? "spredt utover" : `delt i ${o.navn}`}. Hvor lang tid tar det før all snøen er smeltet?`;
+  const valg =
+    o.id === "1"
+      ? [
+          { id: "hjorner", tekst: "På hjørnene" },
+          { id: "sider", tekst: "Midt på sidene" },
+          { id: "overalt", tekst: "Like mye overalt" },
+        ]
+      : [
+          { id: "kortere", tekst: "Kortere tid enn én blokk" },
+          { id: "like", tekst: "Like lang tid" },
+          { id: "lengre", tekst: "Lengre tid enn én blokk" },
+        ];
+  t.forutsi = lagForutsi($("forutsi"), {
+    sporsmal,
+    valg,
+    vedLaas: (gjetning) => {
+      startKnapp.disabled = false;
+      tutor.sendHendelse("gjetning", { oppdeling: o.id, gjetning });
+    },
+  });
+  oppdaterTekst(true);
+}
+
+// ---------------------------------------------------------------------------
+// Grafen
+// ---------------------------------------------------------------------------
+
+function fjernKurve(navn) {
+  const i = serieNavn.indexOf(navn);
+  if (i < 0) return;
+  graf.fjernSerie(i);
+  serieNavn.splice(i, 1);
+}
+
+function nyKurve() {
+  const navn = kjoringsNavn();
+  fjernKurve(navn); // samme valg igjen erstatter den gamle kurven
+  while (serieNavn.length >= MAKS_KJORINGER) fjernKurve(serieNavn[0]);
+  graf.leggTilSerie({ navn, farge: FARGE[valgt().id], strek: strekFor(solValg.checked, underlagValg.checked) });
+  serieNavn.push(navn);
+  t.serie = navn;
+}
+
+function maal(tving = false) {
+  const tid = t.forsok.tid;
+  if (!tving && tid - t.sisteMaaling < MAALING_HVER) return;
+  t.sisteMaaling = tid;
+  const i = serieNavn.indexOf(t.serie);
+  if (i >= 0) graf.leggTil(i, tid / 3600, t.forsok.smeltetAndel() * 100);
+}
+
+// ---------------------------------------------------------------------------
+// Fasit
+// ---------------------------------------------------------------------------
+
+function sjekkResultat() {
+  if (t.resultatVist) return;
+  const f = t.forsok;
+  const gjetning = t.forutsi.gjetning();
+  if (f.oppdeling === "1") {
+    if (f.hjorneNullVed === null && f.midtNullVed === null) return;
+    let fasit = "overalt";
+    if (f.midtNullVed === null || f.hjorneNullVed < f.midtNullVed) fasit = "hjorner";
+    else if (f.hjorneNullVed === null || f.midtNullVed < f.hjorneNullVed) fasit = "sider";
+    t.resultatVist = true;
+    t.forutsi.visResultat(
+      fasit,
+      fasit === "hjorner"
+        ? "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde."
+        : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?"
+    );
+    tutor.sendHendelse("resultat", { oppdeling: "1", fasit, gjetning });
+    return;
+  }
+  if (f.smeltetVed === null || !t.referanse || t.referanse.smeltetVed === null) return;
+  const forhold = f.smeltetVed / t.referanse.smeltetVed;
+  const fasit = forhold < 0.95 ? "kortere" : forhold > 1.05 ? "lengre" : "like";
+  const overflate = overflateOgVolum(f.oppdeling).perVolum / overflateOgVolum("1").perVolum;
+  t.resultatVist = true;
+  t.forutsi.visResultat(
+    fasit,
+    `${valgt().navn}: ${formaterTid(f.smeltetVed)}. Én blokk med samme varmekilder: ${formaterTid(t.referanse.smeltetVed)}. ` +
+      `Samme mengde snø, men ${formaterTall(overflate, 1)} ganger så mye overflate per volum. Varmen kommer inn gjennom overflaten, så mer overflate gir raskere smelting.`
+  );
+  tutor.sendHendelse("resultat", { oppdeling: f.oppdeling, fasit, gjetning });
+}
+
+// ---------------------------------------------------------------------------
+// Tekst
+// ---------------------------------------------------------------------------
+
+function oppdaterTekst(beskrivOgsa = false) {
+  const fartTekst = { 600: "10 min", 3600: "1 time", 14400: "4 timer" }[t.fart] ?? formaterTid(t.fart);
+  let tekst = `Tid i modellen: ${formaterTid(t.forsok.tid)} · 1 s på skjermen = ${fartTekst} i modellen`;
+  if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
+    tekst += ` (maskinen klarer bare ca. ${formaterTid(t.maaltFart)} nå)`;
+  }
+  $("tid").textContent = tekst;
+  if (beskrivOgsa) {
+    const b = beskriv(t.forsok);
+    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Knapper og valg
+// ---------------------------------------------------------------------------
+
+startKnapp.addEventListener("click", () => {
+  if (!t.forutsi.erLaast() || t.ferdig) return;
+  if (!t.startet) {
+    t.startet = true;
+    for (const el of [glider, solValg, underlagValg]) el.disabled = true;
+    nyKurve();
+    maal(true);
+    if (t.forsok.oppdeling !== "1") {
+      t.referanse = lagSnoforsok(data, { oppdeling: "1", sol: solValg.checked, underlag: underlagValg.checked });
+    }
+  }
+  t.kjorer = !t.kjorer;
+  t.maaltFart = t.fart;
+  startKnapp.textContent = t.kjorer ? "Pause" : "Fortsett";
+  oppdaterTekst(true);
+  tutor.sendHendelse(t.kjorer ? "start" : "pause", { oppdeling: t.forsok.oppdeling });
+});
+
+$("nullstill").addEventListener("click", () => {
+  if (t.startet && !t.ferdig && t.serie) fjernKurve(t.serie);
+  bygg();
+  graf.tegn();
+  tutor.sendHendelse("nullstill");
+});
+
+$("tom-graf").addEventListener("click", () => {
+  graf.tomAlt();
+  serieNavn.length = 0;
+  if (t.startet && !t.ferdig) {
+    nyKurve();
+    maal(true);
+  }
+  graf.tegn();
+});
+
+for (const el of [glider, solValg, underlagValg]) {
+  el.addEventListener("input", () => {
+    if (t.startet && !t.ferdig) return;
+    bygg();
+    tutor.sendHendelse("valg", { oppdeling: valgt().id, sol: solValg.checked, underlag: underlagValg.checked });
+  });
+}
+
+$("fart").addEventListener("change", (e) => {
+  t.fart = Number(e.target.value);
+  t.maaltFart = t.fart;
+  oppdaterTekst();
+});
+
+// ---------------------------------------------------------------------------
+// KI-tutor
+// ---------------------------------------------------------------------------
+
+const tutor = koblTilTutor({
+  modell: "overflate-og-volum",
+  hent: () => ({
+    oppdeling: valgt().id,
+    sol: solValg.checked,
+    underlag: underlagValg.checked,
+    gjetning: t.forutsi.gjetning(),
+    kjorer: t.kjorer,
+    ferdig: t.ferdig,
+    overflatePerVolum: overflateOgVolum(valgt().id).perVolum,
+    forsok: t.forsok.tilstand(),
+    kjoringer,
+  }),
+  sett: (ny) => {
+    if (t.startet && !t.ferdig) return;
+    const i = OPPDELINGER.findIndex((o) => o.id === ny.oppdeling);
+    if (i >= 0) glider.value = String(i);
+    if (typeof ny.sol === "boolean") solValg.checked = ny.sol;
+    if (typeof ny.underlag === "boolean") underlagValg.checked = ny.underlag;
+    bygg();
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Løkka
+// ---------------------------------------------------------------------------
+
+let forrige = null;
+let animTid = 0;
+let sisteTekst = 0;
+let sisteBeskrivelse = 0;
+
+function animer(naa) {
+  const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);
+  forrige = naa;
+  animTid += dtEkte;
+
+  if (t.kjorer && dtEkte > 0) {
+    const simulert = t.forsok.stegMedBudsjett(dtEkte * t.fart, MAKS_DELSTEG);
+    t.maaltFart = 0.9 * t.maaltFart + 0.1 * (simulert / dtEkte);
+    // Referanseblokken regnes ferdig i bakgrunnen, litt hvert bilde.
+    if (t.referanse && t.referanse.smeltetVed === null) t.referanse.steg(1800);
+    maal();
+    sjekkResultat();
+    if (t.forsok.smeltetVed !== null) {
+      maal(true);
+      t.kjorer = false;
+      t.ferdig = true;
+      startKnapp.textContent = "Ferdig";
+      startKnapp.disabled = true;
+      for (const el of [glider, solValg, underlagValg]) el.disabled = false;
+      kjoringer.push({ navn: t.serie, smeltetid: Math.round(t.forsok.smeltetVed) });
+      oppdaterTekst(true);
+      tutor.sendHendelse("ferdig", { navn: t.serie, smeltetid: Math.round(t.forsok.smeltetVed) });
+    }
+    graf.tegn();
+  } else if (t.ferdig && !t.resultatVist) {
+    // Referansen kan bli ferdig etter at kjøringen er ferdig.
+    if (t.referanse && t.referanse.smeltetVed === null) t.referanse.steg(1800);
+    sjekkResultat();
+  }
+
+  visning.tegn(ctx, t.forsok, { tid: animTid });
+
+  if (animTid - sisteTekst > 0.2) {
+    sisteTekst = animTid;
+    const beskrivOgsa = animTid - sisteBeskrivelse > 4;
+    if (beskrivOgsa) sisteBeskrivelse = animTid;
+    oppdaterTekst(beskrivOgsa);
+  }
+  requestAnimationFrame(animer);
+}
+
+bygg();
+graf.tegn();
+requestAnimationFrame(animer);

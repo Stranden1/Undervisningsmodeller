@@ -300,6 +300,17 @@ test("varmestromMellom gir k-snitt · temperaturforskjell, fra varm til kald", (
   assert.ok(g.varmestromMellom(1, 0, 0, 0) < 0);
 });
 
+test("Underlag med fast temperatur: celle ender på underlagets temperatur, og regnskapet stemmer", () => {
+  const g = lagVarmegitter({ nx: 1, ny: 1, dx: 1e-2, data, h: 0 });
+  g.settCelle(0, 0, "aluminium", 0);
+  g.settUnderlag(0, 0, 30);
+  const start = g.totalEnergi();
+  g.steg(5000);
+  assert.ok(Math.abs(g.temperatur(0, 0) - 30) < 1e-6);
+  assert.ok(Math.abs(g.totalEnergi() - start - g.energiregnskap.underlag) < 1e-9);
+  assert.equal(g.antallLuftflater(0, 0), 3, "undersiden vender mot underlaget, ikke luft");
+});
+
 test("Ukjent materiale gir tydelig feil", () => {
   const g = lagVarmegitter({ nx: 2, ny: 2, dx: 1e-3, data });
   assert.throws(() => g.settCelle(0, 0, "unobtainium", 20), /Ukjent materiale/);

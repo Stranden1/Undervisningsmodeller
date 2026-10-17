@@ -1,24 +1,15 @@
 // Varmeledning med partikler – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
 import { temperaturFarge, tegnFargeskala } from "../../felles/js/fargeskala.js";
-import { lagPartikler, tegnPartikler } from "../../felles/js/partikler.js";
+import { tegnPartikler } from "../../felles/js/partikler.js";
+import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../felles/js/gittertegning.js";
+import { formaterGrader, formaterTid } from "../../felles/js/format.js";
 import { TA_PAA_GEOMETRI, ISBIT_GEOMETRI } from "./modell.js";
+
+export { formaterTid };
 
 export const TA_PAA_STORRELSE = { bredde: 760, hoyde: 370 };
 export const ISBIT_STORRELSE = { bredde: 760, hoyde: 330 };
-
-// Partikkelfarge per materiale, så elevene ser hva som er hva.
-const PARTIKKELFARGE = {
-  kobber: "rgba(122,62,29,0.8)",
-  aluminium: "rgba(61,68,80,0.8)",
-  rustfritt_stal: "rgba(61,68,80,0.8)",
-  glass: "rgba(47,111,115,0.8)",
-  tre: "rgba(107,74,43,0.8)",
-  isopor: "rgba(110,115,124,0.7)",
-  hud: "rgba(138,75,59,0.8)",
-  is: "rgba(43,79,122,0.8)",
-  vann: "rgba(43,79,122,0.6)",
-};
 
 export function materialNavn(data, nokkel) {
   return data.materialer[nokkel]?.navn ?? nokkel;
@@ -30,41 +21,9 @@ function navnISetning(data, nokkel) {
   return navn.charAt(0).toLowerCase() + navn.slice(1);
 }
 
-function formaterGrader(T, desimaler = 1) {
-  return `${T.toFixed(desimaler).replace(".", ",")} °C`;
-}
-
 // ---------------------------------------------------------------------------
-// Felles: tegn cellene i et gitter og partiklene oppå
+// Felles: piler for varmestrøm
 // ---------------------------------------------------------------------------
-
-/** Partikkelplasser: én partikkel per 2 × 2 celler. */
-function partiklerFor(gitter, celle, x0, y0, fro) {
-  const plasser = [];
-  for (let y = 0; y + 1 < gitter.ny; y += 2) {
-    for (let x = 0; x + 1 < gitter.nx; x += 2) {
-      plasser.push({ x: x0 + (x + 1) * celle, y: y0 + (y + 1) * celle, cx: x, cy: y });
-    }
-  }
-  return lagPartikler(plasser, fro);
-}
-
-function tegnCeller(ctx, gitter, x0, y0, celle, forskyvning = () => 0) {
-  for (let y = 0; y < gitter.ny; y++) {
-    for (let x = 0; x < gitter.nx; x++) {
-      const T = gitter.temperatur(x, y);
-      if (T === null) continue;
-      ctx.fillStyle = temperaturFarge(T);
-      // +0.5 gir ingen hårfine sprekker mellom cellene
-      ctx.fillRect(x0 + x * celle, y0 + y * celle + forskyvning(y), celle + 0.5, celle + 0.5);
-      const andel = gitter.smeltetAndel(x, y);
-      if (andel > 0 && gitter.materiale(x, y) === "is") {
-        ctx.fillStyle = `rgba(40,110,190,${0.15 + 0.45 * andel})`;
-        ctx.fillRect(x0 + x * celle, y0 + y * celle + forskyvning(y), celle + 0.5, celle + 0.5);
-      }
-    }
-  }
-}
 
 function tegnPil(ctx, x, y1, y2, bredde) {
   ctx.strokeStyle = "#b35c00";
@@ -105,7 +64,7 @@ export function lagTaPaaVisning(data) {
   function tegn(ctx, taPaa, { berort, tid }) {
     const { bredde, hoyde } = TA_PAA_STORRELSE;
     ctx.clearRect(0, 0, bredde, hoyde);
-    if (!partikler) partikler = taPaa.scener.map((s, i) => partiklerFor(s.gitter, TP_CELLE, 0, 0, 7 + i));
+    if (!partikler) partikler = taPaa.scener.map((s, i) => lagGitterPartikler(s.gitter, TP_CELLE, 7 + i));
     const loft = berort ? 0 : 28; // fingeren svever over klossen før start
 
     taPaa.scener.forEach((scene, i) => {
@@ -201,7 +160,7 @@ export function lagIsbitVisning(data) {
   function tegn(ctx, isbit, { tid }) {
     const { bredde, hoyde } = ISBIT_STORRELSE;
     ctx.clearRect(0, 0, bredde, hoyde);
-    if (!partikler) partikler = isbit.scener.map((s, i) => partiklerFor(s.gitter, IB_CELLE, 0, 0, 3 + i));
+    if (!partikler) partikler = isbit.scener.map((s, i) => lagGitterPartikler(s.gitter, IB_CELLE, 3 + i));
 
     isbit.scener.forEach((scene, i) => {
       const x0 = sceneX(i);
@@ -285,13 +244,4 @@ export function beskrivIsbit(data, isbit) {
       : `isbiten på ${navn} er ${Math.round(s.smeltetAndel() * 100)} % smeltet`;
   });
   return `Etter ${formaterTid(isbit.tid)}: ${deler.join(", ")}.`;
-}
-
-/** "4 min 12 s" */
-export function formaterTid(s) {
-  const min = Math.floor(s / 60);
-  const sek = Math.floor(s % 60);
-  if (min === 0) return `${sek} s`;
-  if (min < 60) return `${min} min ${sek} s`;
-  return `${Math.floor(min / 60)} t ${min % 60} min`;
 }

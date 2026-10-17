@@ -89,12 +89,15 @@ export function lagVarmegitter({
   const laast = new Uint8Array(N); // 1 = temperaturen holdes fast (f.eks. blod i hånda)
   const laastT = new Float64Array(N);
   const effekt = new Float64Array(N); // ytre tilført effekt (W), f.eks. sol
+  // Underlag med fast temperatur under en plass i gitteret (f.eks. varm bakke).
+  // Hører til plassen, ikke til cellen: flytter en celle seg ned dit, får den kontakt.
+  const underlagT = new Float64Array(N).fill(NaN);
 
   let tid = 0;
   let dtMaksCache = null;
   // Energiregnskap: energi inn utenfra (luft, effekt, låste celler) og energi i fjernede
   // celler, for å kunne sjekke bevaring.
-  const regnskap = { luft: 0, effekt: 0, laast: 0, fjernet: 0 };
+  const regnskap = { luft: 0, effekt: 0, laast: 0, underlag: 0, fjernet: 0 };
 
   // ---------- Hjelpefunksjoner ----------
 
@@ -168,7 +171,8 @@ export function lagVarmegitter({
         if (x === 0 ? kantErLuft : mat[i - 1] === TOM) n++;
         if (x === nx - 1 ? kantErLuft : mat[i + 1] === TOM) n++;
         if (y === 0 ? kantErLuft : mat[i - nx] === TOM) n++;
-        if (y === ny - 1 ? kantErLuft : mat[i + nx] === TOM) n++;
+        // Har plassen et underlag, er undersiden ikke mot luft.
+        if (Number.isNaN(underlagT[i]) && (y === ny - 1 ? kantErLuft : mat[i + nx] === TOM)) n++;
         luftFlater[i] = n;
       }
     }
@@ -202,6 +206,7 @@ export function lagVarmegitter({
         if (h > 0 && luftFlater[i] > 0) {
           sumG += (1 / (1 / h + dx / (2 * ki))) * flateAreal * luftFlater[i];
         }
+        if (!Number.isNaN(underlagT[i])) sumG += 2 * ki * dybde;
         if (sumG > 0) {
           const C = Lcelle[i] > 0 ? Math.min(Cfast[i], Cflyt[i]) : Cfast[i];
           minst = Math.min(minst, C / sumG);
@@ -272,6 +277,12 @@ export function lagVarmegitter({
         const q = luftLedning(i) * (luftTemperatur - T[i]) * dt;
         H[i] += q;
         regnskap.luft += q;
+      }
+      // Underlag med fast temperatur: perfekt kontakt, halv celle med ledning.
+      if (!Number.isNaN(underlagT[i])) {
+        const q = 2 * k[i] * dybde * (underlagT[i] - T[i]) * dt;
+        H[i] += q;
+        regnskap.underlag += q;
       }
       // Ytre effekt (sol, varmeplate ...)
       if (effekt[i] !== 0) {
@@ -391,6 +402,12 @@ export function lagVarmegitter({
     },
 
     /** Ytre effekt inn i en celle, i watt (f.eks. sol på oversiden). */
+    /** Legg et underlag med fast temperatur under plassen (x, y). null fjerner det. */
+    settUnderlag(x, y, temperatur) {
+      underlagT[idx(x, y)] = temperatur === null ? NaN : temperatur;
+      geometriEndret();
+    },
+
     settEffekt(x, y, watt) {
       effekt[idx(x, y)] = watt;
     },
@@ -455,7 +472,7 @@ export function lagVarmegitter({
       return sum;
     },
 
-    /** Energi inn utenfra siden start (J): luft, effekt, låste celler – og energi i fjernede celler (fjernet). */
+    /** Energi inn utenfra siden start (J): luft, effekt, låste celler, underlag – og energi i fjernede celler (fjernet). */
     get energiregnskap() {
       return { ...regnskap };
     },

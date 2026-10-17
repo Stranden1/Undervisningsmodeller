@@ -17,7 +17,9 @@
   "konstanter": {
     "smeltevarme_is": { "verdi": 334000, "enhet": "J/kg", "kilde": "standard tabellverdi" },
     "hudtemperatur":  { "verdi": 33,     "enhet": "°C",   "kilde": "typisk overflatetemperatur på hånd" },
-    "h_stille_luft":  { "verdi": 10,     "enhet": "W/m²·K", "kilde": "varmeovergangstall mot stille luft innendørs: ca. 5 fra naturlig konveksjon + ca. 5 fra varmestråling; ekte verdier ca. 5–25 avhengig av trekk. Valgt 2026-10-17." }
+    "h_stille_luft":  { "verdi": 10,     "enhet": "W/m²·K", "kilde": "varmeovergangstall mot stille luft innendørs: ca. 5 fra naturlig konveksjon + ca. 5 fra varmestråling; ekte verdier ca. 5–25 avhengig av trekk. Valgt 2026-10-17." },
+    "solinnstraling_var": { "verdi": 500, "enhet": "W/m²", "kilde": "Sol på horisontal flate midt på dagen en solrik vårdag. PVGIS 5.3 (EU JRC, database PVGIS-SARAH3), Oslo 59,91° N 10,75° Ø, april: gjennomsnittsdag (med skyer) har inntil 463 W/m² kl. 11–12 UTC; klarvær gir mer. Avrundet til 500. https://re.jrc.ec.europa.eu/pvg_tools/" },
+    "sol_tatt_opp_sno":   { "verdi": 0.20, "enhet": "andel",  "kilde": "Andel av sollyset snøen tar opp (1 − albedo). NSIDC: snødekke reflekterer opptil 90 %, smeltende snø ca. 75 %, altså 10–25 % tatt opp. 20 % valgt for pakket snø. https://nsidc.org/learn/parts-cryosphere/sea-ice/science-sea-ice" }
   },
   "valideringsmal": {
     "_om": "Beregnet kontakttemperatur når hud (33 °C) berører materiale på 20 °C. Partikkel-/gittermodellen bør havne nær disse tallene like etter berøring.",

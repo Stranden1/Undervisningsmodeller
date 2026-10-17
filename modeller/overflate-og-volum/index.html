@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overflate og volum</title>
+  <link rel="stylesheet" href="../../felles/stil.css">
+  <link rel="stylesheet" href="stil.css">
+</head>
+<body>
+  <header class="topp">
+    <a class="tilbake" href="../../index.html">← Alle modeller</a>
+    <h1>Overflate og volum</h1>
+    <p class="ingress">Hvorfor smelter snø raskest på kanten, og raskere når den deles opp eller spres utover?</p>
+  </header>
+
+  <main class="modell">
+    <div class="scene kort">
+      <canvas id="lerret" role="img"
+              aria-label="Snø i luft på 5 grader. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
+      <p id="tid" class="tidsmaler"></p>
+      <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+      <h2 class="graf-tittel">Hvor mye av snøen som har smeltet</h2>
+      <canvas id="graf" role="img" aria-label="Graf over andel smeltet snø over tid, én kurve per kjøring"></canvas>
+      <div class="knapperad graf-knapper">
+        <button id="tom-graf" class="knapp">Tøm grafen</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div id="forutsi"></div>
+
+      <section class="kort">
+        <div class="kontroll">
+          <label for="oppdeling">Samme snø <output id="oppdeling-verdi"></output></label>
+          <input id="oppdeling" type="range" min="0" max="4" step="1" value="0" list="oppdeling-merker"
+                 aria-describedby="oppdeling-forklaring">
+          <datalist id="oppdeling-merker">
+            <option value="0"></option><option value="1"></option><option value="2"></option>
+            <option value="3"></option><option value="4"></option>
+          </datalist>
+          <div class="skala" aria-hidden="true">
+            <span>1</span><span>4</span><span>16</span><span>64</span><span>spredt</span>
+          </div>
+          <p id="oppdeling-forklaring" class="hjelpetekst">Massen er alltid den samme.</p>
+        </div>
+
+        <fieldset class="kilder">
+          <legend>Varme inn fra</legend>
+          <label class="avkrysning"><input type="checkbox" checked disabled> Luft (+5 °C)</label>
+          <label class="avkrysning"><input type="checkbox" id="sol"> Sol på oversiden</label>
+          <label class="avkrysning"><input type="checkbox" id="underlag"> Varmt underlag (+5 °C)</label>
+        </fieldset>
+
+        <div class="knapperad">
+          <button id="start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="nullstill" class="knapp">Nullstill</button>
+        </div>
+        <details class="mer">
+          <summary>Mer</summary>
+          <div class="kontroll">
+            <label for="fart">Fart</label>
+            <select id="fart">
+              <option value="600">1 s = 10 min i modellen</option>
+              <option value="3600" selected>1 s = 1 time i modellen</option>
+              <option value="14400">1 s = 4 timer i modellen</option>
+            </select>
+          </div>
+        </details>
+      </section>
+
+      <section class="kort" aria-labelledby="tall-tittel">
+        <h2 id="tall-tittel">Overflate og volum</h2>
+        <p id="tall-hoved" class="tall-hoved"></p>
+        <table class="verditabell" id="tall-tabell"></table>
+        <p class="hjelpetekst">Tallene gjelder ekte terninger med samme sidekant. Snittet på skjermen viser bare ett lag, så der ser du færre biter.</p>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom −5 °C og 0 °C er bare ca. 1 %.</li>
+          <li>Modellen er et snitt (2D), så bitene er egentlig lange staver. Når sidekanten halveres, blir det 8 terninger i virkeligheten, men 4 biter i snittet.</li>
+          <li>Bitene ligger på rister med luft rundt. Med varmt underlag ligger hver bit på et underlag som holder +5 °C.</li>
+          <li>Sola skinner rett ovenfra på hver bit. Skygge fra andre biter regnes ikke med.</li>
+          <li>Smeltevannet renner bort med en gang, og snøen over synker ned.</li>
+          <li>Lufta er stille (ingen vind), og regnes ikke ut i detalj.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <script type="module" src="kontroller.js"></script>
+</body>
+</html>

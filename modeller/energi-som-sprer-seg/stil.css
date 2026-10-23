@@ -72,8 +72,8 @@
 }
 /* Samme farger som i grafen (Okabe–Ito, fargeblind-vennlige). */
 .fyll.total { background: #1f2328; }
-.fyll.kloss { background: #D55E00; }
-.fyll.vann { background: #0072B2; }
+.fyll.del1 { background: var(--del1-farge, #D55E00); }
+.fyll.del2 { background: var(--del2-farge, #0072B2); }
 .fyll.arbeid { background: #009E73; }
 
 @media (prefers-reduced-motion: reduce) {

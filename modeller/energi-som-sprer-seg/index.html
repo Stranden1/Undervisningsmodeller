@@ -11,17 +11,22 @@
   <header class="topp">
     <a class="tilbake" href="../../index.html">← Alle modeller</a>
     <h1>Energi som sprer seg</h1>
-    <p class="ingress">En varm kloss legges i kaldt vann. Hvor blir det av energien når klossen blir kald?</p>
+    <p class="ingress">Hvor blir det av energien når noe varmt blir kaldt – og hva skjer med kvaliteten?</p>
   </header>
 
-  <main class="modell">
+  <div class="faner" role="tablist" aria-label="Velg forsøk">
+    <button role="tab" id="fane-kloss" aria-selected="true" aria-controls="panel">Varm kloss</button>
+    <button role="tab" id="fane-dyppekoker" aria-selected="false" aria-controls="panel" tabindex="-1">Dyppekoker</button>
+  </div>
+
+  <main id="panel" class="modell" role="tabpanel" aria-labelledby="fane-kloss">
     <div class="scene kort">
       <canvas id="lerret" role="img"
-              aria-label="En kobberkloss midt i vann i et lukket kar. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
+              aria-label="Et lukket kar med vann. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
       <p id="tid" class="tidsmaler"></p>
       <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
       <h2 class="graf-tittel">Energiregnskapet over tid</h2>
-      <canvas id="graf" role="img" aria-label="Graf over varmen i karet, i klossen, i vannet og hvor mye som kan gjøre arbeid, over tid"></canvas>
+      <canvas id="graf" role="img" aria-label="Graf over energiregnskapet over tid: energien i alt, hvor den er, og hvor mye som kan gjøre arbeid"></canvas>
     </div>
 
     <aside class="panel">
@@ -32,11 +37,11 @@
           <label for="vannmengde">Vannmengde</label>
           <select id="vannmengde"></select>
         </div>
-        <div class="kontroll">
+        <div class="kontroll" id="klosst-kontroll">
           <label for="klosst">Klossens temperatur <output id="klosst-verdi"></output></label>
           <input id="klosst" type="range" min="40" max="90" step="5" value="90">
         </div>
-        <p class="hjelpetekst">Vannet er alltid 10 °C ved start. Karet er isolert: ingen varme går inn eller ut.</p>
+        <p class="hjelpetekst" id="oppsett-tekst"></p>
 
         <div class="knapperad">
           <button id="start" class="knapp knapp-hoved" disabled>Start</button>
@@ -58,22 +63,22 @@
 
       <section class="kort" aria-labelledby="regnskap-tittel">
         <h2 id="regnskap-tittel">Energiregnskap</h2>
-        <p class="hjelpetekst forste">100 % = varmen klossen hadde ved start.</p>
+        <p class="hjelpetekst forste" id="hundre-tekst"></p>
         <div class="soyler" id="soyler">
           <div class="soyle hoved">
-            <span class="navn">Varme i karet</span>
+            <span class="navn" id="navn-total"></span>
             <span class="spor"><span id="soyle-total" class="fyll total"></span></span>
             <span id="tall-total" class="tall verdi"></span>
           </div>
           <div class="soyle under">
-            <span class="navn">i klossen</span>
-            <span class="spor"><span id="soyle-kloss" class="fyll kloss"></span></span>
-            <span id="tall-kloss" class="tall verdi"></span>
+            <span class="navn" id="navn-del1"></span>
+            <span class="spor"><span id="soyle-del1" class="fyll del1"></span></span>
+            <span id="tall-del1" class="tall verdi"></span>
           </div>
           <div class="soyle under">
-            <span class="navn">i vannet</span>
-            <span class="spor"><span id="soyle-vann" class="fyll vann"></span></span>
-            <span id="tall-vann" class="tall verdi"></span>
+            <span class="navn" id="navn-del2"></span>
+            <span class="spor"><span id="soyle-del2" class="fyll del2"></span></span>
+            <span id="tall-del2" class="tall verdi"></span>
           </div>
           <div class="soyle hoved">
             <span class="navn">Kan gjøre arbeid</span>
@@ -97,6 +102,7 @@
           <li>Modellen er et snitt (2D) gjennom karet, 4 mm tykt. Derfor vises energien i prosent, ikke i joule.</li>
           <li>Karet er perfekt isolert. Et ekte kar slipper ut litt varme hele tiden.</li>
           <li>«Kan gjøre arbeid» gjelder en tenkt, perfekt maskin. Ekte maskiner får ut mye mindre.</li>
+          <li><strong>Dyppekokeren er svak.</strong> En ekte dyppekoker får vannet til å koke. Her er effekten valgt så ingenting blir over ca. 75 °C, fordi koking ikke er med i modellen. Energien er den samme som kobberklossen på 90 °C har.</li>
         </ul>
       </details>
     </aside>

@@ -1,0 +1,2729 @@
+<!doctype html>
+<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/energi-som-sprer-seg/ (2026-10-23). Ikke rediger for hånd. -->
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Energi som sprer seg</title>
+  <style>
+/* Felles utseende for alle naturfagsmodeller.
+   Rolig og rent: modellen skal få oppmerksomheten, ikke pynten.
+   Fargene er valgt slik at de kan skilles også ved fargeblindhet
+   (blå–oransje i stedet for rød–grønn). */
+
+:root {
+  /* Flater og tekst */
+  --bakgrunn: #f7f6f2;
+  --flate: #ffffff;
+  --flate-dempet: #efede6;
+  --tekst: #1f2328;
+  --tekst-dempet: #5b616b;
+  --linje: #d8d5cc;
+
+  /* Handling og fokus */
+  --aksent: #1f5fa8;
+  --aksent-mork: #17487f;
+  --aksent-lys: #e3ecf7;
+  --fokus: #f2a900;
+
+  /* Betydningsfarger (fargeblind-vennlige) */
+  --kald: #2b6cb0;      /* blå */
+  --varm: #d9730d;      /* oransje */
+  --noytral: #7a7f87;
+  --advarsel-bg: #fff6e0;
+  --advarsel-linje: #e0b44a;
+
+  /* Typografi – systemfonter, ingen nedlasting */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-tall: ui-monospace, "SF Mono", Consolas, "Roboto Mono", monospace;
+
+  /* Avstand og form */
+  --rom-1: 4px;
+  --rom-2: 8px;
+  --rom-3: 12px;
+  --rom-4: 16px;
+  --rom-5: 24px;
+  --rom-6: 32px;
+  --radius: 8px;
+  --skygge: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* hidden skal alltid skjule, også elementer som har display: grid fra en klasse */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  font-size: 17px;
+}
+
+body {
+  margin: 0;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0 0 var(--rom-3);
+}
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1rem; }
+
+p { margin: 0 0 var(--rom-3); }
+
+a { color: var(--aksent); }
+
+/* ---------- Sideoppsett ---------- */
+
+.topp {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rom-4) var(--rom-4) var(--rom-3);
+}
+
+.topp .tilbake {
+  display: inline-block;
+  margin-bottom: var(--rom-2);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+  text-decoration: none;
+}
+.topp .tilbake:hover { text-decoration: underline; }
+
+.ingress {
+  font-size: 1.1rem;
+  color: var(--tekst-dempet);
+  max-width: 60ch;
+}
+
+/* Modellside: scene til venstre, panel til høyre. Stables på smal skjerm. */
+.modell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--rom-4) var(--rom-6);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--rom-4);
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .modell { grid-template-columns: minmax(0, 1fr); }
+}
+
+.kort {
+  background: var(--flate);
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  box-shadow: var(--skygge);
+  padding: var(--rom-4);
+}
+
+.scene canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--flate);
+  border-radius: calc(var(--radius) - 2px);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rom-4);
+}
+
+/* Tekstbeskrivelse av hva som skjer (leses også av skjermleser) */
+.beskrivelse {
+  margin: var(--rom-3) 0 0;
+  color: var(--tekst-dempet);
+  font-size: 0.95rem;
+  min-height: 1.5em;
+}
+
+/* Skjult for øynene, men lest av skjermleser */
+.kun-skjermleser {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Knapper ---------- */
+
+.knapp {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: var(--rom-2) var(--rom-4);
+  min-height: 44px; /* stort nok for fingre på iPad */
+  border-radius: var(--radius);
+  border: 1px solid var(--linje);
+  background: var(--flate);
+  color: var(--tekst);
+  cursor: pointer;
+}
+.knapp:hover { background: var(--flate-dempet); }
+
+.knapp-hoved {
+  background: var(--aksent);
+  border-color: var(--aksent);
+  color: #fff;
+}
+.knapp-hoved:hover { background: var(--aksent-mork); }
+
+.knapp:disabled,
+.knapp[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.knapperad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rom-2);
+}
+
+:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 2px;
+}
+
+/* ---------- Glidebrytere og valg ---------- */
+
+.kontroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rom-1);
+  margin-bottom: var(--rom-3);
+}
+
+.kontroll label,
+.kontroll .etikett {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rom-2);
+}
+
+.kontroll output {
+  font-family: var(--font-tall);
+  font-weight: 400;
+  color: var(--tekst-dempet);
+}
+
+input[type="range"] {
+  width: 100%;
+  min-height: 32px;
+  accent-color: var(--aksent);
+}
+
+select {
+  font: inherit;
+  padding: var(--rom-2);
+  min-height: 44px;
+  border-radius: var(--radius);
+  border: 1px solid var(--linje);
+  background: var(--flate);
+}
+
+/* Avanserte valg skjules bak "Mer" */
+.mer > summary {
+  cursor: pointer;
+  color: var(--tekst-dempet);
+  font-size: 0.95rem;
+}
+
+/* ---------- Faner ---------- */
+
+.faner {
+  display: flex;
+  gap: var(--rom-1);
+  border-bottom: 1px solid var(--linje);
+  max-width: 1200px;
+  margin: 0 auto var(--rom-4);
+  padding: 0 var(--rom-4);
+}
+
+.faner [role="tab"] {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--rom-2) var(--rom-4);
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--tekst-dempet);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.faner [role="tab"][aria-selected="true"] {
+  background: var(--flate);
+  border-color: var(--linje);
+  color: var(--tekst);
+}
+
+/* ---------- Forutsi først ---------- */
+
+.forutsi {
+  background: var(--aksent-lys);
+  border: 1px solid #c3d4ea;
+  border-radius: var(--radius);
+  padding: var(--rom-4);
+}
+
+.forutsi fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.forutsi legend {
+  font-weight: 700;
+  margin-bottom: var(--rom-2);
+  padding: 0;
+}
+
+.forutsi .valg {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  padding: var(--rom-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.forutsi .valg:hover { background: rgba(255, 255, 255, 0.6); }
+
+.forutsi input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--aksent);
+}
+
+.forutsi .laast {
+  font-weight: 600;
+}
+
+.sammenligning {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--rom-1) var(--rom-3);
+  margin-top: var(--rom-3);
+}
+.sammenligning dt { color: var(--tekst-dempet); }
+.sammenligning dd { margin: 0; font-weight: 600; }
+
+/* ---------- Tall ---------- */
+
+.tall {
+  font-family: var(--font-tall);
+  font-variant-numeric: tabular-nums;
+}
+
+.tallrad {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rom-3);
+  padding: var(--rom-1) 0;
+  border-bottom: 1px dashed var(--linje);
+}
+.tallrad:last-child { border-bottom: none; }
+
+/* Simulert tid i forhold til ekte tid */
+.tidsmaler {
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
+/* ---------- Hva modellen forenkler ---------- */
+
+.forenkler {
+  background: var(--advarsel-bg);
+  border: 1px solid var(--advarsel-linje);
+  border-radius: var(--radius);
+  padding: var(--rom-3) var(--rom-4);
+}
+.forenkler > summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+.forenkler ul {
+  margin: var(--rom-2) 0 0;
+  padding-left: 1.2em;
+}
+.forenkler li { margin-bottom: var(--rom-1); }
+
+/* ---------- Katalog (index.html) ---------- */
+
+.katalog {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--rom-4) var(--rom-6);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--rom-4);
+}
+
+.katalog .kort h2 { margin-bottom: var(--rom-2); }
+.katalog .kort p { color: var(--tekst-dempet); }
+
+/* Mindre bevegelse for dem som har bedt om det */
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
+
+</style>
+  <style>
+/* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
+
+.graf-tittel {
+  font-size: 0.95rem;
+  margin: var(--rom-4) 0 var(--rom-2);
+  color: var(--tekst-dempet);
+}
+
+#graf {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.kontroll select {
+  font: inherit;
+  padding: var(--rom-1) var(--rom-2);
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  background: var(--flate);
+}
+
+.hjelpetekst {
+  color: var(--tekst-dempet);
+  font-size: 0.9rem;
+  margin-top: var(--rom-2);
+}
+.hjelpetekst.forste { margin-top: 0; margin-bottom: var(--rom-3); }
+
+.avkrysning {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  margin: var(--rom-2) 0 0;
+}
+.avkrysning input { width: 20px; height: 20px; }
+
+/* ---------- Energiregnskap ---------- */
+
+.soyler { display: grid; gap: var(--rom-2); }
+
+/* Navn og tall på én linje, søylen over hele bredden under. */
+.soyle {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "navn verdi" "spor spor";
+  gap: 2px var(--rom-2);
+  align-items: baseline;
+}
+.soyle .navn { grid-area: navn; }
+.soyle .verdi { grid-area: verdi; }
+.soyle .spor { grid-area: spor; }
+.soyle.under { margin-left: var(--rom-3); }
+.soyle.hoved .navn { font-weight: 600; }
+.soyle.under .navn { color: var(--tekst-dempet); font-size: 0.9rem; }
+.soyle .verdi { text-align: right; font-size: 0.9rem; }
+
+.spor {
+  display: block;
+  height: 14px;
+  background: var(--flate-dempet);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.soyle.under .spor { height: 10px; }
+
+.fyll {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 0.15s linear;
+}
+/* Samme farger som i grafen (Okabe–Ito, fargeblind-vennlige). */
+.fyll.total { background: #1f2328; }
+.fyll.del1 { background: var(--del1-farge, #D55E00); }
+.fyll.del2 { background: var(--del2-farge, #0072B2); }
+.fyll.arbeid { background: #009E73; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fyll { transition: none; }
+}
+
+.forklaring {
+  margin-top: var(--rom-3);
+  font-size: 0.9rem;
+}
+.forklaring summary { cursor: pointer; color: var(--aksent); }
+.forklaring p { margin: var(--rom-2) 0 0; }
+
+</style>
+</head>
+<body>
+  <header class="topp">
+    <h1>Energi som sprer seg</h1>
+    <p class="ingress">Hvor blir det av energien når noe varmt blir kaldt – og hva skjer med kvaliteten?</p>
+  </header>
+
+  <div class="faner" role="tablist" aria-label="Velg forsøk">
+    <button role="tab" id="fane-kloss" aria-selected="true" aria-controls="panel">Varm kloss</button>
+    <button role="tab" id="fane-dyppekoker" aria-selected="false" aria-controls="panel" tabindex="-1">Dyppekoker</button>
+  </div>
+
+  <main id="panel" class="modell" role="tabpanel" aria-labelledby="fane-kloss">
+    <div class="scene kort">
+      <canvas id="lerret" role="img"
+              aria-label="Et lukket kar med vann. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
+      <p id="tid" class="tidsmaler"></p>
+      <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+      <h2 class="graf-tittel">Energiregnskapet over tid</h2>
+      <canvas id="graf" role="img" aria-label="Graf over energiregnskapet over tid: energien i alt, hvor den er, og hvor mye som kan gjøre arbeid"></canvas>
+    </div>
+
+    <aside class="panel">
+      <div id="forutsi"></div>
+
+      <section class="kort">
+        <div class="kontroll">
+          <label for="vannmengde">Vannmengde</label>
+          <select id="vannmengde"></select>
+        </div>
+        <div class="kontroll" id="klosst-kontroll">
+          <label for="klosst">Klossens temperatur <output id="klosst-verdi"></output></label>
+          <input id="klosst" type="range" min="40" max="90" step="5" value="90">
+        </div>
+        <p class="hjelpetekst" id="oppsett-tekst"></p>
+
+        <div class="knapperad">
+          <button id="start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="nullstill" class="knapp">Nullstill</button>
+        </div>
+        <details class="mer">
+          <summary>Mer</summary>
+          <div class="kontroll">
+            <label for="fart">Fart</label>
+            <select id="fart">
+              <option value="0.25">Sakte</option>
+              <option value="1" selected>Vanlig</option>
+              <option value="4">Rask</option>
+            </select>
+          </div>
+          <label class="avkrysning"><input type="checkbox" id="joule"> Vis tall i joule</label>
+        </details>
+      </section>
+
+      <section class="kort" aria-labelledby="regnskap-tittel">
+        <h2 id="regnskap-tittel">Energiregnskap</h2>
+        <p class="hjelpetekst forste" id="hundre-tekst"></p>
+        <div class="soyler" id="soyler">
+          <div class="soyle hoved">
+            <span class="navn" id="navn-total"></span>
+            <span class="spor"><span id="soyle-total" class="fyll total"></span></span>
+            <span id="tall-total" class="tall verdi"></span>
+          </div>
+          <div class="soyle under">
+            <span class="navn" id="navn-del1"></span>
+            <span class="spor"><span id="soyle-del1" class="fyll del1"></span></span>
+            <span id="tall-del1" class="tall verdi"></span>
+          </div>
+          <div class="soyle under">
+            <span class="navn" id="navn-del2"></span>
+            <span class="spor"><span id="soyle-del2" class="fyll del2"></span></span>
+            <span id="tall-del2" class="tall verdi"></span>
+          </div>
+          <div class="soyle hoved">
+            <span class="navn">Kan gjøre arbeid</span>
+            <span class="spor"><span id="soyle-arbeid" class="fyll arbeid"></span></span>
+            <span id="tall-arbeid" class="tall verdi"></span>
+          </div>
+        </div>
+        <p id="joule-tall" class="hjelpetekst" hidden></p>
+        <details class="forklaring">
+          <summary>Hva betyr «kan gjøre arbeid»?</summary>
+          <p>Energi kan bare gjøre noe nyttig – drive en motor, lyse, løfte – når den strømmer fra noe varmt til noe kaldt. Tallet viser det aller meste en perfekt maskin kunne fått ut av temperaturforskjellene i karet. Når alt har samme temperatur, er det ingen forskjell igjen å bruke. Da er tallet 0, selv om all varmen fortsatt er der.</p>
+          <p>Allerede ved start er tallet lavt. Varme er energi av lav kvalitet. Strøm er energi av høy kvalitet.</p>
+        </details>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li><strong>Vannet står helt stille.</strong> Ekte vann strømmer når det blir varmt, så i et forsøk jevner temperaturen seg ut på noen minutter. I modellen spres varmen bare ved ledning, så det tar mye lengre tid.</li>
+          <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom 10 °C og 90 °C er ca. 13 %.</li>
+          <li>Modellen er et snitt (2D) gjennom karet, 4 mm tykt. Derfor vises energien i prosent, ikke i joule.</li>
+          <li>Karet er perfekt isolert. Et ekte kar slipper ut litt varme hele tiden.</li>
+          <li>«Kan gjøre arbeid» gjelder en tenkt, perfekt maskin. Ekte maskiner får ut mye mindre.</li>
+          <li><strong>Dyppekokeren er svak.</strong> En ekte dyppekoker får vannet til å koke. Her er effekten valgt så ingenting blir over ca. 75 °C, fordi koking ikke er med i modellen. Energien er den samme som kobberklossen på 90 °C har.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <script>globalThis.NATURFAG_MATERIALER = {
+  "_om": "Typiske verdier ved romtemperatur. Ekte materialer varierer (tre etter treslag og fukt, snø etter tetthet). Modellene skal bruke forholdet mellom verdiene; de trenger ikke være eksakte. k = varmeledningsevne (W/m·K), rho = tetthet (kg/m³), c = spesifikk varmekapasitet (J/kg·K). Effusivitet e = sqrt(k·rho·c) avgjør hvor kaldt noe kjennes ved berøring. Kontakttemperatur ved berøring: T = (e_hud·T_hud + e_mat·T_mat) / (e_hud + e_mat). smelter_til: materialet smelter ved 0 °C (smeltevarme_is) og blir til det oppgitte materialet.",
+  "materialer": {
+    "kobber":        { "navn": "Kobber",          "k": 400,   "rho": 8960, "c": 385,  "kilde": "standard tabellverdi" },
+    "aluminium":     { "navn": "Aluminium",       "k": 237,   "rho": 2700, "c": 900,  "kilde": "ESPCI Transport Phenomena, Simple problems" },
+    "rustfritt_stal":{ "navn": "Rustfritt stål",  "k": 15,    "rho": 8000, "c": 500,  "kilde": "standard tabellverdi (ca. 14–16)" },
+    "glass":         { "navn": "Glass",           "k": 1.0,   "rho": 2500, "c": 840,  "kilde": "standard tabellverdi; effusivitet ca. 1450, jf. Marin 2007" },
+    "is":            { "navn": "Is",              "k": 2.2,   "rho": 917,  "c": 2100, "smelter_til": "vann", "kilde": "standard tabellverdi" },
+    "vann":          { "navn": "Vann",            "k": 0.60,  "rho": 1000, "c": 4180, "kilde": "standard tabellverdi (ved ca. 0–20 °C)" },
+    "tre":           { "navn": "Tre (furu)",      "k": 0.15,  "rho": 600,  "c": 1700, "kilde": "ESPCI Transport Phenomena, Simple problems" },
+    "nysno":         { "navn": "Nysnø",           "k": 0.08,  "rho": 120,  "c": 2100, "smelter_til": "vann", "kilde": "Aggarwal 2009, Defence Science Journal 59(2): 0,08 W/mK for nysnø 120 kg/m³" },
+    "pakket_sno":    { "navn": "Pakket snø",      "k": 0.32,  "rho": 420,  "c": 2100, "smelter_til": "vann", "kilde": "Aggarwal 2009: 0,32 W/mK ved 420 kg/m³" },
+    "isopor":        { "navn": "Isopor",          "k": 0.033, "rho": 30,   "c": 1300, "kilde": "standard tabellverdi" },
+    "luft":          { "navn": "Luft",            "k": 0.026, "rho": 1.2,  "c": 1005, "kilde": "standard tabellverdi" },
+    "hud":           { "navn": "Hud",             "k": 0.37,  "rho": 1000, "c": 3500, "kilde": "Marin 2007, Lat. Am. J. Phys. Educ.: effusivitet ca. 1120" }
+  },
+  "konstanter": {
+    "smeltevarme_is": { "verdi": 334000, "enhet": "J/kg", "kilde": "standard tabellverdi" },
+    "hudtemperatur":  { "verdi": 33,     "enhet": "°C",   "kilde": "typisk overflatetemperatur på hånd" },
+    "h_stille_luft":  { "verdi": 10,     "enhet": "W/m²·K", "kilde": "varmeovergangstall mot stille luft innendørs: ca. 5 fra naturlig konveksjon + ca. 5 fra varmestråling; ekte verdier ca. 5–25 avhengig av trekk. Valgt 2026-10-17." },
+    "solinnstraling_var": { "verdi": 500, "enhet": "W/m²", "kilde": "Sol på horisontal flate midt på dagen en solrik vårdag. PVGIS 5.3 (EU JRC, database PVGIS-SARAH3), Oslo 59,91° N 10,75° Ø, april: gjennomsnittsdag (med skyer) har inntil 463 W/m² kl. 11–12 UTC; klarvær gir mer. Avrundet til 500. https://re.jrc.ec.europa.eu/pvg_tools/" },
+    "sol_tatt_opp_sno":   { "verdi": 0.20, "enhet": "andel",  "kilde": "Andel av sollyset snøen tar opp (1 − albedo). NSIDC: snødekke reflekterer opptil 90 %, smeltende snø ca. 75 %, altså 10–25 % tatt opp. 20 % valgt for pakket snø. https://nsidc.org/learn/parts-cryosphere/sea-ice/science-sea-ice" }
+  },
+  "valideringsmal": {
+    "_om": "Beregnet kontakttemperatur når hud (33 °C) berører materiale på 20 °C. Partikkel-/gittermodellen bør havne nær disse tallene like etter berøring.",
+    "kobber": 20.4, "aluminium": 20.6, "rustfritt_stal": 21.7, "glass": 25.7, "is_ved_20C_teoretisk": 24.6, "tre": 29.7, "nysno_ved_20C_teoretisk": 31.6, "isopor": 32.6
+  }
+};</script>
+  <script type="module">
+const __moduler = {};
+// ---- felles/js/varmegitter.js ----
+__moduler["felles/js/varmegitter.js"] = await (async () => {
+// Felles varmemotor: et 2D-gitter av celler der hver celle har et materiale og en energi.
+//
+// Ren fysikk – ingen DOM og ingen canvas, så fila kan testes i Node.
+// Materialverdiene sendes inn (innholdet i felles/data/materialer.json), slik at motoren
+// aldri har egne tall.
+//
+// Hovedidéer (forklart for lærere i docs/plan.html):
+//  - Gitteret er et snitt gjennom tingene. Hver celle er en liten terning med side dx.
+//  - Hver celle lagrer ENERGI (entalpi), og temperaturen regnes ut fra energien.
+//    Da står is på 0 °C mens den smelter: tilført energi går med til å smelte,
+//    ikke til å øke temperaturen.
+//  - Varme flyter mellom naboceller etter temperaturforskjell (Fouriers lov).
+//    Mellom to materialer brukes harmonisk snitt av k, som for to lag i serie.
+//  - Luft simuleres ikke. Overflater mot tomme celler mister/får varme med et
+//    varmeovergangstall h.
+//  - Eksplisitt tidssteg (neste øyeblikk regnes direkte fra nåværende). Det er bare
+//    stabilt for små steg, så motoren deler opp i så mange delsteg som trengs.
+
+const TOM = 0;
+
+/**
+ * @param {object} oppsett
+ * @param {number} oppsett.nx   antall celler bortover
+ * @param {number} oppsett.ny   antall celler nedover
+ * @param {number} oppsett.dx   cellestørrelse i meter
+ * @param {object} oppsett.data innholdet i materialer.json
+ * @param {number} [oppsett.h=0]              varmeovergangstall mot luft, W/m²·K (0 = isolert)
+ * @param {number} [oppsett.luftTemperatur=20] °C
+ * @param {boolean} [oppsett.kantErLuft=true] skal gitterets ytterkant regnes som luft?
+ * @param {number} [oppsett.sikkerhet=0.9]    andel av største stabile tidssteg som brukes
+ */
+function lagVarmegitter({
+  nx,
+  ny,
+  dx,
+  data,
+  h = 0,
+  luftTemperatur = 20,
+  kantErLuft = true,
+  sikkerhet = 0.9,
+}) {
+  const N = nx * ny;
+  const dybde = dx; // cellene er terninger, så energiene blir ekte joule for en liten terning
+  const volum = dx * dx * dybde;
+  const flateAreal = dx * dybde;
+  const smeltevarme = data.konstanter.smeltevarme_is.verdi;
+
+  // ---------- Materialtabell ----------
+  // Indeks 0 er "tom" (luft som ikke simuleres).
+  const nokler = [null];
+  const kFast = [0]; // k før smelting
+  const kFlytende = [0]; // k etter smelting (lik kFast for materialer som ikke smelter)
+  const rho = [0];
+  const cFast = [0];
+  const cFlytende = [0];
+  const smelter = [false];
+  const indeksFor = new Map();
+
+  for (const [nokkel, m] of Object.entries(data.materialer)) {
+    indeksFor.set(nokkel, nokler.length);
+    nokler.push(nokkel);
+    kFast.push(m.k);
+    rho.push(m.rho);
+    cFast.push(m.c);
+    if (m.smelter_til) {
+      const etter = data.materialer[m.smelter_til];
+      if (!etter) throw new Error(`${nokkel} smelter til ukjent materiale ${m.smelter_til}`);
+      kFlytende.push(etter.k);
+      cFlytende.push(etter.c);
+      smelter.push(true);
+    } else {
+      kFlytende.push(m.k);
+      cFlytende.push(m.c);
+      smelter.push(false);
+    }
+  }
+  if (nokler.length > 255) throw new Error("For mange materialer");
+
+  // ---------- Celletilstand ----------
+  const mat = new Uint8Array(N); // materialindeks per celle
+  const H = new Float64Array(N); // energi (J). 0 J = fast stoff ved 0 °C.
+  const T = new Float64Array(N).fill(NaN); // temperatur (°C), regnet ut fra H
+  const andel = new Float64Array(N); // smeltet andel 0–1
+  const k = new Float64Array(N); // varmeledningsevne akkurat nå
+  const Cfast = new Float64Array(N); // varmekapasitet før smelting (J/K)
+  const Cflyt = new Float64Array(N); // varmekapasitet etter smelting (J/K)
+  const Lcelle = new Float64Array(N); // energi som trengs for å smelte hele cellen (J)
+  const luftFlater = new Uint8Array(N); // antall sider som vender mot luft
+  const laast = new Uint8Array(N); // 1 = temperaturen holdes fast (f.eks. blod i hånda)
+  const laastT = new Float64Array(N);
+  const effekt = new Float64Array(N); // ytre tilført effekt (W), f.eks. sol
+  // Underlag med fast temperatur under en plass i gitteret (f.eks. varm bakke).
+  // Hører til plassen, ikke til cellen: flytter en celle seg ned dit, får den kontakt.
+  const underlagT = new Float64Array(N).fill(NaN);
+
+  let tid = 0;
+  let dtMaksCache = null;
+  // Energiregnskap: energi inn utenfra (luft, effekt, låste celler) og energi i fjernede
+  // celler, for å kunne sjekke bevaring.
+  const regnskap = { luft: 0, effekt: 0, laast: 0, underlag: 0, fjernet: 0 };
+
+  // ---------- Hjelpefunksjoner ----------
+
+  function idx(x, y) {
+    if (x < 0 || y < 0 || x >= nx || y >= ny) throw new RangeError(`Celle (${x}, ${y}) er utenfor gitteret`);
+    return y * nx + x;
+  }
+
+  /** Energi for en celle med gitt temperatur. Ved nøyaktig 0 °C avgjør smeltet andel. */
+  function energiFra(i, temperatur, smeltetAndel = 0) {
+    if (Lcelle[i] > 0) {
+      if (temperatur < 0) return Cfast[i] * temperatur;
+      if (temperatur > 0) return Lcelle[i] + Cflyt[i] * temperatur;
+      return smeltetAndel * Lcelle[i];
+    }
+    return Cfast[i] * temperatur;
+  }
+
+  /** Regn ut temperatur, smeltet andel og k fra energien. */
+  function regnUt(i) {
+    const m = mat[i];
+    if (m === TOM) {
+      T[i] = NaN;
+      return;
+    }
+    const e = H[i];
+    if (Lcelle[i] > 0) {
+      if (e < 0) {
+        T[i] = e / Cfast[i];
+        andel[i] = 0;
+      } else if (e <= Lcelle[i]) {
+        // Smelter: all energi går til å bryte bindinger, temperaturen står på 0 °C.
+        T[i] = 0;
+        andel[i] = e / Lcelle[i];
+      } else {
+        T[i] = (e - Lcelle[i]) / Cflyt[i];
+        andel[i] = 1;
+      }
+      // En halvveis smeltet celle er en blanding; enkleste rimelige valg er lineær blanding.
+      k[i] = kFast[m] + andel[i] * (kFlytende[m] - kFast[m]);
+    } else {
+      T[i] = e / Cfast[i];
+    }
+  }
+
+  function regnUtAlle() {
+    for (let i = 0; i < N; i++) regnUt(i);
+  }
+
+  /** Harmonisk snitt: to halve celler i serie. Det dårligste materialet bestemmer. */
+  function ledningstall(ka, kb) {
+    return (dybde * 2 * ka * kb) / (ka + kb); // W/K. (areal/avstand = dybde når cellene er like store)
+  }
+
+  /** Varmeovergang fra cellemidten til lufta: halv celle med ledning i serie med h. */
+  function luftLedning(i) {
+    if (h <= 0 || luftFlater[i] === 0) return 0;
+    const U = 1 / (1 / h + dx / (2 * k[i]));
+    return U * flateAreal * luftFlater[i];
+  }
+
+  function oppdaterLuftFlater() {
+    for (let y = 0; y < ny; y++) {
+      for (let x = 0; x < nx; x++) {
+        const i = y * nx + x;
+        if (mat[i] === TOM) {
+          luftFlater[i] = 0;
+          continue;
+        }
+        let n = 0;
+        if (x === 0 ? kantErLuft : mat[i - 1] === TOM) n++;
+        if (x === nx - 1 ? kantErLuft : mat[i + 1] === TOM) n++;
+        if (y === 0 ? kantErLuft : mat[i - nx] === TOM) n++;
+        // Har plassen et underlag, er undersiden ikke mot luft.
+        if (Number.isNaN(underlagT[i]) && (y === ny - 1 ? kantErLuft : mat[i + nx] === TOM)) n++;
+        luftFlater[i] = n;
+      }
+    }
+  }
+
+  function geometriEndret() {
+    oppdaterLuftFlater();
+    dtMaksCache = null;
+  }
+
+  /**
+   * Største stabile tidssteg. En celle må ikke kunne gi fra seg mer varme i ett steg
+   * enn det som skal til for å nå naboens temperatur – ellers "skyter den over" og
+   * regnestykket begynner å svinge. Kravet er dt ≤ C / (sum av ledningstall).
+   */
+  function dtMaks() {
+    if (dtMaksCache !== null) return dtMaksCache;
+    let minst = Infinity;
+    for (let y = 0; y < ny; y++) {
+      for (let x = 0; x < nx; x++) {
+        const i = y * nx + x;
+        const m = mat[i];
+        if (m === TOM) continue;
+        const ki = Math.max(kFast[m], kFlytende[m]);
+        let sumG = 0;
+        const naboer = [x > 0 ? i - 1 : -1, x < nx - 1 ? i + 1 : -1, y > 0 ? i - nx : -1, y < ny - 1 ? i + nx : -1];
+        for (const j of naboer) {
+          if (j < 0 || mat[j] === TOM) continue;
+          sumG += ledningstall(ki, Math.max(kFast[mat[j]], kFlytende[mat[j]]));
+        }
+        if (h > 0 && luftFlater[i] > 0) {
+          sumG += (1 / (1 / h + dx / (2 * ki))) * flateAreal * luftFlater[i];
+        }
+        if (!Number.isNaN(underlagT[i])) sumG += 2 * ki * dybde;
+        if (sumG > 0) {
+          const C = Lcelle[i] > 0 ? Math.min(Cfast[i], Cflyt[i]) : Cfast[i];
+          minst = Math.min(minst, C / sumG);
+        }
+      }
+    }
+    dtMaksCache = sikkerhet * minst;
+    return dtMaksCache;
+  }
+
+  function settCelleUtenGeometri(i, nokkel, temperatur, { smeltetAndel = 0 } = {}) {
+    if (nokkel === null) {
+      mat[i] = TOM;
+      H[i] = 0;
+      andel[i] = 0;
+      k[i] = 0;
+      Cfast[i] = Cflyt[i] = Lcelle[i] = 0;
+      laast[i] = 0;
+      effekt[i] = 0;
+    } else {
+      const m = indeksFor.get(nokkel);
+      if (m === undefined) throw new Error(`Ukjent materiale: ${nokkel}`);
+      const masse = rho[m] * volum;
+      mat[i] = m;
+      k[i] = kFast[m];
+      Cfast[i] = masse * cFast[m];
+      Cflyt[i] = masse * cFlytende[m];
+      Lcelle[i] = smelter[m] ? masse * smeltevarme : 0;
+      H[i] = energiFra(i, temperatur, smeltetAndel);
+    }
+    regnUt(i);
+  }
+
+  // ---------- Ett delsteg ----------
+
+  function delsteg(dt) {
+    regnUtAlle();
+
+    // Ledning mellom naboer. Hvert par regnes én gang, og det som går ut av den ene
+    // cellen går inn i den andre – derfor er energien bevart helt eksakt.
+    for (let y = 0; y < ny; y++) {
+      const rad = y * nx;
+      for (let x = 0; x < nx - 1; x++) {
+        const a = rad + x;
+        const b = a + 1;
+        if (mat[a] === TOM || mat[b] === TOM) continue;
+        const q = ledningstall(k[a], k[b]) * (T[b] - T[a]) * dt;
+        H[a] += q;
+        H[b] -= q;
+      }
+    }
+    for (let y = 0; y < ny - 1; y++) {
+      const rad = y * nx;
+      for (let x = 0; x < nx; x++) {
+        const a = rad + x;
+        const b = a + nx;
+        if (mat[a] === TOM || mat[b] === TOM) continue;
+        const q = ledningstall(k[a], k[b]) * (T[b] - T[a]) * dt;
+        H[a] += q;
+        H[b] -= q;
+      }
+    }
+
+    for (let i = 0; i < N; i++) {
+      if (mat[i] === TOM) continue;
+      // Luft ved overflaten
+      if (h > 0 && luftFlater[i] > 0) {
+        const q = luftLedning(i) * (luftTemperatur - T[i]) * dt;
+        H[i] += q;
+        regnskap.luft += q;
+      }
+      // Underlag med fast temperatur: perfekt kontakt, halv celle med ledning.
+      if (!Number.isNaN(underlagT[i])) {
+        const q = 2 * k[i] * dybde * (underlagT[i] - T[i]) * dt;
+        H[i] += q;
+        regnskap.underlag += q;
+      }
+      // Ytre effekt (sol, varmeplate ...)
+      if (effekt[i] !== 0) {
+        const q = effekt[i] * dt;
+        H[i] += q;
+        regnskap.effekt += q;
+      }
+      // Celler med fast temperatur (f.eks. holdt varm av blodet)
+      if (laast[i]) {
+        const nyEnergi = energiFra(i, laastT[i]);
+        regnskap.laast += nyEnergi - H[i];
+        H[i] = nyEnergi;
+      }
+    }
+
+    tid += dt;
+  }
+
+  // ---------- Det som kan brukes utenfra ----------
+
+  const gitter = {
+    nx,
+    ny,
+    dx,
+
+    /** Simulert tid i sekunder. */
+    get tid() {
+      return tid;
+    },
+
+    get h() {
+      return h;
+    },
+    set h(verdi) {
+      h = verdi;
+      dtMaksCache = null;
+    },
+
+    get luftTemperatur() {
+      return luftTemperatur;
+    },
+    set luftTemperatur(verdi) {
+      luftTemperatur = verdi;
+    },
+
+    /**
+     * Sett materiale og temperatur i én celle. nokkel = null gjør cellen tom (luft).
+     * For is og snø ved nøyaktig 0 °C kan smeltet andel oppgis.
+     */
+    settCelle(x, y, nokkel, temperatur = 0, valg = {}) {
+      settCelleUtenGeometri(idx(x, y), nokkel, temperatur, valg);
+      geometriEndret();
+    },
+
+    /** Fyll et rektangel (x, y øverst til venstre, b × hoyde celler). */
+    fyllRektangel(x, y, b, hoyde, nokkel, temperatur = 0, valg = {}) {
+      for (let yy = y; yy < y + hoyde; yy++) {
+        for (let xx = x; xx < x + b; xx++) settCelleUtenGeometri(idx(xx, yy), nokkel, temperatur, valg);
+      }
+      geometriEndret();
+    },
+
+    /**
+     * Fjern en celle (f.eks. smeltevann som renner bort). Energien og massen den hadde,
+     * føres i energiregnskapet som "fjernet", så bevaring fortsatt kan sjekkes.
+     * @returns {{ energi: number, masse: number }}
+     */
+    fjernCelle(x, y) {
+      const i = idx(x, y);
+      if (mat[i] === TOM) return { energi: 0, masse: 0 };
+      const ut = { energi: H[i], masse: rho[mat[i]] * volum };
+      regnskap.fjernet += H[i];
+      settCelleUtenGeometri(i, null);
+      geometriEndret();
+      return ut;
+    },
+
+    /**
+     * Flytt en celle med alt innhold til en tom plass (f.eks. is som synker ned når
+     * cellen under har smeltet). Energien følger med, så ingenting går tapt.
+     */
+    flyttCelle(xFra, yFra, xTil, yTil) {
+      const a = idx(xFra, yFra);
+      const b = idx(xTil, yTil);
+      if (mat[b] !== TOM) throw new Error(`Celle (${xTil}, ${yTil}) er ikke tom`);
+      mat[b] = mat[a];
+      H[b] = H[a];
+      k[b] = k[a];
+      Cfast[b] = Cfast[a];
+      Cflyt[b] = Cflyt[a];
+      Lcelle[b] = Lcelle[a];
+      laast[b] = laast[a];
+      laastT[b] = laastT[a];
+      effekt[b] = effekt[a];
+      settCelleUtenGeometri(a, null);
+      regnUt(b);
+      geometriEndret();
+    },
+
+    /** Massen i en celle (kg). */
+    masse(x, y) {
+      const i = idx(x, y);
+      return mat[i] === TOM ? 0 : rho[mat[i]] * volum;
+    },
+
+    /** Hold en celle på fast temperatur (null slipper den). */
+    holdTemperatur(x, y, temperatur) {
+      const i = idx(x, y);
+      if (temperatur === null) {
+        laast[i] = 0;
+      } else {
+        laast[i] = 1;
+        laastT[i] = temperatur;
+        H[i] = energiFra(i, temperatur);
+        regnUt(i);
+      }
+    },
+
+    /** Ytre effekt inn i en celle, i watt (f.eks. sol på oversiden). */
+    /** Legg et underlag med fast temperatur under plassen (x, y). null fjerner det. */
+    settUnderlag(x, y, temperatur) {
+      underlagT[idx(x, y)] = temperatur === null ? NaN : temperatur;
+      geometriEndret();
+    },
+
+    settEffekt(x, y, watt) {
+      effekt[idx(x, y)] = watt;
+    },
+
+    materiale(x, y) {
+      return nokler[mat[idx(x, y)]];
+    },
+    temperatur(x, y) {
+      const t = T[idx(x, y)];
+      return Number.isNaN(t) ? null : t;
+    },
+    smeltetAndel(x, y) {
+      return andel[idx(x, y)];
+    },
+    energi(x, y) {
+      return H[idx(x, y)];
+    },
+    erTom(x, y) {
+      return mat[idx(x, y)] === TOM;
+    },
+    antallLuftflater(x, y) {
+      return luftFlater[idx(x, y)];
+    },
+
+    /**
+     * Temperaturen i grenseflaten mellom to naboceller. Varmen som går inn i flaten fra
+     * den ene siden må gå ut på den andre, så flaten havner nærmest temperaturen til
+     * cellen som leder best: T = (ka·Ta + kb·Tb) / (ka + kb).
+     */
+    grenseflateTemperatur(xa, ya, xb, yb) {
+      const a = idx(xa, ya);
+      const b = idx(xb, yb);
+      return (k[a] * T[a] + k[b] * T[b]) / (k[a] + k[b]);
+    },
+
+    /** Varme per sekund (W) som strømmer fra celle a til nabocelle b akkurat nå. */
+    varmestromMellom(xa, ya, xb, yb) {
+      const a = idx(xa, ya);
+      const b = idx(xb, yb);
+      if (mat[a] === TOM || mat[b] === TOM) return 0;
+      return ledningstall(k[a], k[b]) * (T[a] - T[b]);
+    },
+
+    /** Direkte tilgang for tegning (les, ikke skriv). Tomme celler har NaN. */
+    get temperaturFelt() {
+      return T;
+    },
+    get smeltetFelt() {
+      return andel;
+    },
+    get materialFelt() {
+      return mat;
+    },
+    materialNokkel(indeks) {
+      return nokler[indeks];
+    },
+
+    /** Summen av energien i alle celler (J). */
+    totalEnergi() {
+      let sum = 0;
+      for (let i = 0; i < N; i++) sum += H[i];
+      return sum;
+    },
+
+    /** Energi inn utenfra siden start (J): luft, effekt, låste celler, underlag – og energi i fjernede celler (fjernet). */
+    get energiregnskap() {
+      return { ...regnskap };
+    },
+
+    /** Masse av is/snø som har smeltet, og total masse som kan smelte (kg). */
+    smeltetMasse() {
+      let smeltet = 0;
+      let totalt = 0;
+      for (let i = 0; i < N; i++) {
+        if (Lcelle[i] > 0) {
+          const masse = Lcelle[i] / smeltevarme;
+          totalt += masse;
+          smeltet += masse * andel[i];
+        }
+      }
+      return { smeltet, totalt };
+    },
+
+    dtMaks,
+
+    /**
+     * Simuler dt sekunder. Deles automatisk i små nok delsteg.
+     * @returns {number} antall delsteg som ble brukt
+     */
+    steg(dt) {
+      if (dt <= 0) return 0;
+      const grense = dtMaks();
+      const n = Number.isFinite(grense) ? Math.max(1, Math.ceil(dt / grense)) : 1;
+      const lite = dt / n;
+      for (let s = 0; s < n; s++) delsteg(lite);
+      regnUtAlle();
+      return n;
+    },
+
+    /**
+     * For animasjon: simuler opptil dtOnsket sekunder, men bruk høyst maksDelsteg.
+     * Er maskinen for treg, går simuleringen saktere enn ønsket i stedet for å bli
+     * ustabil. Returnerer hvor mye tid som faktisk ble simulert, slik at skjermen
+     * ærlig kan vise "1 s = X s simulert".
+     */
+    stegMedBudsjett(dtOnsket, maksDelsteg) {
+      if (dtOnsket <= 0) return 0;
+      const grense = dtMaks();
+      if (!Number.isFinite(grense)) {
+        this.steg(dtOnsket);
+        return dtOnsket;
+      }
+      const trengs = Math.ceil(dtOnsket / grense);
+      if (trengs <= maksDelsteg) {
+        this.steg(dtOnsket);
+        return dtOnsket;
+      }
+      for (let s = 0; s < maksDelsteg; s++) delsteg(grense);
+      regnUtAlle();
+      return maksDelsteg * grense;
+    },
+  };
+
+  return gitter;
+}
+
+return { lagVarmegitter };
+})();
+// ---- modeller/energi-som-sprer-seg/modell.js ----
+__moduler["modeller/energi-som-sprer-seg/modell.js"] = await (async () => {
+// Energi som sprer seg – ren fysikk. Ingen DOM og ingen canvas.
+//
+// En varm kobberkloss ligger midt i kaldt vann i et lukket, isolert kar. Varmen leder
+// fra klossen ut i vannet til alt har samme temperatur. Modellen fører et energiregnskap:
+//   - "Varme i karet": energien over vannets starttemperatur. Den står stille, fordi
+//     karet er lukket (ingen luft, ingen kant mot omgivelsene).
+//   - "Kan gjøre arbeid": det meste en tenkt, perfekt varmekraftmaskin kunne hentet ut
+//     av temperaturforskjellene inne i karet. Den synker mot 0 når temperaturen jevner
+//     seg ut. Det er dette som menes med at energien får lavere kvalitet.
+//
+// Bygger på den felles varmemotoren. Motoren endres ikke.
+
+const { lagVarmegitter } = __moduler["felles/js/varmegitter.js"];
+
+/** Vannet i karet ved start (°C). Valgt i planen 2026-10-21: kaldt springvann. */
+const VANN_START = 10;
+/** Klossens starttemperatur kan velges mellom disse (°C). */
+const KLOSS_T_MIN = 40;
+const KLOSS_T_MAKS = 90;
+const KLOSS_MATERIALE = "kobber";
+
+// 4 mm celler: kobber tåler da ca. 31 ms per delsteg, så det går lett på en billig
+// Chromebook. Klossen er 7 × 7 celler = 2,8 cm.
+const KAR = { dx: 4e-3, kloss: 7 };
+
+/** Vannmengden velges ved å gjøre karet større. Mål i celler (bredde, høyde). */
+const VANNMENGDER = [
+  { id: "lite", navn: "Lite", nx: 15, ny: 15 },
+  { id: "middels", navn: "Middels", nx: 20, ny: 15 },
+  { id: "mye", navn: "Mye", nx: 25, ny: 20 },
+];
+
+/** Alt har "samme temperatur" når forskjellen mellom varmeste og kaldeste celle er under dette (°C). */
+const LIKEVEKT_GRENSE = 0.1;
+
+const KELVIN = 273.15;
+
+function vannmengde(id) {
+  const v = VANNMENGDER.find((m) => m.id === id);
+  if (!v) throw new Error(`Ukjent vannmengde: ${id}`);
+  return v;
+}
+
+/** Hvor klossen ligger: midt i karet. */
+function klossPlass(vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  return { x: Math.floor((nx - KAR.kloss) / 2), y: Math.floor((ny - KAR.kloss) / 2), side: KAR.kloss };
+}
+
+/** Varmekapasiteten til én celle (J/K): tetthet · spesifikk varmekapasitet · volum. */
+function cellekapasitet(data, nokkel) {
+  const m = data.materialer[nokkel];
+  return m.rho * m.c * KAR.dx ** 3;
+}
+
+/**
+ * Temperaturen alt ender på, regnet for hånd (kalorimetri): varmen klossen gir fra seg
+ * er lik varmen vannet tar opp, så T = (C_kloss·T_kloss + C_vann·T_vann) / (C_kloss + C_vann).
+ * Brukes til å teste motoren, og kan vises for eleven etterpå.
+ */
+function blandingstemperatur(data, vannmengdeId, klossT) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const klossCeller = KAR.kloss * KAR.kloss;
+  const Ck = klossCeller * cellekapasitet(data, KLOSS_MATERIALE);
+  const Cv = (nx * ny - klossCeller) * cellekapasitet(data, "vann");
+  return (Ck * klossT + Cv * VANN_START) / (Ck + Cv);
+}
+
+/**
+ * Største arbeid (J) en perfekt varmekraftmaskin kan hente ut av et lukket system av
+ * deler med varmekapasitet C og temperatur T (°C), uten noe utenfor å slippe varme til.
+ *
+ * Hvorfor denne formelen: en perfekt maskin lager ingen ny entropi. Da ender alle delene
+ * på en felles temperatur T_slutt der ln T_slutt = Σ C·ln T / Σ C (temperaturer i kelvin).
+ * Energien som ikke er igjen som varme, er blitt arbeid: W = Σ C·T − Σ C · T_slutt.
+ * W er 0 når alt har samme temperatur, og kan bare synke når varme leder av seg selv.
+ *
+ * @param {Iterable<[number, number]>} deler  par av [C (J/K), T (°C)]
+ */
+function kanGjoreArbeid(deler) {
+  let sumC = 0;
+  let sumCT = 0;
+  let sumClnT = 0;
+  for (const [C, Tc] of deler) {
+    const T = Tc + KELVIN;
+    sumC += C;
+    sumCT += C * T;
+    sumClnT += C * Math.log(T);
+  }
+  if (sumC === 0) return 0;
+  // Avrundingsfeil kan gi et bittelite negativt tall når alt er likt. Arbeid er aldri negativt.
+  return Math.max(0, sumCT - sumC * Math.exp(sumClnT / sumC));
+}
+
+/** Tomt, lukket kar fylt med vann. Ingen varmeovergang mot luft (h = 0), ingen luft langs kanten. */
+function lagLukketKar(data, vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const gitter = lagVarmegitter({ nx, ny, dx: KAR.dx, data, h: 0, kantErLuft: false });
+  gitter.fyllRektangel(0, 0, nx, ny, "vann", VANN_START);
+  return gitter;
+}
+
+/** Varmekapasitet per celle, regnet én gang. Materialene endrer seg ikke underveis. */
+function lagCelleliste(gitter, data, erDel) {
+  const celler = [];
+  for (let y = 0; y < gitter.ny; y++) {
+    for (let x = 0; x < gitter.nx; x++) {
+      celler.push({ x, y, C: cellekapasitet(data, gitter.materiale(x, y)), erDel: erDel(x, y) });
+    }
+  }
+  return celler;
+}
+
+/**
+ * Les av temperaturene. "Varme" er energi over vannets starttemperatur (J), delt på
+ * delen (klossen eller varmeelementet) og resten (vannet).
+ */
+function maal(gitter, celler) {
+  let del = 0;
+  let resten = 0;
+  let delCT = 0;
+  let delC = 0;
+  let min = Infinity;
+  let maks = -Infinity;
+  const deler = [];
+  for (const c of celler) {
+    const T = gitter.temperatur(c.x, c.y);
+    const over = c.C * (T - VANN_START);
+    if (c.erDel) {
+      del += over;
+      delCT += c.C * T;
+      delC += c.C;
+    } else {
+      resten += over;
+    }
+    if (T < min) min = T;
+    if (T > maks) maks = T;
+    deler.push([c.C, T]);
+  }
+  return { del, resten, delTemperatur: delCT / delC, min, maks, arbeid: kanGjoreArbeid(deler) };
+}
+
+/**
+ * Lag karet med kloss og vann.
+ * @param {object} data  materialer.json
+ * @param {{ vannmengde?: string, klossT?: number }} valg
+ */
+function lagKar(data, { vannmengde: vannmengdeId = "middels", klossT = KLOSS_T_MAKS } = {}) {
+  if (!(klossT >= KLOSS_T_MIN && klossT <= KLOSS_T_MAKS)) {
+    throw new RangeError(`Klossens temperatur må være mellom ${KLOSS_T_MIN} og ${KLOSS_T_MAKS} °C`);
+  }
+  const gitter = lagLukketKar(data, vannmengdeId);
+  const plass = klossPlass(vannmengdeId);
+  gitter.fyllRektangel(plass.x, plass.y, plass.side, plass.side, KLOSS_MATERIALE, klossT);
+  const celler = lagCelleliste(gitter, data, (x, y) => gitter.materiale(x, y) === KLOSS_MATERIALE);
+
+  // 100 % = varmen klossen hadde over vannets temperatur ved start.
+  // Prosent i stedet for joule: snittet er bare 4 mm tykt, så joule-tallet sier lite.
+  const startVarme = celler.reduce((s, c) => s + (c.erDel ? c.C * (klossT - VANN_START) : 0), 0);
+  const blanding = blandingstemperatur(data, vannmengdeId, klossT);
+
+  function regnskap() {
+    const m = maal(gitter, celler);
+    const varme = m.del + m.resten;
+    return {
+      tid: gitter.tid,
+      iKlossen: m.del / startVarme,
+      iVannet: m.resten / startVarme,
+      varmeIKaret: varme / startVarme,
+      energiIAlt: varme / startVarme,
+      kanGjoreArbeid: m.arbeid / startVarme,
+      kanGjoreArbeidJoule: m.arbeid,
+      varmeJoule: varme,
+      klossTemperatur: m.delTemperatur,
+      minTemperatur: m.min,
+      maksTemperatur: m.maks,
+      likevekt: m.maks - m.min < LIKEVEKT_GRENSE,
+    };
+  }
+
+  return {
+    gitter,
+    vannmengde: vannmengdeId,
+    klossT,
+    /** Temperaturen alt skal ende på (håndregning). */
+    blandingstemperatur: blanding,
+    regnskap,
+    steg: (dt) => gitter.steg(dt),
+    stegMedBudsjett: (dt, maksDelsteg) => gitter.stegMedBudsjett(dt, maksDelsteg),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Fane 2: dyppekoker
+// ---------------------------------------------------------------------------
+
+// Et varmeelement av rustfritt stål midt i vannet får strøm i en fast tid og slås så av.
+// Energien er like stor som varmen kobberklossen på 90 °C kom med, så fanene kan
+// sammenlignes. Strøm er energi av høyeste kvalitet: alt kan i prinsippet gjøre arbeid.
+//
+// Elementet er 5 × 5 celler (2 cm) og står på i 5 min. Prøvekjørt 23. okt.: da blir det
+// høyst ca. 75 °C. Mindre element eller kortere tid ga 95–190 °C, og koking er ikke med
+// i modellen. Effekten er derfor valgt etter dette, ikke etter en ekte dyppekoker.
+const ELEMENT_MATERIALE = "rustfritt_stal";
+const DYPPEKOKER = { side: 5, paaTid: 300 };
+
+/** Hvor varmeelementet står: midt i karet. */
+function elementPlass(vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const side = DYPPEKOKER.side;
+  return { x: Math.floor((nx - side) / 2), y: Math.floor((ny - side) / 2), side };
+}
+
+/** Elektrisk energi (J i snittet): det samme som kobberklossen på 90 °C har over vannets temperatur. */
+function dyppekokerEnergi(data) {
+  return KAR.kloss * KAR.kloss * cellekapasitet(data, KLOSS_MATERIALE) * (KLOSS_T_MAKS - VANN_START);
+}
+
+/** Temperaturen alt ender på når all strømmen er blitt varme i vann og element (håndregning). */
+function dyppekokerSluttemperatur(data, vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const elementCeller = DYPPEKOKER.side ** 2;
+  const C =
+    elementCeller * cellekapasitet(data, ELEMENT_MATERIALE) +
+    (nx * ny - elementCeller) * cellekapasitet(data, "vann");
+  return VANN_START + dyppekokerEnergi(data) / C;
+}
+
+/**
+ * Lag karet med vann og dyppekoker.
+ * @param {object} data  materialer.json
+ * @param {{ vannmengde?: string }} valg
+ */
+function lagDyppekoker(data, { vannmengde: vannmengdeId = "middels" } = {}) {
+  const gitter = lagLukketKar(data, vannmengdeId);
+  const plass = elementPlass(vannmengdeId);
+  gitter.fyllRektangel(plass.x, plass.y, plass.side, plass.side, ELEMENT_MATERIALE, VANN_START);
+  const celler = lagCelleliste(gitter, data, (x, y) => gitter.materiale(x, y) === ELEMENT_MATERIALE);
+  const elementCeller = celler.filter((c) => c.erDel);
+
+  const strom = dyppekokerEnergi(data); // J
+  const effekt = strom / DYPPEKOKER.paaTid; // W i snittet
+  let paa = true;
+  let slattAvVed = null;
+
+  function settEffekt(watt) {
+    for (const c of elementCeller) gitter.settEffekt(c.x, c.y, watt / elementCeller.length);
+  }
+  settEffekt(effekt);
+
+  /** Tid (s) til all strømmen er levert. Motoren teller levert energi selv. */
+  function tidIgjen() {
+    return Math.max(0, (strom - gitter.energiregnskap.effekt) / effekt);
+  }
+  function slaaAvHvisFerdig() {
+    // Liten margin for avrunding: 1 µs med strøm er ingenting.
+    if (paa && tidIgjen() < 1e-6) {
+      settEffekt(0);
+      paa = false;
+      slattAvVed = gitter.tid;
+    }
+  }
+
+  /** Simuler dt sekunder. Strømmen slås av nøyaktig når all energien er levert. */
+  function steg(dt) {
+    let igjen = dt;
+    if (paa) {
+      const d = Math.min(igjen, tidIgjen());
+      if (d > 0) gitter.steg(d);
+      igjen -= d;
+      slaaAvHvisFerdig();
+    }
+    if (!paa && igjen > 0) gitter.steg(igjen);
+  }
+
+  /** For animasjon. Stopper ved avslåingen, så strømmen aldri står på for lenge. */
+  function stegMedBudsjett(dt, maksDelsteg) {
+    const d = paa ? Math.min(dt, tidIgjen()) : dt;
+    const simulert = d > 0 ? gitter.stegMedBudsjett(d, maksDelsteg) : 0;
+    slaaAvHvisFerdig();
+    return simulert;
+  }
+
+  function regnskap() {
+    const m = maal(gitter, celler);
+    const levert = gitter.energiregnskap.effekt;
+    const igjen = strom - levert;
+    const varme = m.del + m.resten;
+    return {
+      tid: gitter.tid,
+      paa,
+      slattAvVed,
+      somStrom: igjen / strom,
+      iElementet: m.del / strom,
+      iVannet: m.resten / strom,
+      varmeIKaret: varme / strom,
+      energiIAlt: (igjen + varme) / strom,
+      // Strøm kan i prinsippet bli til arbeid uten tap. Varme bare til en liten del.
+      kanGjoreArbeid: (igjen + m.arbeid) / strom,
+      kanGjoreArbeidJoule: igjen + m.arbeid,
+      varmeJoule: varme,
+      stromLevertJoule: levert,
+      elementTemperatur: m.delTemperatur,
+      minTemperatur: m.min,
+      maksTemperatur: m.maks,
+      likevekt: !paa && m.maks - m.min < LIKEVEKT_GRENSE,
+    };
+  }
+
+  return {
+    gitter,
+    vannmengde: vannmengdeId,
+    /** Temperaturen alt skal ende på (håndregning). */
+    blandingstemperatur: dyppekokerSluttemperatur(data, vannmengdeId),
+    regnskap,
+    steg,
+    stegMedBudsjett,
+  };
+}
+
+return { VANN_START, KLOSS_T_MIN, KLOSS_T_MAKS, KLOSS_MATERIALE, KAR, VANNMENGDER, LIKEVEKT_GRENSE, klossPlass, blandingstemperatur, kanGjoreArbeid, lagKar, ELEMENT_MATERIALE, DYPPEKOKER, elementPlass, dyppekokerEnergi, dyppekokerSluttemperatur, lagDyppekoker };
+})();
+// ---- felles/js/fargeskala.js ----
+__moduler["felles/js/fargeskala.js"] = await (async () => {
+// Fargeskala for temperatur: blå (kaldt) – lys grå (rom) – oransje (varmt).
+// Blå/oransje kan skilles også ved rød-grønn fargeblindhet. Temperaturen skal likevel
+// alltid også vises som tall eller tekst et sted.
+
+const STOPP = [
+  [-20, [31, 78, 140]],
+  [-5, [91, 143, 201]],
+  [0, [169, 200, 232]],
+  [20, [230, 226, 218]],
+  [30, [242, 178, 107]],
+  [40, [196, 90, 0]],
+  // Over 40 °C (bare "Energi som sprer seg" går så høyt): mørkere brunoransje.
+  [65, [150, 62, 6]],
+  [90, [104, 38, 10]],
+];
+
+/** RGB-farge for en temperatur i °C, som [r, g, b]. */
+function temperaturRgb(T) {
+  if (T <= STOPP[0][0]) return STOPP[0][1];
+  for (let i = 1; i < STOPP.length; i++) {
+    const [t1, f1] = STOPP[i];
+    if (T <= t1) {
+      const [t0, f0] = STOPP[i - 1];
+      const a = (T - t0) / (t1 - t0);
+      return [0, 1, 2].map((j) => Math.round(f0[j] + a * (f1[j] - f0[j])));
+    }
+  }
+  return STOPP[STOPP.length - 1][1];
+}
+
+/** CSS-farge for en temperatur i °C. */
+function temperaturFarge(T, alfa = 1) {
+  const [r, g, b] = temperaturRgb(T);
+  return alfa === 1 ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${alfa})`;
+}
+
+/** Tegn en liten fargeskala-forklaring. */
+function tegnFargeskala(ctx, x, y, bredde, hoyde, minT = -20, maksT = 40) {
+  for (let i = 0; i < bredde; i++) {
+    ctx.fillStyle = temperaturFarge(minT + ((maksT - minT) * i) / (bredde - 1));
+    ctx.fillRect(x + i, y, 1, hoyde);
+  }
+  ctx.strokeStyle = "#d8d5cc";
+  ctx.strokeRect(x + 0.5, y + 0.5, bredde - 1, hoyde - 1);
+  ctx.fillStyle = "#5b616b";
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.textBaseline = "top";
+  ctx.textAlign = "left";
+  ctx.fillText(`${minT} °C`, x, y + hoyde + 3);
+  ctx.textAlign = "right";
+  ctx.fillText(`${maksT} °C`, x + bredde, y + hoyde + 3);
+  if (minT < 0 && maksT > 0) {
+    ctx.textAlign = "center";
+    ctx.fillText("0 °C", x + (bredde * (0 - minT)) / (maksT - minT), y + hoyde + 3);
+  }
+}
+
+return { temperaturRgb, temperaturFarge, tegnFargeskala };
+})();
+// ---- felles/js/partikler.js ----
+__moduler["felles/js/partikler.js"] = await (async () => {
+// Partikler som vibrerer etter temperatur.
+//
+// ÆRLIGHET: Partiklenes bevegelsesenergi er proporsjonal med temperaturen i kelvin.
+// Mellom −20 °C (253 K) og 40 °C (313 K) er forskjellen i utslag bare ca. 10 %, som
+// knapt synes. Her forsterkes forskjellen kraftig: utslaget går nesten fra null ved
+// −20 °C til fullt ved 40 °C. Dette må stå i modellens "Hva modellen forenkler".
+
+const FORSTERKNING = { minT: -20, maksT: 40, minUtslag: 0.25, maksUtslag: 3.2 };
+
+const redusertBevegelse =
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Utslag i piksler for en temperatur (forsterket, se over).
+ * En modell med et annet temperaturområde kan sende inn sin egen forsterkning.
+ */
+function utslag(T, forsterkning = FORSTERKNING) {
+  const { minT, maksT, minUtslag, maksUtslag } = forsterkning;
+  const a = Math.min(1, Math.max(0, (T - minT) / (maksT - minT)));
+  return minUtslag + a * (maksUtslag - minUtslag);
+}
+
+/** Enkel, forutsigbar tilfeldighet, så partiklene ser like ut hver gang. */
+function lagTilfeldig(fro) {
+  let s = fro >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+/**
+ * Lag partikler på faste plasser.
+ * @param {{x: number, y: number, celle: any}[]} plasser  hvileplass og hvilken celle partikkelen hører til
+ */
+function lagPartikler(plasser, fro = 1) {
+  const tilfeldig = lagTilfeldig(fro);
+  return plasser.map((p) => ({
+    ...p,
+    fx: 0.8 + tilfeldig() * 0.6,
+    fy: 0.8 + tilfeldig() * 0.6,
+    px: tilfeldig() * Math.PI * 2,
+    py: tilfeldig() * Math.PI * 2,
+  }));
+}
+
+/**
+ * Tegn partiklene.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {object[]} partikler fra lagPartikler
+ * @param {(p: object) => number | null} temperaturFor  temperatur for partikkelens celle (null = ikke tegn)
+ * @param {number} tid  sekunder (ekte tid, for jevn bevegelse)
+ * @param {{ radius?: number, farge?: (p: object) => string, forsterkning?: object }} [valg]
+ */
+function tegnPartikler(ctx, partikler, temperaturFor, tid, valg = {}) {
+  const radius = valg.radius ?? 2.4;
+  const fart = redusertBevegelse ? 0.15 : 1;
+  const forsterkning = { ...FORSTERKNING, ...valg.forsterkning };
+  for (const p of partikler) {
+    const T = temperaturFor(p);
+    if (T === null || Number.isNaN(T)) continue;
+    const A = utslag(T, forsterkning);
+    // Varmere partikler svinger også litt raskere.
+    const andel = Math.min(1, Math.max(0, (T - forsterkning.minT) / (forsterkning.maksT - forsterkning.minT)));
+    const w = (10 + 15 * andel) * fart;
+    const x = p.x + A * (Math.sin(w * p.fx * tid + p.px) + 0.5 * Math.sin(1.7 * w * p.fy * tid + p.py)) / 1.5;
+    const y = p.y + A * (Math.sin(w * p.fy * tid + p.py) + 0.5 * Math.sin(1.3 * w * p.fx * tid + p.px)) / 1.5;
+    ctx.fillStyle = valg.farge ? valg.farge(p) : "rgba(31,35,40,0.7)";
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+return { FORSTERKNING, utslag, lagPartikler, tegnPartikler };
+})();
+// ---- felles/js/gittertegning.js ----
+__moduler["felles/js/gittertegning.js"] = await (async () => {
+// Tegner et varmegitter: hver celle farget etter temperatur, med partikler oppå.
+// Brukes av alle modeller som bygger på felles/js/varmegitter.js.
+
+const { temperaturFarge } = __moduler["felles/js/fargeskala.js"];
+const { lagPartikler } = __moduler["felles/js/partikler.js"];
+
+/** Partikkelfarge per materiale, så elevene ser hva som er hva. */
+const PARTIKKELFARGE = {
+  kobber: "rgba(122,62,29,0.8)",
+  aluminium: "rgba(61,68,80,0.8)",
+  rustfritt_stal: "rgba(61,68,80,0.8)",
+  glass: "rgba(47,111,115,0.8)",
+  tre: "rgba(107,74,43,0.8)",
+  isopor: "rgba(110,115,124,0.7)",
+  hud: "rgba(138,75,59,0.8)",
+  is: "rgba(43,79,122,0.8)",
+  vann: "rgba(43,79,122,0.6)",
+  nysno: "rgba(43,79,122,0.7)",
+  pakket_sno: "rgba(43,79,122,0.7)",
+};
+
+/**
+ * Tegn cellene. En celle som er i ferd med å smelte, "synker": nederst temperaturfargen
+ * for det som er igjen, øverst lyst vann for det som har smeltet. Et mørkt slør ville
+ * sett ut som kulde.
+ * @param {(y: number) => number} [forskyvning] ekstra y-forskyvning per rad (piksler)
+ */
+function tegnCeller(ctx, gitter, x0, y0, celle, forskyvning = () => 0) {
+  for (let y = 0; y < gitter.ny; y++) {
+    const dy = forskyvning(y);
+    for (let x = 0; x < gitter.nx; x++) {
+      const T = gitter.temperatur(x, y);
+      if (T === null) continue;
+      const px = x0 + x * celle;
+      const py = y0 + y * celle + dy;
+      const andel = gitter.smeltetAndel(x, y);
+      // +0.5 gir ingen hårfine sprekker mellom cellene
+      if (andel > 0 && andel < 1) {
+        const vannH = celle * andel;
+        ctx.fillStyle = "rgba(120,180,235,0.55)";
+        ctx.fillRect(px, py, celle + 0.5, vannH + 0.5);
+        ctx.fillStyle = temperaturFarge(T);
+        ctx.fillRect(px, py + vannH, celle + 0.5, celle - vannH + 0.5);
+      } else {
+        ctx.fillStyle = temperaturFarge(T);
+        ctx.fillRect(px, py, celle + 0.5, celle + 0.5);
+      }
+    }
+  }
+}
+
+/** Partikkelplasser: én partikkel per 2 × 2 celler, relativt til gitterets øvre venstre hjørne. */
+function lagGitterPartikler(gitter, celle, fro = 1) {
+  const plasser = [];
+  for (let y = 0; y + 1 < gitter.ny; y += 2) {
+    for (let x = 0; x + 1 < gitter.nx; x += 2) {
+      plasser.push({ x: (x + 1) * celle, y: (y + 1) * celle, cx: x, cy: y });
+    }
+  }
+  return lagPartikler(plasser, fro);
+}
+
+return { PARTIKKELFARGE, tegnCeller, lagGitterPartikler };
+})();
+// ---- felles/js/format.js ----
+__moduler["felles/js/format.js"] = await (async () => {
+// Tall og tid skrevet slik elevene leser dem (norsk desimalkomma).
+
+/** "20,4 °C" */
+function formaterGrader(T, desimaler = 1) {
+  return `${T.toFixed(desimaler).replace(".", ",")} °C`;
+}
+
+/** "45 s", "4 min 12 s", "3 t 10 min" */
+function formaterTid(s) {
+  const min = Math.floor(s / 60);
+  const sek = Math.floor(s % 60);
+  if (min === 0) return `${sek} s`;
+  if (min < 60) return `${min} min ${sek} s`;
+  return `${Math.floor(min / 60)} t ${min % 60} min`;
+}
+
+const tallFormat = new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 });
+
+/** "1 600", "0,75" */
+function formaterTall(x, maksDesimaler = 2) {
+  if (maksDesimaler === 2) return tallFormat.format(x);
+  return new Intl.NumberFormat("nb-NO", { maximumFractionDigits: maksDesimaler }).format(x);
+}
+
+return { formaterGrader, formaterTid, formaterTall };
+})();
+// ---- modeller/energi-som-sprer-seg/visning.js ----
+__moduler["modeller/energi-som-sprer-seg/visning.js"] = await (async () => {
+// Energi som sprer seg – tegning. Ingen fysikk her, bare lesing av tilstanden.
+
+const { tegnFargeskala } = __moduler["felles/js/fargeskala.js"];
+const { tegnPartikler, lagPartikler } = __moduler["felles/js/partikler.js"];
+const { tegnCeller, PARTIKKELFARGE } = __moduler["felles/js/gittertegning.js"];
+const { formaterGrader, formaterTid } = __moduler["felles/js/format.js"];
+const { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } = __moduler["modeller/energi-som-sprer-seg/modell.js"];
+
+const STORRELSE = { bredde: 760, hoyde: 400 };
+
+const CELLE = 14; // samme cellestørrelse for alle kar, så mer vann faktisk ser større ut
+const VEGG = 7;
+const Y0 = 52;
+const VEGGFARGE = "#b9b4a8";
+const STROMFARGE = "#a8487f"; // samme som "som strøm" i søylene og grafen
+
+// Vibrasjonen forsterkes over hele området modellen bruker (10–90 °C). Se "Hva modellen forenkler".
+const FORSTERKNING = { minT: VANN_START, maksT: KLOSS_T_MAKS, minUtslag: 0.3, maksUtslag: 3.4 };
+
+/** Hva som står midt i karet i hver fane. */
+const DELEN = {
+  kloss: { navn: "Kobberklossen", plass: klossPlass, temperatur: (r) => r.klossTemperatur },
+  dyppekoker: { navn: "Varmeelementet", plass: elementPlass, temperatur: (r) => r.elementTemperatur },
+};
+
+function lagVisning() {
+  let partikler = null;
+  let forrigeKar = null;
+
+  /** Én partikkel per celle, så eleven ser hvor mange partikler varmen fordeles på. */
+  function lagCellePartikler(g) {
+    const plasser = [];
+    for (let y = 0; y < g.ny; y++) {
+      for (let x = 0; x < g.nx; x++) {
+        plasser.push({ x: (x + 0.5) * CELLE, y: (y + 0.5) * CELLE, cx: x, cy: y });
+      }
+    }
+    return lagPartikler(plasser, 7);
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {object} kar  fra lagKar eller lagDyppekoker
+   * @param {{ tid: number, fane: "kloss" | "dyppekoker" }} vis  ekte tid (for jevn vibrasjon) og fane
+   */
+  function tegn(ctx, kar, { tid, fane }) {
+    const { bredde, hoyde } = STORRELSE;
+    ctx.clearRect(0, 0, bredde, hoyde);
+    const g = kar.gitter;
+    if (kar !== forrigeKar) {
+      partikler = lagCellePartikler(g);
+      forrigeKar = kar;
+    }
+    const delen = DELEN[fane];
+    const r = kar.regnskap();
+    const karB = g.nx * CELLE;
+    const karH = g.ny * CELLE;
+    const x0 = Math.round((bredde - karB) / 2);
+    const y0 = Y0;
+
+    // Isolert kar: tykk vegg rundt og lokk på
+    ctx.fillStyle = VEGGFARGE;
+    ctx.fillRect(x0 - VEGG, y0 - VEGG, karB + 2 * VEGG, karH + 2 * VEGG);
+    ctx.clearRect(x0, y0, karB, karH);
+
+    tegnCeller(ctx, g, x0, y0, CELLE);
+    tegnPartikler(
+      ctx,
+      partikler.map((p) => ({ ...p, x: x0 + p.x, y: y0 + p.y })),
+      (p) => g.temperatur(p.cx, p.cy),
+      tid,
+      { radius: 2.3, farge: (p) => PARTIKKELFARGE[g.materiale(p.cx, p.cy)], forsterkning: FORSTERKNING }
+    );
+
+    // Omriss av delen i midten, så den kan skilles fra vannet også når fargene er like
+    const k = delen.plass(kar.vannmengde);
+    const kx = x0 + k.x * CELLE;
+    const ky = y0 + k.y * CELLE;
+    ctx.strokeStyle = "rgba(31,35,40,0.55)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(kx + 0.5, ky + 0.5, k.side * CELLE - 1, k.side * CELLE - 1);
+    ctx.setLineDash([]);
+
+    if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0);
+
+    // Overskrift
+    ctx.fillStyle = "#5b616b";
+    ctx.font = "15px system-ui, sans-serif";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left";
+    ctx.fillText("Isolert kar: ingen varme går inn eller ut", 12, 12);
+
+    // Merkelapper til høyre for karet
+    const lx = x0 + karB + VEGG + 18;
+    ctx.textAlign = "left";
+    ctx.font = "600 15px system-ui, sans-serif";
+    ctx.fillStyle = "#1f2328";
+    ctx.fillText(delen.navn, lx, y0 + karH / 2 - 34);
+    ctx.font = "15px system-ui, sans-serif";
+    ctx.fillText(formaterGrader(delen.temperatur(r)), lx, y0 + karH / 2 - 14);
+    ctx.font = "600 15px system-ui, sans-serif";
+    ctx.fillText("Vannet", lx, y0 + karH / 2 + 14);
+    ctx.font = "15px system-ui, sans-serif";
+    const [vMin, vMaks] = vannSpenn(kar, k);
+    const vannTekst = r.likevekt ? formaterGrader(r.minTemperatur) : `${formaterGrader(vMin)} – ${formaterGrader(vMaks)}`;
+    ctx.fillText(vannTekst, lx, y0 + karH / 2 + 34);
+
+    // Under karet
+    ctx.textAlign = "center";
+    ctx.font = "600 17px system-ui, sans-serif";
+    ctx.fillStyle = "#1f2328";
+    let status;
+    if (r.likevekt) status = `Alt har samme temperatur: ${formaterGrader(kar.blandingstemperatur)}`;
+    else if (r.tid === 0) status = "Gjett først, trykk så Start";
+    else if (fane === "dyppekoker" && r.paa) status = "Strømmen blir til varme i elementet";
+    else status = "Varmen sprer seg";
+    ctx.fillText(status, bredde / 2, y0 + karH + VEGG + 14);
+
+    tegnFargeskala(ctx, bredde - 170, hoyde - 30, 150, 8, VANN_START, KLOSS_T_MAKS);
+  }
+
+  return { tegn };
+}
+
+/** Ledning fra elementet opp gjennom lokket, med en merkelapp: strøm på eller av. */
+function tegnLedning(ctx, r, x, yElement, yKar) {
+  const paa = r.paa;
+  const topp = yKar - VEGG - 16;
+  ctx.strokeStyle = paa ? STROMFARGE : "#9aa0a8";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x, yElement);
+  ctx.lineTo(x, topp);
+  ctx.stroke();
+  ctx.font = "600 14px system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = paa ? STROMFARGE : "#5b616b";
+  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % igjen` : "Strøm av";
+  ctx.fillText(tekst, x + 10, topp + 4);
+}
+
+/** Kaldeste og varmeste vann (alt utenom delen i midten). */
+function vannSpenn(kar, k) {
+  const g = kar.gitter;
+  let min = Infinity;
+  let maks = -Infinity;
+  for (let y = 0; y < g.ny; y++) {
+    for (let x = 0; x < g.nx; x++) {
+      if (x >= k.x && x < k.x + k.side && y >= k.y && y < k.y + k.side) continue;
+      const T = g.temperatur(x, y);
+      if (T < min) min = T;
+      if (T > maks) maks = T;
+    }
+  }
+  return [min, maks];
+}
+
+/** Tekst om hva som skjer (for skjermleser og som hjelp). */
+function beskriv(kar, fane) {
+  const r = kar.regnskap();
+  const pst = (x) => `${Math.round(x * 100)} %`;
+  const arbeid = `Kan gjøre arbeid: ${(r.kanGjoreArbeid * 100).toFixed(1).replace(".", ",")} %.`;
+  const slutt = r.likevekt ? ` Alt har nå samme temperatur, ${formaterGrader(kar.blandingstemperatur)}.` : "";
+
+  if (fane === "dyppekoker") {
+    if (r.tid === 0) {
+      return `Vannet og varmeelementet er ${formaterGrader(VANN_START, 0)}. All energien er ennå strøm, og alt av den kan gjøre arbeid.`;
+    }
+    const strom = r.paa ? `${pst(r.somStrom)} av energien er fortsatt strøm, ` : "Strømmen er slått av. ";
+    return (
+      `Etter ${formaterTid(r.tid)} er elementet ${formaterGrader(r.elementTemperatur)}. ${strom}` +
+      `${pst(r.varmeIKaret)} er varme i karet – til sammen ${pst(r.energiIAlt)}. ${arbeid}${slutt}`
+    );
+  }
+
+  if (r.tid === 0) {
+    return `Kobberklossen er ${formaterGrader(kar.klossT, 0)}, vannet er ${formaterGrader(VANN_START, 0)}. All varmen er i klossen.`;
+  }
+  return (
+    `Etter ${formaterTid(r.tid)} er klossen ${formaterGrader(r.klossTemperatur)}. ` +
+    `${pst(r.iKlossen)} av varmen er i klossen og ${pst(r.iVannet)} i vannet – til sammen ${pst(r.varmeIKaret)}. ${arbeid}${slutt}`
+  );
+}
+
+return { STORRELSE, lagVisning, beskriv };
+})();
+// ---- felles/js/data.js ----
+__moduler["felles/js/data.js"] = await (async () => {
+// Henter materialverdiene. Alle modeller bruker denne, så verdiene bare finnes ett sted.
+//
+// Når en modell pakkes til én enkelt fil (verktoy/lag-enkeltfil.js), legges innholdet
+// i globalThis.NATURFAG_MATERIALER, og da trengs ingen henting.
+
+async function hentMaterialer() {
+  if (globalThis.NATURFAG_MATERIALER) return globalThis.NATURFAG_MATERIALER;
+  const svar = await fetch(new URL("../data/materialer.json", import.meta.url));
+  if (!svar.ok) throw new Error(`Fant ikke materialer.json (${svar.status})`);
+  return svar.json();
+}
+
+return { hentMaterialer };
+})();
+// ---- felles/js/forutsi.js ----
+__moduler["felles/js/forutsi.js"] = await (async () => {
+// "Gjett først"-komponent.
+//
+// Eleven velger et svar og låser det før simuleringen kan startes.
+// Etterpå vises gjetningen ved siden av resultatet.
+//
+// Bruk:
+//   const forutsi = lagForutsi(document.getElementById("forutsi"), {
+//     sporsmal: "Hvilken isbit smelter først?",
+//     valg: [ { id: "al", tekst: "På aluminium" }, { id: "tre", tekst: "På tre" } ],
+//     vedLaas: (valgId) => { /* nå kan Play slås på */ },
+//   });
+//   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.");
+
+let teller = 0;
+
+/**
+ * @param {HTMLElement} element
+ * @param {object} oppsett
+ * @param {string} oppsett.sporsmal
+ * @param {{id: string, tekst: string}[]} oppsett.valg
+ * @param {(valgId: string) => void} [oppsett.vedLaas]
+ */
+function lagForutsi(element, { sporsmal, valg, vedLaas }) {
+  const gruppe = `forutsi-${++teller}`;
+  let gjetning = null;
+
+  element.classList.add("forutsi");
+
+  function tegnSporsmal() {
+    gjetning = null;
+    element.innerHTML = "";
+
+    const skjema = document.createElement("form");
+    const felt = document.createElement("fieldset");
+    const tittel = document.createElement("legend");
+    tittel.textContent = "Gjett først: " + sporsmal;
+    felt.append(tittel);
+
+    for (const v of valg) {
+      const etikett = document.createElement("label");
+      etikett.className = "valg";
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = gruppe;
+      radio.value = v.id;
+      etikett.append(radio, document.createTextNode(v.tekst));
+      felt.append(etikett);
+    }
+
+    const knapp = document.createElement("button");
+    knapp.type = "submit";
+    knapp.className = "knapp knapp-hoved";
+    knapp.textContent = "Lås gjetningen";
+    knapp.disabled = true;
+
+    felt.addEventListener("change", () => {
+      knapp.disabled = !skjema.querySelector("input:checked");
+    });
+
+    skjema.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const valgt = skjema.querySelector("input:checked");
+      if (!valgt) return;
+      gjetning = valgt.value;
+      tegnLaast();
+      if (vedLaas) vedLaas(gjetning);
+    });
+
+    skjema.append(felt, knapp);
+    element.append(skjema);
+  }
+
+  function tegnLaast() {
+    element.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "laast";
+    p.textContent = `Din gjetning: ${tekstFor(gjetning)}`;
+    const hint = document.createElement("p");
+    hint.textContent = "Trykk Start og se hva som skjer.";
+    element.append(p, hint);
+  }
+
+  function tekstFor(id) {
+    const funnet = valg.find((v) => v.id === id);
+    return funnet ? funnet.tekst : "–";
+  }
+
+  tegnSporsmal();
+
+  return {
+    /** Valgt id, eller null hvis eleven ikke har låst ennå. */
+    gjetning: () => gjetning,
+    erLaast: () => gjetning !== null,
+    /** Vis gjetningen ved siden av det som faktisk skjedde. */
+    visResultat(fasitId, forklaring = "") {
+      element.innerHTML = "";
+      const liste = document.createElement("dl");
+      liste.className = "sammenligning";
+      const rader = [
+        ["Du gjettet", tekstFor(gjetning)],
+        ["Det skjedde", tekstFor(fasitId)],
+      ];
+      for (const [navn, verdi] of rader) {
+        const dt = document.createElement("dt");
+        dt.textContent = navn;
+        const dd = document.createElement("dd");
+        dd.textContent = verdi;
+        liste.append(dt, dd);
+      }
+      element.append(liste);
+      if (forklaring) {
+        const p = document.createElement("p");
+        p.textContent = forklaring;
+        element.append(p);
+      }
+    },
+    /** Start på nytt med samme spørsmål. */
+    nullstill: tegnSporsmal,
+  };
+}
+
+return { lagForutsi };
+})();
+// ---- felles/js/tilstand.js ----
+__moduler["felles/js/tilstand.js"] = await (async () => {
+// Tilstand ut og inn, slik at en KI-tutor senere kan lese hva eleven gjør.
+//
+// Hver modell kaller koblTilTutor() én gang. Da kan tilstanden leses på tre måter:
+//   1. I samme side:   window.naturfagsmodell.hentTilstand()
+//   2. Fra en forelder-side (modellen ligger i en <iframe>):
+//        iframe.contentWindow.postMessage({ kilde: "tutor", type: "hentTilstand" }, "*")
+//      svaret kommer som { kilde: "naturfagsmodell", type: "tilstand", modell, tilstand }
+//   3. Hendelser (f.eks. "eleven låste gjetningen") sendes automatisk til forelder-siden
+//      som { kilde: "naturfagsmodell", type: "hendelse", modell, navn, data, tid }.
+//
+// Ingen nettverkskall: postMessage sender bare mellom vinduer i samme nettleser.
+// Tilstanden skal aldri inneholde personopplysninger.
+
+const KILDE = "naturfagsmodell";
+
+/**
+ * @param {object} oppsett
+ * @param {string} oppsett.modell   kort navn, f.eks. "varmeledning-partikler"
+ * @param {() => object} oppsett.hent   returnerer et vanlig objekt (kan gjøres om til JSON)
+ * @param {(tilstand: object) => void} [oppsett.sett]   setter modellen i en gitt tilstand
+ * @returns {{ sendHendelse: (navn: string, data?: object) => void }}
+ */
+function koblTilTutor({ modell, hent, sett }) {
+  const hentTilstand = () => strukturertKopi(hent());
+  const settTilstand = (tilstand) => {
+    if (typeof sett === "function") sett(tilstand);
+  };
+
+  function sendHendelse(navn, data = {}) {
+    const melding = { kilde: KILDE, type: "hendelse", modell, navn, data, tid: Date.now() };
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(melding, "*");
+    }
+    window.dispatchEvent(new CustomEvent("naturfagsmodell", { detail: melding }));
+  }
+
+  window.addEventListener("message", (e) => {
+    const m = e.data;
+    if (!m || m.kilde !== "tutor") return;
+    if (m.type === "hentTilstand" && e.source) {
+      e.source.postMessage(
+        { kilde: KILDE, type: "tilstand", modell, tilstand: hentTilstand() },
+        "*"
+      );
+    } else if (m.type === "settTilstand" && m.tilstand) {
+      settTilstand(m.tilstand);
+    }
+  });
+
+  window.naturfagsmodell = { modell, hentTilstand, settTilstand, sendHendelse };
+  return { sendHendelse };
+}
+
+function strukturertKopi(objekt) {
+  return JSON.parse(JSON.stringify(objekt));
+}
+
+return { koblTilTutor };
+})();
+// ---- felles/js/lerret.js ----
+__moduler["felles/js/lerret.js"] = await (async () => {
+// Skarpt lerret på skjermer med høy oppløsning (iPad, mange Chromebooks).
+// Vi tegner i faste "logiske" piksler, og lerretet skaleres med CSS.
+
+/**
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} bredde logisk bredde
+ * @param {number} hoyde  logisk høyde
+ * @returns {CanvasRenderingContext2D}
+ */
+function klargjorLerret(canvas, bredde, hoyde) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(bredde * dpr);
+  canvas.height = Math.round(hoyde * dpr);
+  canvas.style.aspectRatio = `${bredde} / ${hoyde}`;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.logiskBredde = bredde;
+  ctx.logiskHoyde = hoyde;
+  return ctx;
+}
+
+return { klargjorLerret };
+})();
+// ---- felles/js/graf.js ----
+__moduler["felles/js/graf.js"] = await (async () => {
+// Enkel sanntidsgraf på canvas. Flere serier, faste akser, x-aksen kan vokse.
+//
+// Bruk:
+//   const graf = lagGraf(canvas, {
+//     xMaks: 20, yMin: 18, yMaks: 34, xTekst: "tid (s)", yTekst: "°C",
+//     serier: [{ navn: "Aluminium", farge: "#1f5fa8" }, { navn: "Tre", farge: "#b35c00", strek: [6, 4] }],
+//     referanser: [{ y: 33, tekst: "huden før" }],
+//   });
+//   graf.leggTil(0, t, T); graf.tegn();
+
+const { klargjorLerret } = __moduler["felles/js/lerret.js"];
+
+function lagGraf(canvas, oppsett) {
+  const B = oppsett.bredde ?? 560;
+  const H = oppsett.hoyde ?? 240;
+  const ctx = klargjorLerret(canvas, B, H);
+  const marg = { v: 52, h: 16, o: 28, u: 40 };
+  const serier = oppsett.serier.map((s) => ({ ...s }));
+  const xFormat = oppsett.xFormat ?? ((x) => String(Math.round(x)));
+  const yFormat = oppsett.yFormat ?? ((y) => String(Math.round(y)));
+  let xMaks = oppsett.xMaks;
+  let data = serier.map(() => []);
+
+  const px = (x) => marg.v + (x / xMaks) * (B - marg.v - marg.h);
+  const py = (y) => marg.o + (1 - (y - oppsett.yMin) / (oppsett.yMaks - oppsett.yMin)) * (H - marg.o - marg.u);
+
+  function fineSteg(spenn, antall) {
+    const grovt = spenn / antall;
+    const tierpotens = 10 ** Math.floor(Math.log10(grovt));
+    for (const m of [1, 2, 2.5, 5, 10]) if (m * tierpotens >= grovt) return m * tierpotens;
+    return 10 * tierpotens;
+  }
+
+  /** Plasser forklaringene; bryt linja når den blir for lang. */
+  function plasserForklaring() {
+    ctx.font = "12px system-ui, sans-serif";
+    const plasser = [];
+    let lx = marg.v;
+    let linje = 0;
+    for (const s of serier) {
+      const b = 30 + ctx.measureText(s.navn).width + 16;
+      if (lx + b > B - marg.h && lx > marg.v) {
+        linje++;
+        lx = marg.v;
+      }
+      plasser.push({ x: lx, y: 12 + linje * 16 });
+      lx += b;
+    }
+    marg.o = 28 + linje * 16;
+    return plasser;
+  }
+
+  function tegn() {
+    ctx.clearRect(0, 0, B, H);
+    const forklaring = plasserForklaring();
+    ctx.font = "12px system-ui, sans-serif";
+
+    // Rutenett og akser
+    ctx.strokeStyle = "#ebe8e0";
+    ctx.fillStyle = "#5b616b";
+    ctx.lineWidth = 1;
+    const ySteg = fineSteg(oppsett.yMaks - oppsett.yMin, 4);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (let y = Math.ceil(oppsett.yMin / ySteg) * ySteg; y <= oppsett.yMaks + 1e-9; y += ySteg) {
+      ctx.beginPath();
+      ctx.moveTo(marg.v, py(y));
+      ctx.lineTo(B - marg.h, py(y));
+      ctx.stroke();
+      ctx.fillText(yFormat(y), marg.v - 6, py(y));
+    }
+    const xSteg = fineSteg(xMaks, 5);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (let x = 0; x <= xMaks + 1e-9; x += xSteg) {
+      ctx.beginPath();
+      ctx.moveTo(px(x), marg.o);
+      ctx.lineTo(px(x), H - marg.u);
+      ctx.stroke();
+      ctx.fillText(xFormat(x), px(x), H - marg.u + 4);
+    }
+    ctx.fillText(oppsett.xTekst, (marg.v + B - marg.h) / 2, H - 16);
+    ctx.save();
+    ctx.translate(12, (marg.o + H - marg.u) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textBaseline = "middle";
+    ctx.fillText(oppsett.yTekst, 0, 0);
+    ctx.restore();
+
+    // Referanselinjer
+    for (const r of oppsett.referanser ?? []) {
+      ctx.strokeStyle = "#9aa0a8";
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(marg.v, py(r.y));
+      ctx.lineTo(B - marg.h, py(r.y));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#5b616b";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(r.tekst, B - marg.h - 4, py(r.y) - 2);
+    }
+
+    // Seriene
+    serier.forEach((s, i) => {
+      const punkter = data[i];
+      if (punkter.length === 0) return;
+      ctx.strokeStyle = s.farge;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash(s.strek ?? []);
+      ctx.beginPath();
+      punkter.forEach(([x, y], j) => {
+        const yy = py(Math.min(oppsett.yMaks, Math.max(oppsett.yMin, y)));
+        if (j === 0) ctx.moveTo(px(x), yy);
+        else ctx.lineTo(px(x), yy);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Forklaring øverst
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    serier.forEach((s, i) => {
+      const { x, y } = forklaring[i];
+      ctx.strokeStyle = s.farge;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash(s.strek ?? []);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 24, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#1f2328";
+      ctx.fillText(s.navn, x + 30, y);
+    });
+  }
+
+  return {
+    leggTil(serie, x, y) {
+      while (oppsett.utvidX !== false && x > xMaks) xMaks *= 2;
+      data[serie].push([x, y]);
+    },
+    /** Bytt navn på seriene (f.eks. når eleven velger nytt materiale). */
+    settSerieNavn(navn) {
+      navn.forEach((n, i) => (serier[i].navn = n));
+    },
+    /** Legg til en ny serie (f.eks. en ny kjøring). Returnerer nummeret. */
+    leggTilSerie(serie) {
+      serier.push({ ...serie });
+      data.push([]);
+      return serier.length - 1;
+    },
+    /** Fjern en serie. Numrene til seriene etter den flyttes én ned. */
+    fjernSerie(i) {
+      serier.splice(i, 1);
+      data.splice(i, 1);
+    },
+    get antallSerier() {
+      return serier.length;
+    },
+    /** Tøm dataene, men behold seriene. */
+    nullstill() {
+      data = serier.map(() => []);
+      xMaks = oppsett.xMaks;
+    },
+    /** Fjern alle serier. */
+    tomAlt() {
+      serier.length = 0;
+      data = [];
+      xMaks = oppsett.xMaks;
+    },
+    tegn,
+  };
+}
+
+return { lagGraf };
+})();
+// ---- modeller/energi-som-sprer-seg/kontroller.js ----
+__moduler["modeller/energi-som-sprer-seg/kontroller.js"] = await (async () => {
+// Energi som sprer seg – faner, knapper, valg og løkka som driver modellen.
+// Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
+
+const { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } = __moduler["modeller/energi-som-sprer-seg/modell.js"];
+const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/energi-som-sprer-seg/visning.js"];
+const { hentMaterialer } = __moduler["felles/js/data.js"];
+const { lagForutsi } = __moduler["felles/js/forutsi.js"];
+const { koblTilTutor } = __moduler["felles/js/tilstand.js"];
+const { lagGraf } = __moduler["felles/js/graf.js"];
+const { klargjorLerret } = __moduler["felles/js/lerret.js"];
+const { formaterTid, formaterTall, formaterGrader } = __moduler["felles/js/format.js"];
+
+const data = await hentMaterialer();
+const $ = (id) => document.getElementById(id);
+
+const MAKS_DELSTEG = 200; // per skjermbilde
+// Det meste skjer de første minuttene: klossen går fra 90 til 40 °C på ca. 4 min. Med
+// konstant fart var det over på under 2 sekunder. Derfor starter farten lavt og øker
+// med tiden i modellen (tid/4), opp til fanens toppfart. Skjermen viser farten hele tiden.
+const START_FART = 10;
+// Grafen starter med 10 min på x-aksen og dobler den når tiden går forbi. Da synes de
+// første minuttene, der det meste skjer, mens forsøket pågår.
+const GRAF_START_MINUTTER = 10;
+const prosent = (x, d = 0) => `${formaterTall(Math.max(0, x) * 100, d)} %`;
+
+// Fargeblind-vennlige farger (Okabe–Ito). Søylene bruker de samme.
+const FARGE = { total: "#1f2328", kloss: "#D55E00", vann: "#0072B2", strom: "#a8487f", varme: "#D55E00", arbeid: "#009E73" };
+
+/**
+ * Alt som er ulikt i de to fanene. Toppfarten (simulerte sekunder per ekte sekund ved
+ * "Vanlig") er valgt slik at alt har samme temperatur etter ca. ett minutt. Testene:
+ * kloss 53/167/181 min, dyppekoker 69/215/210 min for lite/middels/mye vann.
+ */
+const FANER = {
+  kloss: {
+    toppfart: { lite: 60, middels: 180, mye: 180 },
+    lag: (vannmengde) => lagKar(data, { vannmengde, klossT: Number($("klosst").value) }),
+    oppsett: "Vannet er alltid 10 °C ved start. Karet er isolert: ingen varme går inn eller ut.",
+    hundre: "100 % = varmen klossen hadde ved start.",
+    yTekst: "% av varmen klossen hadde",
+    soyler: [
+      { navn: "Varme i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.total },
+      { navn: "i klossen", verdi: (r) => r.iKlossen, farge: FARGE.kloss, strek: [6, 4] },
+      { navn: "i vannet", verdi: (r) => r.iVannet, farge: FARGE.vann, strek: [2, 3] },
+    ],
+    joule: (r) => `Varme i karet: ${formaterTall(r.varmeJoule, 0)} J · kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
+    forutsi: (kar) => ({
+      sporsmal: `En kobberkloss på ${kar.klossT} °C legges i vann på 10 °C i et lukket kar. Når alt har fått samme temperatur: hvor mye av varmen fra klossen finnes fortsatt i karet?`,
+      valg: [
+        { id: "ingenting", tekst: "Ingenting – den er brukt opp" },
+        { id: "litt", tekst: "Litt – resten har forsvunnet" },
+        { id: "alt", tekst: "Alt sammen" },
+        { id: "mer", tekst: "Mer enn klossen hadde" },
+      ],
+    }),
+    fasit: (kar, r) => {
+      const k = klossPlass(kar.vannmengde);
+      return {
+        id: "alt",
+        tekst:
+          `All varmen er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
+          `Men den er spredt fra ${k.side * k.side} til ${kar.gitter.nx * kar.gitter.ny} partikler i snittet, så temperaturen ble bare ` +
+          `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å gjøre arbeid: ` +
+          `fra ${prosent(t.startArbeid, 1)} til ${prosent(r.kanGjoreArbeid, 1)}. Energien har fått lavere kvalitet.`,
+      };
+    },
+  },
+
+  dyppekoker: {
+    toppfart: { lite: 70, middels: 215, mye: 215 },
+    lag: (vannmengde) => lagDyppekoker(data, { vannmengde }),
+    oppsett: "Vannet er 10 °C ved start. Dyppekokeren får strøm i 5 minutter og slås så av. Karet er isolert.",
+    hundre: "100 % = energien strømmen gir. Det er like mye som kobberklossen på 90 °C hadde.",
+    yTekst: "% av energien fra strømmen",
+    soyler: [
+      { navn: "Energi i alt", verdi: (r) => r.energiIAlt, farge: FARGE.total },
+      { navn: "som strøm", verdi: (r) => r.somStrom, farge: FARGE.strom, strek: [6, 4] },
+      { navn: "som varme i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.varme, strek: [2, 3] },
+    ],
+    joule: (r) =>
+      `Strøm levert: ${formaterTall(r.stromLevertJoule, 0)} J · varme i karet: ${formaterTall(r.varmeJoule, 0)} J · ` +
+      `kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
+    forutsi: () => ({
+      sporsmal:
+        "Strøm kan i prinsippet gjøre arbeid uten tap: 100 %. Dyppekokeren gjør strømmen om til varme i vannet. Når alt har fått samme temperatur: hvor mye av energien kan fortsatt gjøre arbeid?",
+      valg: [
+        { id: "alt", tekst: "Fortsatt 100 % – energien er jo bevart" },
+        { id: "halve", tekst: "Omtrent halvparten" },
+        { id: "litt", tekst: "Litt, ca. 10 %" },
+        { id: "ingenting", tekst: "Ingenting" },
+      ],
+    }),
+    fasit: (kar, r) => ({
+      id: "ingenting",
+      tekst:
+        `Ved start var all energien strøm, og alt kunne gjøre arbeid. Da strømmen ble slått av, var bare ` +
+        `${prosent(t.arbeidVedAvslaaing ?? 0, 1)} igjen. Nå er det ${prosent(r.kanGjoreArbeid, 1)}. ` +
+        `Energien i alt er fortsatt ${prosent(r.energiIAlt)} – den er blitt varme spredt i hele karet, ` +
+        `${formaterGrader(kar.blandingstemperatur)}. Strøm er energi av høy kvalitet. Lunkent vann har lav kvalitet.`,
+    }),
+  },
+};
+
+const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
+const visning = lagVisning();
+let graf = null;
+
+const vannValg = $("vannmengde");
+const tempValg = $("klosst");
+const startKnapp = $("start");
+const fartValg = $("fart");
+
+for (const v of VANNMENGDER) {
+  const o = document.createElement("option");
+  o.value = v.id;
+  o.textContent = v.navn;
+  vannValg.append(o);
+}
+vannValg.value = "middels";
+
+const t = {
+  fane: "kloss",
+  kar: null,
+  forutsi: null,
+  kjorer: false,
+  startet: false,
+  ferdig: false,
+  startArbeid: 0,
+  arbeidVedAvslaaing: null,
+  fart: START_FART,
+  maaltFart: START_FART,
+  sisteMaaling: -Infinity,
+};
+const fane = () => FANER[t.fane];
+
+// ---------------------------------------------------------------------------
+// Bygg et nytt kar
+// ---------------------------------------------------------------------------
+
+function bygg() {
+  const f = fane();
+  const vannmengde = vannValg.value;
+  t.kar = f.lag(vannmengde);
+  t.kjorer = t.startet = t.ferdig = false;
+  t.startArbeid = t.kar.regnskap().kanGjoreArbeid;
+  t.arbeidVedAvslaaing = null;
+  t.sisteMaaling = -Infinity;
+  settFart();
+  t.maaltFart = t.fart;
+
+  const klossT = Number(tempValg.value);
+  $("klosst-verdi").textContent = formaterGrader(klossT, 0);
+  tempValg.setAttribute("aria-valuetext", formaterGrader(klossT, 0));
+  $("klosst-kontroll").hidden = t.fane !== "kloss";
+  $("oppsett-tekst").textContent = f.oppsett;
+  $("hundre-tekst").textContent = f.hundre;
+  const soyler = $("soyler");
+  f.soyler.forEach((s, i) => {
+    const id = ["total", "del1", "del2"][i];
+    $(`navn-${id}`).textContent = s.navn;
+    if (i > 0) soyler.style.setProperty(`--${id}-farge`, s.farge);
+  });
+
+  for (const el of [vannValg, tempValg]) el.disabled = false;
+  startKnapp.disabled = true;
+  startKnapp.textContent = "Start";
+
+  // Ny graf for hvert kar, med fanens serier.
+  graf = lagGraf($("graf"), {
+    xMaks: GRAF_START_MINUTTER,
+    yMin: 0,
+    yMaks: 100,
+    xTekst: "tid i modellen (minutter)",
+    yTekst: f.yTekst,
+    serier: [...f.soyler.map(({ navn, farge, strek }) => ({ navn, farge, strek })), { navn: "Kan gjøre arbeid", farge: FARGE.arbeid }],
+  });
+  graf.tegn();
+
+  const fanen = t.fane;
+  t.forutsi = lagForutsi($("forutsi"), {
+    ...f.forutsi(t.kar),
+    vedLaas: (gjetning) => {
+      startKnapp.disabled = false;
+      tutor.sendHendelse("gjetning", { fane: fanen, vannmengde, gjetning });
+    },
+  });
+  oppdaterRegnskap();
+  oppdaterTekst(true);
+}
+
+function settFart() {
+  const tid = t.kar ? t.kar.gitter.tid : 0;
+  const grunn = Math.max(START_FART, Math.min(fane().toppfart[vannValg.value], tid / 4));
+  t.fart = grunn * Number(fartValg.value);
+}
+
+// ---------------------------------------------------------------------------
+// Energiregnskap: søyler, graf og tekst
+// ---------------------------------------------------------------------------
+
+function settSoyle(id, andel, tekst) {
+  $(`soyle-${id}`).style.width = `${Math.min(100, Math.max(0, andel * 100))}%`;
+  $(`tall-${id}`).textContent = tekst;
+}
+
+function oppdaterRegnskap() {
+  const r = t.kar.regnskap();
+  fane().soyler.forEach((s, i) => {
+    const v = s.verdi(r);
+    settSoyle(["total", "del1", "del2"][i], v, prosent(v));
+  });
+  settSoyle("arbeid", r.kanGjoreArbeid, prosent(r.kanGjoreArbeid, 1));
+  const joule = $("joule-tall");
+  joule.hidden = !$("joule").checked;
+  if (!joule.hidden) joule.textContent = `${fane().joule(r)} Gjelder et snitt som er ${KAR.dx * 1000} mm tykt.`;
+}
+
+function maal(tving = false) {
+  const r = t.kar.regnskap();
+  if (!tving && r.tid - t.sisteMaaling < t.fart / 6) return;
+  t.sisteMaaling = r.tid;
+  const min = r.tid / 60;
+  const verdier = [...fane().soyler.map((s) => s.verdi(r)), r.kanGjoreArbeid];
+  verdier.forEach((v, i) => graf.leggTil(i, min, v * 100));
+}
+
+function oppdaterTekst(beskrivOgsa = false) {
+  let tekst = `Tid i modellen: ${formaterTid(t.kar.gitter.tid)} · 1 s på skjermen = ${formaterTid(t.fart)} i modellen`;
+  if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
+    tekst += ` (maskinen klarer bare ca. ${formaterTid(t.maaltFart)} nå)`;
+  }
+  $("tid").textContent = tekst;
+  if (beskrivOgsa) {
+    const b = beskriv(t.kar, t.fane);
+    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+  }
+}
+
+function visFasit() {
+  const { id, tekst } = fane().fasit(t.kar, t.kar.regnskap());
+  t.forutsi.visResultat(id, tekst);
+}
+
+// ---------------------------------------------------------------------------
+// Faner
+// ---------------------------------------------------------------------------
+
+const faneKnapper = [$("fane-kloss"), $("fane-dyppekoker")];
+
+function velgFane(navn, fokus = false) {
+  if (!FANER[navn]) return;
+  for (const knapp of faneKnapper) {
+    const valgt = knapp.id === `fane-${navn}`;
+    knapp.setAttribute("aria-selected", String(valgt));
+    knapp.tabIndex = valgt ? 0 : -1;
+    if (valgt && fokus) knapp.focus();
+  }
+  $("panel").setAttribute("aria-labelledby", `fane-${navn}`);
+  if (navn === t.fane) return;
+  // Et nytt forsøk i den andre fanen. Det som kjørte, stoppes.
+  t.fane = navn;
+  bygg();
+  tutor.sendHendelse("fane", { fane: navn });
+}
+
+faneKnapper.forEach((knapp, i) => {
+  knapp.addEventListener("click", () => velgFane(knapp.id.replace("fane-", "")));
+  knapp.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const neste = faneKnapper[(i + (e.key === "ArrowRight" ? 1 : faneKnapper.length - 1)) % faneKnapper.length];
+    velgFane(neste.id.replace("fane-", ""), true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Knapper og valg
+// ---------------------------------------------------------------------------
+
+startKnapp.addEventListener("click", () => {
+  if (!t.forutsi.erLaast() || t.ferdig) return;
+  if (!t.startet) {
+    t.startet = true;
+    for (const el of [vannValg, tempValg]) el.disabled = true;
+    maal(true);
+  }
+  t.kjorer = !t.kjorer;
+  t.maaltFart = t.fart;
+  startKnapp.textContent = t.kjorer ? "Pause" : "Fortsett";
+  oppdaterTekst(true);
+  tutor.sendHendelse(t.kjorer ? "start" : "pause", { fane: t.fane, vannmengde: t.kar.vannmengde });
+});
+
+$("nullstill").addEventListener("click", () => {
+  bygg();
+  tutor.sendHendelse("nullstill", { fane: t.fane });
+});
+
+for (const el of [vannValg, tempValg]) {
+  el.addEventListener("input", () => {
+    if (t.startet && !t.ferdig) return;
+    bygg();
+    tutor.sendHendelse("valg", { fane: t.fane, vannmengde: vannValg.value, klossT: Number(tempValg.value) });
+  });
+}
+
+fartValg.addEventListener("change", () => {
+  settFart();
+  t.maaltFart = t.fart;
+  oppdaterTekst();
+});
+
+$("joule").addEventListener("change", oppdaterRegnskap);
+
+// ---------------------------------------------------------------------------
+// KI-tutor
+// ---------------------------------------------------------------------------
+
+const tutor = koblTilTutor({
+  modell: "energi-som-sprer-seg",
+  hent: () => {
+    const r = t.kar.regnskap();
+    const pst = (x) => Math.round(x * 1000) / 10;
+    const felles = {
+      fane: t.fane,
+      vannmengde: t.kar.vannmengde,
+      gjetning: t.forutsi.gjetning(),
+      kjorer: t.kjorer,
+      tid: Math.round(r.tid),
+      energiIAltProsent: pst(r.energiIAlt),
+      varmeIKarProsent: pst(r.varmeIKaret),
+      kanGjoreArbeidProsent: pst(r.kanGjoreArbeid),
+      sluttTemperatur: Math.round(t.kar.blandingstemperatur * 10) / 10,
+      ferdig: t.ferdig,
+    };
+    if (t.fane === "dyppekoker") {
+      return {
+        ...felles,
+        stromPaa: r.paa,
+        somStromProsent: pst(r.somStrom),
+        elementTemperatur: Math.round(r.elementTemperatur * 10) / 10,
+      };
+    }
+    return {
+      ...felles,
+      klossTemperatur: t.kar.klossT,
+      iKlossenProsent: pst(r.iKlossen),
+      iVannetProsent: pst(r.iVannet),
+      klossTemperaturNa: Math.round(r.klossTemperatur * 10) / 10,
+    };
+  },
+  sett: (ny) => {
+    if (t.startet && !t.ferdig) return;
+    if (VANNMENGDER.some((v) => v.id === ny.vannmengde)) vannValg.value = ny.vannmengde;
+    if (typeof ny.klossTemperatur === "number") tempValg.value = String(ny.klossTemperatur);
+    if (FANER[ny.fane] && ny.fane !== t.fane) velgFane(ny.fane);
+    else bygg();
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Løkka
+// ---------------------------------------------------------------------------
+
+let forrige = null;
+let animTid = 0;
+let sisteTekst = 0;
+let sisteBeskrivelse = 0;
+
+function animer(naa) {
+  const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);
+  forrige = naa;
+  animTid += dtEkte;
+
+  if (t.kjorer && dtEkte > 0) {
+    settFart();
+    const simulert = t.kar.stegMedBudsjett(dtEkte * t.fart, MAKS_DELSTEG);
+    t.maaltFart = 0.9 * t.maaltFart + 0.1 * (simulert / dtEkte);
+    const r = t.kar.regnskap();
+    if (t.fane === "dyppekoker" && t.arbeidVedAvslaaing === null && !r.paa) {
+      t.arbeidVedAvslaaing = r.kanGjoreArbeid;
+      maal(true);
+      tutor.sendHendelse("strom-av", { kanGjoreArbeidProsent: Math.round(r.kanGjoreArbeid * 1000) / 10 });
+    }
+    maal();
+    if (r.likevekt) {
+      maal(true);
+      t.kjorer = false;
+      t.ferdig = true;
+      startKnapp.textContent = "Ferdig";
+      startKnapp.disabled = true;
+      for (const el of [vannValg, tempValg]) el.disabled = false;
+      visFasit();
+      oppdaterTekst(true);
+      tutor.sendHendelse("ferdig", { fane: t.fane, sluttTemperatur: t.kar.blandingstemperatur, gjetning: t.forutsi.gjetning() });
+    }
+    graf.tegn();
+  }
+
+  visning.tegn(ctx, t.kar, { tid: animTid, fane: t.fane });
+
+  if (animTid - sisteTekst > 0.2) {
+    sisteTekst = animTid;
+    oppdaterRegnskap();
+    const beskrivOgsa = animTid - sisteBeskrivelse > 4;
+    if (beskrivOgsa) sisteBeskrivelse = animTid;
+    oppdaterTekst(beskrivOgsa);
+  }
+  requestAnimationFrame(animer);
+}
+
+bygg();
+requestAnimationFrame(animer);
+
+return {  };
+})();
+</script>
+</body>
+</html>

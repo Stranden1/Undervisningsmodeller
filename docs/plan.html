@@ -21,8 +21,8 @@
 <body>
   <header class="topp plan">
     <a class="tilbake" href="../index.html">← Alle modeller</a>
-    <h1>Plan: to modeller med felles varmemotor</h1>
-    <p class="ingress">Modell A (metall kjennes kaldt) og modell B (snø smelter fra kanten) bygger på samme regnemotor for varme. Vi jobber i faser og stopper etter hver.</p>
+    <h1>Plan: tre modeller med felles varmemotor</h1>
+    <p class="ingress">Modell A (metall kjennes kaldt), modell B (snø smelter fra kanten) og modell C (energi som sprer seg) bygger på samme regnemotor for varme. Vi jobber i faser og stopper etter hver.</p>
   </header>
 
   <main class="plan">
@@ -51,6 +51,11 @@
         <h3>Fase 4 – Ferdigstilling <span class="merke">ferdig</span></h3>
         <p>Katalogside med fenomen, misoppfatninger, lærerveiledning og nedlasting. <code>verktoy/lag-enkeltfil.js</code> pakker en modell til én fil (ca. 80–90 kB) som virker ved dobbeltklikk; begge er eksportert til <code>eksport/</code> og prøvd uten server.</p>
       </div>
+      <div class="fase ferdig">
+        <h3>Fase 5 – Modell C: energi som sprer seg <span class="merke">ferdig</span></h3>
+        <p>Valgt etter <a href="kartlegging-laereplan.md">kartleggingen av læreplan og læreverk</a>. Egen plan: <a href="plan-energi-som-sprer-seg.html">plan-energi-som-sprer-seg.html</a>. Fane "Varm kloss" (kobber i kaldt vann i et isolert kar) og fane "Dyppekoker" (strøm blir varme). Energiregnskap som søyler og graf: energien står på 100 %, mens "kan gjøre arbeid" synker til 0. 15 fysiske tester for modellen består. Varmemotoren er ikke endret.</p>
+        <p><strong>Funn:</strong> Stille vann leder sakte, så det tar 1–3 timer i modellen før alt har samme temperatur. Farten starter derfor lavt og øker, og grafens tidsakse vokser, så de første minuttene synes. Varm kobber på 90 °C kan bare gi ca. 10 % som arbeid; strøm gir 100 %, og bare ca. 5 % er igjen når dyppekokeren slås av.</p>
+      </div>
     </section>
 
     <section>
@@ -71,6 +76,7 @@
         <li><strong>17. okt.:</strong> Snømodellen: pakket snø −5 °C, luft +5 °C, varmt underlag +5 °C, sol 500 W/m² der snøen tar opp 20 % (kilder: PVGIS og NSIDC, står i materialer.json). Tall vises for terninger.</li>
         <li><strong>17. okt.:</strong> Isbiten starter på −18 °C (fra fryseren). Fingeren er et 2 mm hudlag der blodet holder baksiden på 33 °C.</li>
         <li><strong>17. okt.:</strong> Vann (k = 0,60, ρ = 1000, c = 4180) og h = 10 W/m²·K mot stille luft er lagt inn i <code>materialer.json</code>. Is, nysnø og pakket snø er merket med <code>smelter_til: "vann"</code>.</li>
+        <li><strong>23. okt.:</strong> Modell C: kobberkloss i kaldt vann (10 °C), kontroller for vannmengde og klossens temperatur (40–90 °C), energikvalitet som søylen "Kan gjøre arbeid" (største arbeid en perfekt maskin kan hente ut), dyppekoker som fane 2. Dyppekokeren er 2 cm og står på i 5 min, så ingenting blir over ca. 75 °C.</li>
       </ul>
 
     </section>

@@ -14,7 +14,7 @@ import {
   KLOSS_T_MAKS,
 } from "../modell.js";
 
-const data = JSON.parse(readFileSync(new URL("../../../felles/data/materialer.json", import.meta.url), "utf8"));
+const data = JSON.parse(readFileSync(new URL("../../../../felles/data/materialer.json", import.meta.url), "utf8"));
 const grader = (T) => `${T.toFixed(2)} °C`;
 const prosent = (x) => `${(100 * x).toFixed(1)} %`;
 

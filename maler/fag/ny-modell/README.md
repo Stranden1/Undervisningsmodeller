@@ -1,7 +1,8 @@
 # Modellnavn – lærerveiledning
 
-> Kopier mappa `maler/ny-modell/` til `modeller/<modellnavn>/` og fyll ut alt under
-> **før** du skriver fysikkoden. Misoppfatningen bestemmer hva modellen skal vise.
+> Kopier mappa `maler/fag/ny-modell/` til `modeller/<fag>/<modellnavn>/` (f.eks.
+> `modeller/naturfag/`) og fyll ut alt under **før** du skriver modellkoden.
+> Misoppfatningen bestemmer hva modellen skal vise.
 
 ## Fenomen
 Hva eleven skal undre seg over, formulert som et spørsmål.

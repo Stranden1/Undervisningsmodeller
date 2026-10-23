@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { lagSnoforsok, smeltetid, lagBiter, overflateOgVolum, OPPDELINGER } from "../modell.js";
 
-const data = JSON.parse(readFileSync(new URL("../../../felles/data/materialer.json", import.meta.url), "utf8"));
+const data = JSON.parse(readFileSync(new URL("../../../../felles/data/materialer.json", import.meta.url), "utf8"));
 const timer = (s) => `${(s / 3600).toFixed(1)} t`;
 
 test("Alle oppdelinger har samme mengde snø", () => {

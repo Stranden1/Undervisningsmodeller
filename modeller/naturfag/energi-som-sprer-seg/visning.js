@@ -1,9 +1,9 @@
 // Energi som sprer seg – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
-import { tegnFargeskala } from "../../felles/js/fargeskala.js";
-import { tegnPartikler, lagPartikler } from "../../felles/js/partikler.js";
-import { tegnCeller, PARTIKKELFARGE } from "../../felles/js/gittertegning.js";
-import { formaterGrader, formaterTid } from "../../felles/js/format.js";
+import { tegnFargeskala } from "../../../felles/js/fargeskala.js";
+import { tegnPartikler, lagPartikler } from "../../../felles/js/partikler.js";
+import { tegnCeller, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
+import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
 import { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } from "./modell.js";
 
 export const STORRELSE = { bredde: 760, hoyde: 400 };

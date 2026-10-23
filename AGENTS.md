@@ -1,6 +1,7 @@
-# Naturfagsmodeller
+# Undervisningsmodeller
 
-En samling interaktive modeller for naturfag i norsk skole (ungdomsskole og Vg1 først).
+En samling interaktive modeller for naturfag og samfunnsfag i norsk skole (ungdomsskole
+og Vg1 først). Modellene ligger i `modeller/<fag>/<modellnavn>/`.
 Hver modell skal kunne brukes alene, løftes ut og bakes inn i andre ting senere.
 Dette er et "body of work" – konsistens og kvalitet er viktigere enn fart.
 
@@ -38,7 +39,8 @@ begreper og forkortelser kort første gang de dukker opp i en økt.
   - `modell.js` – ren fysikk, ingen DOM/canvas. Kan testes i Node.
   - `visning.js` – tegner tilstanden. Inneholder ingen fysikk.
   - `kontroller.js` – knapper og glidebrytere.
-- **Fysiske verdier hentes alltid fra `felles/data/materialer.json`.** Ikke finn opp tall.
+- **Tall hentes alltid fra `felles/data/`, med kilde.** Ikke finn opp tall.
+  Naturfag: `felles/data/materialer.json`. Samfunnsfag: egne datafiler, f.eks. fra SSB.
   Mangler en verdi: si fra, ikke gjett.
 - En modell kan bare importere fra sin egen mappe og fra `felles/`. **Aldri fra en annen
   modell.** Da kan den løftes ut alene.
@@ -58,7 +60,7 @@ begreper og forkortelser kort første gang de dukker opp i en økt.
 ## Mappestruktur
 
 ```
-Naturfagsmodeller/
+Undervisningsmodeller/
 ├── AGENTS.md               ← denne fila
 ├── README.md               ← oversikt for mennesker
 ├── index.html              ← katalog over alle modeller
@@ -80,22 +82,25 @@ Naturfagsmodeller/
 │   └── data/
 │       └── materialer.json ← materialverdier med kilder
 ├── modeller/
-│   └── <modellnavn>/
-│       ├── index.html
-│       ├── stil.css        ← bare det som gjelder denne modellen
-│       ├── modell.js
-│       ├── visning.js
-│       ├── kontroller.js
-│       ├── README.md       ← lærerveiledning (se under)
-│       └── tester/
-│           └── fysikk.test.js
-├── maler/ny-modell/        ← kopieres når en ny modell startes
+│   ├── naturfag/
+│   │   └── <modellnavn>/
+│   │       ├── index.html
+│   │       ├── stil.css    ← bare det som gjelder denne modellen
+│   │       ├── modell.js
+│   │       ├── visning.js
+│   │       ├── kontroller.js
+│   │       ├── README.md   ← lærerveiledning (se under)
+│   │       └── tester/
+│   │           └── fysikk.test.js
+│   └── samfunnsfag/        ← samme oppbygning; README.md forklarer hva som hører hjemme her
+├── maler/fag/ny-modell/    ← kopieres til modeller/<fag>/ når en ny modell startes
 ├── verktoy/
 │   ├── server.js           ← lokal webserver for utvikling (node verktoy/server.js)
 │   ├── lag-enkeltfil.js    ← pakker en modell til én HTML-fil
 │   └── tester/
 │       └── lag-enkeltfil.test.js
-├── eksport/                ← ferdige enkeltfiler (genereres, ikke rediger for hånd)
+├── eksport/                ← ferdige enkeltfiler, flatt: eksport/<modellnavn>.html
+│                             (genereres, ikke rediger for hånd; modellnavn er unike på tvers av fag)
 └── docs/
     ├── plan.html           ← plan og beslutninger
     └── designprinsipper.md
@@ -110,10 +115,12 @@ KI-generert simuleringskode kan se perfekt ut og være feil. Derfor:
 
 - **Tekniske tester:** glidebrytere oppdaterer alt, reset virker, ingenting havner utenfor
   lerretet, ingen feil i konsollen.
-- **Fysiske tester** i `tester/` (kjøres med `node --test`): sammenlign mot kjente svar.
-  Eksempler: energien er bevart i et lukket system; to klosser ender på riktig
+- **Faglige tester** i `tester/` (kjøres med `node --test`): sammenlign mot kjente svar.
+  Naturfag: energien er bevart i et lukket system; to klosser ender på riktig
   likevektstemperatur; doblet varmeledningsevne gir raskere utjevning; temperaturen står
-  stille på 0 °C mens is smelter.
+  stille på 0 °C mens is smelter. Samfunnsfag: modellen gjenskaper kjente tall og
+  sammenhenger (med kilde), og antakelsene om hvordan mennesker oppfører seg står i
+  «Hva modellen forenkler».
 - Bygg **trinnvis**: få kjernen til å virke og bestå testene før visning og ekstra
   funksjoner legges til. Stopp og vis eieren etter hver fase.
 - Når du er usikker på fysikken: si det og forklar valget, ikke skjul det.

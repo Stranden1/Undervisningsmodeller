@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { lagEnkeltfil } from "../lag-enkeltfil.js";
+import { lagEnkeltfil, finnModeller } from "../lag-enkeltfil.js";
 
 for (const modell of ["varmeledning-partikler", "overflate-og-volum", "energi-som-sprer-seg"]) {
   test(`${modell}: blir én fil uten eksterne filer`, async () => {
@@ -32,3 +32,14 @@ for (const modell of ["varmeledning-partikler", "overflate-og-volum", "energi-so
     }
   });
 }
+
+test("finner modellene i fagmappene under modeller/", async () => {
+  const modeller = await finnModeller();
+  for (const modell of ["varmeledning-partikler", "overflate-og-volum", "energi-som-sprer-seg"]) {
+    assert.ok(modeller.some((m) => m.fag === "naturfag" && m.modell === modell), `${modell} skal ligge i naturfag/`);
+  }
+});
+
+test("et ukjent modellnavn gir en tydelig feil", async () => {
+  await assert.rejects(lagEnkeltfil("finnes-ikke"), /Fant ingen modell som heter "finnes-ikke"/);
+});

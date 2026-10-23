@@ -5,7 +5,7 @@
 //   "Isbit på kloss": en isbit fra fryseren legges på aluminium og på tre.
 // Hvert scenario har to scener side om side, som regnes med samme tidssteg.
 
-import { lagVarmegitter } from "../../felles/js/varmegitter.js";
+import { lagVarmegitter } from "../../../felles/js/varmegitter.js";
 
 /** Materialer eleven kan velge i "Ta på". */
 export const TA_PAA_MATERIALER = ["kobber", "aluminium", "rustfritt_stal", "glass", "tre", "isopor"];

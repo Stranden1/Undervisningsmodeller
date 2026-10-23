@@ -19,12 +19,12 @@ import {
   formaterTid,
   materialNavn,
 } from "./visning.js";
-import { hentMaterialer } from "../../felles/js/data.js";
-import { lagForutsi } from "../../felles/js/forutsi.js";
-import { koblTilTutor } from "../../felles/js/tilstand.js";
-import { lagGraf } from "../../felles/js/graf.js";
-import { klargjorLerret } from "../../felles/js/lerret.js";
-import { temperaturFarge } from "../../felles/js/fargeskala.js";
+import { hentMaterialer } from "../../../felles/js/data.js";
+import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { koblTilTutor } from "../../../felles/js/tilstand.js";
+import { lagGraf } from "../../../felles/js/graf.js";
+import { klargjorLerret } from "../../../felles/js/lerret.js";
+import { temperaturFarge } from "../../../felles/js/fargeskala.js";
 
 const data = await hentMaterialer();
 const $ = (id) => document.getElementById(id);

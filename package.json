@@ -1,7 +1,7 @@
 {
-  "name": "naturfagsmodeller",
+  "name": "undervisningsmodeller",
   "private": true,
-  "description": "Interaktive modeller for naturfag. Ingen avhengigheter og ingen build-steg.",
+  "description": "Interaktive modeller for naturfag og samfunnsfag. Ingen avhengigheter og ingen build-steg.",
   "type": "module",
   "scripts": {
     "start": "node verktoy/server.js",

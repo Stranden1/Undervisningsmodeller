@@ -1,8 +1,8 @@
-# Naturfagsmodeller
+# Undervisningsmodeller
 
-Interaktive modeller for naturfag i norsk skole (ungdomsskole og Vg1). Hver modell tar for
-seg ett fenomen og én vanlig misoppfatning. Eleven gjetter først, ser hva som skjer, og
-forklarer hvorfor.
+Interaktive modeller for naturfag og samfunnsfag i norsk skole (ungdomsskole og Vg1).
+Hver modell tar for seg ett fenomen og én vanlig misoppfatning. Eleven gjetter først, ser
+hva som skjer, og forklarer hvorfor.
 
 Alt er vanlig HTML og JavaScript. Ingenting må installeres eller bygges, det er ingen
 innlogging, ingen sporing og ingen kall til nettet.
@@ -18,7 +18,7 @@ node verktoy/server.js
 
 Åpne så <http://localhost:8000> i nettleseren. Stopp serveren med `Ctrl+C`.
 
-Kjør de fysiske testene:
+Kjør testene (fysikk, faglige sammenhenger og verktøy):
 
 ```bash
 node --test
@@ -38,16 +38,18 @@ redigeres for hånd.
 
 | Modell | Fenomen | Status |
 |---|---|---|
-| `modeller/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Klar til elevtesting |
-| `modeller/overflate-og-volum/` | Hvorfor smelter snø raskest på kanten? | Klar til elevtesting |
+| `modeller/naturfag/varmeledning-partikler/` | Hvorfor kjennes metall kaldere enn tre? | Klar til elevtesting |
+| `modeller/naturfag/overflate-og-volum/` | Hvorfor smelter snø raskest på kanten? | Klar til elevtesting |
+| `modeller/naturfag/energi-som-sprer-seg/` | Hvor blir det av energien når en varm kloss blir kald? | Klar til elevtesting |
 
 Planen ligger i [`docs/plan.html`](docs/plan.html).
 
 ## Mapper
 
 - `felles/` – stil, felles JavaScript og materialverdier (`felles/data/materialer.json`)
-- `modeller/` – én mappe per modell, med lærerveiledning i `README.md`
-- `maler/ny-modell/` – kopieres når en ny modell startes
+- `modeller/<fag>/` – én mappe per modell, sortert etter fag (`naturfag/`, `samfunnsfag/`),
+  med lærerveiledning i `README.md`
+- `maler/fag/ny-modell/` – kopieres til `modeller/<fag>/` når en ny modell startes
 - `verktoy/` – lokal server og verktøyet som lager enkeltfiler
 - `eksport/` – ferdige enkeltfiler som kan deles (lages av verktøyet)
 - `docs/` – plan og designprinsipper

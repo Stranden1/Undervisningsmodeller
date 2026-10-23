@@ -1,17 +1,17 @@
 // Tilstand ut og inn, slik at en KI-tutor senere kan lese hva eleven gjør.
 //
 // Hver modell kaller koblTilTutor() én gang. Da kan tilstanden leses på tre måter:
-//   1. I samme side:   window.naturfagsmodell.hentTilstand()
+//   1. I samme side:   window.undervisningsmodell.hentTilstand()
 //   2. Fra en forelder-side (modellen ligger i en <iframe>):
 //        iframe.contentWindow.postMessage({ kilde: "tutor", type: "hentTilstand" }, "*")
-//      svaret kommer som { kilde: "naturfagsmodell", type: "tilstand", modell, tilstand }
+//      svaret kommer som { kilde: "undervisningsmodell", type: "tilstand", modell, tilstand }
 //   3. Hendelser (f.eks. "eleven låste gjetningen") sendes automatisk til forelder-siden
-//      som { kilde: "naturfagsmodell", type: "hendelse", modell, navn, data, tid }.
+//      som { kilde: "undervisningsmodell", type: "hendelse", modell, navn, data, tid }.
 //
 // Ingen nettverkskall: postMessage sender bare mellom vinduer i samme nettleser.
 // Tilstanden skal aldri inneholde personopplysninger.
 
-const KILDE = "naturfagsmodell";
+const KILDE = "undervisningsmodell";
 
 /**
  * @param {object} oppsett
@@ -31,7 +31,7 @@ export function koblTilTutor({ modell, hent, sett }) {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage(melding, "*");
     }
-    window.dispatchEvent(new CustomEvent("naturfagsmodell", { detail: melding }));
+    window.dispatchEvent(new CustomEvent("undervisningsmodell", { detail: melding }));
   }
 
   window.addEventListener("message", (e) => {
@@ -47,7 +47,7 @@ export function koblTilTutor({ modell, hent, sett }) {
     }
   });
 
-  window.naturfagsmodell = { modell, hentTilstand, settTilstand, sendHendelse };
+  window.undervisningsmodell = { modell, hentTilstand, settTilstand, sendHendelse };
   return { sendHendelse };
 }
 

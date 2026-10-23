@@ -1,4 +1,4 @@
-/* Felles utseende for alle naturfagsmodeller.
+/* Felles utseende for alle undervisningsmodeller.
    Rolig og rent: modellen skal få oppmerksomheten, ikke pynten.
    Fargene er valgt slik at de kan skilles også ved fargeblindhet
    (blå–oransje i stedet for rød–grønn). */
@@ -373,7 +373,14 @@ select {
   gap: var(--rom-4);
 }
 
-.katalog .kort h2 { margin-bottom: var(--rom-2); }
+.fag-tittel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rom-3) var(--rom-4) var(--rom-3);
+}
+
+.katalog .kort h3 { font-size: 1.2rem; margin-bottom: var(--rom-2); }
+.katalog .tom { grid-column: 1 / -1; }
 .katalog .kort p { color: var(--tekst-dempet); }
 
 /* Mindre bevegelse for dem som har bedt om det */

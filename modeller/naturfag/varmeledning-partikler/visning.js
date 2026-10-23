@@ -1,9 +1,9 @@
 // Varmeledning med partikler – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
-import { temperaturFarge, tegnFargeskala } from "../../felles/js/fargeskala.js";
-import { tegnPartikler } from "../../felles/js/partikler.js";
-import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../felles/js/gittertegning.js";
-import { formaterGrader, formaterTid } from "../../felles/js/format.js";
+import { temperaturFarge, tegnFargeskala } from "../../../felles/js/fargeskala.js";
+import { tegnPartikler } from "../../../felles/js/partikler.js";
+import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
+import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
 import { TA_PAA_GEOMETRI, ISBIT_GEOMETRI } from "./modell.js";
 
 export { formaterTid };

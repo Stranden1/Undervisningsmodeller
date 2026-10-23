@@ -4,7 +4,7 @@
 // tynt lag. Varme kommer inn gjennom overflaten (luft, og valgfritt sol og varmt
 // underlag). Smeltevann renner bort, og snøen over synker ned.
 
-import { lagVarmegitter } from "../../felles/js/varmegitter.js";
+import { lagVarmegitter } from "../../../felles/js/varmegitter.js";
 
 /** Snøtype og starttemperatur. Valgt av eieren 2026-10-17. */
 export const SNO = "pakket_sno";

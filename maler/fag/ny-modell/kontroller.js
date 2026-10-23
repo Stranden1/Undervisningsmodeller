@@ -3,8 +3,8 @@
 
 import { lagModell } from "./modell.js";
 import { tegn, beskriv } from "./visning.js";
-import { lagForutsi } from "../../felles/js/forutsi.js";
-import { koblTilTutor } from "../../felles/js/tilstand.js";
+import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { koblTilTutor } from "../../../felles/js/tilstand.js";
 
 const lerret = document.getElementById("lerret");
 const ctx = lerret.getContext("2d");

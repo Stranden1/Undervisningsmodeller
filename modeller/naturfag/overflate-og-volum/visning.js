@@ -1,9 +1,9 @@
 // Overflate og volum – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
-import { tegnFargeskala, temperaturFarge } from "../../felles/js/fargeskala.js";
-import { tegnPartikler } from "../../felles/js/partikler.js";
-import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../felles/js/gittertegning.js";
-import { formaterTid } from "../../felles/js/format.js";
+import { tegnFargeskala, temperaturFarge } from "../../../felles/js/fargeskala.js";
+import { tegnPartikler } from "../../../felles/js/partikler.js";
+import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
+import { formaterTid } from "../../../felles/js/format.js";
 import { GEOMETRI, OPPDELINGER, LUFT_T, UNDERLAG_T } from "./modell.js";
 
 export const STORRELSE = { bredde: 760, hoyde: 380 };

@@ -4,7 +4,8 @@
 //   node verktoy/lag-enkeltfil.js                        (alle modeller)
 //   node verktoy/lag-enkeltfil.js varmeledning-partikler (én modell)
 //
-// Resultatet havner i eksport/<modell>.html.
+// Modellene ligger i modeller/<fag>/<modell>/, men resultatet havner flatt i
+// eksport/<modell>.html. Derfor kan ikke to fag ha en modell med samme navn.
 //
 // Hvorfor dette trengs: nettlesere nekter å laste JS-moduler fra hverandre når en fil
 // åpnes direkte fra disken (file://). Her legges alle modulene inn i én <script> i
@@ -95,8 +96,31 @@ function pakkModul(fil, kode) {
 /** Ikke la innholdet avslutte <script>- eller <style>-taggen for tidlig. */
 const trygg = (tekst, tagg) => tekst.replace(new RegExp(`</${tagg}`, "gi"), `<\\/${tagg}`);
 
+async function undermapper(mappe) {
+  return (await readdir(mappe, { withFileTypes: true }))
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+}
+
+/** Alle modeller, uansett fag: [{ fag: "naturfag", modell: "overflate-og-volum" }, …] */
+export async function finnModeller() {
+  const modeller = [];
+  for (const fag of await undermapper(join(ROT, "modeller"))) {
+    for (const modell of await undermapper(join(ROT, "modeller", fag))) {
+      modeller.push({ fag, modell });
+    }
+  }
+  // Enkeltfilene ligger flatt i eksport/, så samme navn i to fag ville overskrive hverandre.
+  const navn = modeller.map((m) => m.modell);
+  const dobbel = navn.find((n, i) => navn.indexOf(n) !== i);
+  if (dobbel) throw new Error(`To modeller heter "${dobbel}". Modellnavn må være unike på tvers av fag.`);
+  return modeller;
+}
+
 export async function lagEnkeltfil(modell) {
-  const mappe = join(ROT, "modeller", modell);
+  const funnet = (await finnModeller()).find((m) => m.modell === modell);
+  if (!funnet) throw new Error(`Fant ingen modell som heter "${modell}"`);
+  const mappe = join(ROT, "modeller", funnet.fag, modell);
   let html = await readFile(join(mappe, "index.html"), "utf8");
 
   // Stilark -> <style>
@@ -129,16 +153,14 @@ export async function lagEnkeltfil(modell) {
   const dato = new Date().toISOString().slice(0, 10);
   html = html.replace(
     /<!doctype html>/i,
-    `<!doctype html>\n<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/${modell}/ (${dato}). Ikke rediger for hånd. -->`
+    `<!doctype html>\n<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/${funnet.fag}/${modell}/ (${dato}). Ikke rediger for hånd. -->`
   );
   return html;
 }
 
 async function hovedprogram() {
   const valgt = process.argv.slice(2);
-  const alle = (await readdir(join(ROT, "modeller"), { withFileTypes: true }))
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
+  const alle = (await finnModeller()).map((m) => m.modell);
   const modeller = valgt.length ? valgt : alle;
   await mkdir(join(ROT, "eksport"), { recursive: true });
   for (const m of modeller) {

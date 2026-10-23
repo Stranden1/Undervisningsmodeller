@@ -1,12 +1,12 @@
 <!doctype html>
-<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/energi-som-sprer-seg/ (2026-10-23). Ikke rediger for hånd. -->
+<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/naturfag/energi-som-sprer-seg/ (2026-10-23). Ikke rediger for hånd. -->
 <html lang="nb">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Energi som sprer seg</title>
   <style>
-/* Felles utseende for alle naturfagsmodeller.
+/* Felles utseende for alle undervisningsmodeller.
    Rolig og rent: modellen skal få oppmerksomheten, ikke pynten.
    Fargene er valgt slik at de kan skilles også ved fargeblindhet
    (blå–oransje i stedet for rød–grønn). */
@@ -381,7 +381,14 @@ select {
   gap: var(--rom-4);
 }
 
-.katalog .kort h2 { margin-bottom: var(--rom-2); }
+.fag-tittel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rom-3) var(--rom-4) var(--rom-3);
+}
+
+.katalog .kort h3 { font-size: 1.2rem; margin-bottom: var(--rom-2); }
+.katalog .tom { grid-column: 1 / -1; }
 .katalog .kort p { color: var(--tekst-dempet); }
 
 /* Mindre bevegelse for dem som har bedt om det */
@@ -1152,8 +1159,8 @@ function lagVarmegitter({
 
 return { lagVarmegitter };
 })();
-// ---- modeller/energi-som-sprer-seg/modell.js ----
-__moduler["modeller/energi-som-sprer-seg/modell.js"] = await (async () => {
+// ---- modeller/naturfag/energi-som-sprer-seg/modell.js ----
+__moduler["modeller/naturfag/energi-som-sprer-seg/modell.js"] = await (async () => {
 // Energi som sprer seg – ren fysikk. Ingen DOM og ingen canvas.
 //
 // En varm kobberkloss ligger midt i kaldt vann i et lukket, isolert kar. Varmen leder
@@ -1709,15 +1716,15 @@ function formaterTall(x, maksDesimaler = 2) {
 
 return { formaterGrader, formaterTid, formaterTall };
 })();
-// ---- modeller/energi-som-sprer-seg/visning.js ----
-__moduler["modeller/energi-som-sprer-seg/visning.js"] = await (async () => {
+// ---- modeller/naturfag/energi-som-sprer-seg/visning.js ----
+__moduler["modeller/naturfag/energi-som-sprer-seg/visning.js"] = await (async () => {
 // Energi som sprer seg – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
 const { tegnFargeskala } = __moduler["felles/js/fargeskala.js"];
 const { tegnPartikler, lagPartikler } = __moduler["felles/js/partikler.js"];
 const { tegnCeller, PARTIKKELFARGE } = __moduler["felles/js/gittertegning.js"];
 const { formaterGrader, formaterTid } = __moduler["felles/js/format.js"];
-const { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } = __moduler["modeller/energi-som-sprer-seg/modell.js"];
+const { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } = __moduler["modeller/naturfag/energi-som-sprer-seg/modell.js"];
 
 const STORRELSE = { bredde: 760, hoyde: 400 };
 
@@ -2045,17 +2052,17 @@ __moduler["felles/js/tilstand.js"] = await (async () => {
 // Tilstand ut og inn, slik at en KI-tutor senere kan lese hva eleven gjør.
 //
 // Hver modell kaller koblTilTutor() én gang. Da kan tilstanden leses på tre måter:
-//   1. I samme side:   window.naturfagsmodell.hentTilstand()
+//   1. I samme side:   window.undervisningsmodell.hentTilstand()
 //   2. Fra en forelder-side (modellen ligger i en <iframe>):
 //        iframe.contentWindow.postMessage({ kilde: "tutor", type: "hentTilstand" }, "*")
-//      svaret kommer som { kilde: "naturfagsmodell", type: "tilstand", modell, tilstand }
+//      svaret kommer som { kilde: "undervisningsmodell", type: "tilstand", modell, tilstand }
 //   3. Hendelser (f.eks. "eleven låste gjetningen") sendes automatisk til forelder-siden
-//      som { kilde: "naturfagsmodell", type: "hendelse", modell, navn, data, tid }.
+//      som { kilde: "undervisningsmodell", type: "hendelse", modell, navn, data, tid }.
 //
 // Ingen nettverkskall: postMessage sender bare mellom vinduer i samme nettleser.
 // Tilstanden skal aldri inneholde personopplysninger.
 
-const KILDE = "naturfagsmodell";
+const KILDE = "undervisningsmodell";
 
 /**
  * @param {object} oppsett
@@ -2075,7 +2082,7 @@ function koblTilTutor({ modell, hent, sett }) {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage(melding, "*");
     }
-    window.dispatchEvent(new CustomEvent("naturfagsmodell", { detail: melding }));
+    window.dispatchEvent(new CustomEvent("undervisningsmodell", { detail: melding }));
   }
 
   window.addEventListener("message", (e) => {
@@ -2091,7 +2098,7 @@ function koblTilTutor({ modell, hent, sett }) {
     }
   });
 
-  window.naturfagsmodell = { modell, hentTilstand, settTilstand, sendHendelse };
+  window.undervisningsmodell = { modell, hentTilstand, settTilstand, sendHendelse };
   return { sendHendelse };
 }
 
@@ -2307,13 +2314,13 @@ function lagGraf(canvas, oppsett) {
 
 return { lagGraf };
 })();
-// ---- modeller/energi-som-sprer-seg/kontroller.js ----
-__moduler["modeller/energi-som-sprer-seg/kontroller.js"] = await (async () => {
+// ---- modeller/naturfag/energi-som-sprer-seg/kontroller.js ----
+__moduler["modeller/naturfag/energi-som-sprer-seg/kontroller.js"] = await (async () => {
 // Energi som sprer seg – faner, knapper, valg og løkka som driver modellen.
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
-const { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } = __moduler["modeller/energi-som-sprer-seg/modell.js"];
-const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/energi-som-sprer-seg/visning.js"];
+const { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } = __moduler["modeller/naturfag/energi-som-sprer-seg/modell.js"];
+const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/naturfag/energi-som-sprer-seg/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
 const { koblTilTutor } = __moduler["felles/js/tilstand.js"];

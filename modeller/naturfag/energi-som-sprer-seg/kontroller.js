@@ -3,12 +3,12 @@
 
 import { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } from "./modell.js";
 import { lagVisning, beskriv, STORRELSE } from "./visning.js";
-import { hentMaterialer } from "../../felles/js/data.js";
-import { lagForutsi } from "../../felles/js/forutsi.js";
-import { koblTilTutor } from "../../felles/js/tilstand.js";
-import { lagGraf } from "../../felles/js/graf.js";
-import { klargjorLerret } from "../../felles/js/lerret.js";
-import { formaterTid, formaterTall, formaterGrader } from "../../felles/js/format.js";
+import { hentMaterialer } from "../../../felles/js/data.js";
+import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { koblTilTutor } from "../../../felles/js/tilstand.js";
+import { lagGraf } from "../../../felles/js/graf.js";
+import { klargjorLerret } from "../../../felles/js/lerret.js";
+import { formaterTid, formaterTall, formaterGrader } from "../../../felles/js/format.js";
 
 const data = await hentMaterialer();
 const $ = (id) => document.getElementById(id);

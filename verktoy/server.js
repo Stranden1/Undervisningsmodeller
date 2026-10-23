@@ -54,5 +54,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Naturfagsmodeller kjører på http://localhost:${PORT}  (stopp med Ctrl+C)`);
+  console.log(`Undervisningsmodeller kjører på http://localhost:${PORT}  (stopp med Ctrl+C)`);
 });

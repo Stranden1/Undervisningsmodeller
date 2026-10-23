@@ -10,7 +10,7 @@
 //
 // Bygger på den felles varmemotoren. Motoren endres ikke.
 
-import { lagVarmegitter } from "../../felles/js/varmegitter.js";
+import { lagVarmegitter } from "../../../felles/js/varmegitter.js";
 
 /** Vannet i karet ved start (°C). Valgt i planen 2026-10-21: kaldt springvann. */
 export const VANN_START = 10;

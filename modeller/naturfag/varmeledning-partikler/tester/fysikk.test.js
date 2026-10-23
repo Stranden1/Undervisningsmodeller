@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { lagTaPaa, lagIsbit, kaldestKloss, forstSmeltet, TA_PAA_MATERIALER } from "../modell.js";
 
-const data = JSON.parse(readFileSync(new URL("../../../felles/data/materialer.json", import.meta.url), "utf8"));
+const data = JSON.parse(readFileSync(new URL("../../../../felles/data/materialer.json", import.meta.url), "utf8"));
 
 /** Kontakttemperatur etter 1 s for hvert materiale. */
 function kontaktEtter1s() {

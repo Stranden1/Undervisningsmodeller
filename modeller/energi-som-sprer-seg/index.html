@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Energi som sprer seg</title>
+  <link rel="stylesheet" href="../../felles/stil.css">
+  <link rel="stylesheet" href="stil.css">
+</head>
+<body>
+  <header class="topp">
+    <a class="tilbake" href="../../index.html">← Alle modeller</a>
+    <h1>Energi som sprer seg</h1>
+    <p class="ingress">En varm kloss legges i kaldt vann. Hvor blir det av energien når klossen blir kald?</p>
+  </header>
+
+  <main class="modell">
+    <div class="scene kort">
+      <canvas id="lerret" role="img"
+              aria-label="En kobberkloss midt i vann i et lukket kar. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
+      <p id="tid" class="tidsmaler"></p>
+      <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+      <h2 class="graf-tittel">Energiregnskapet over tid</h2>
+      <canvas id="graf" role="img" aria-label="Graf over varmen i karet, i klossen, i vannet og hvor mye som kan gjøre arbeid, over tid"></canvas>
+    </div>
+
+    <aside class="panel">
+      <div id="forutsi"></div>
+
+      <section class="kort">
+        <div class="kontroll">
+          <label for="vannmengde">Vannmengde</label>
+          <select id="vannmengde"></select>
+        </div>
+        <div class="kontroll">
+          <label for="klosst">Klossens temperatur <output id="klosst-verdi"></output></label>
+          <input id="klosst" type="range" min="40" max="90" step="5" value="90">
+        </div>
+        <p class="hjelpetekst">Vannet er alltid 10 °C ved start. Karet er isolert: ingen varme går inn eller ut.</p>
+
+        <div class="knapperad">
+          <button id="start" class="knapp knapp-hoved" disabled>Start</button>
+          <button id="nullstill" class="knapp">Nullstill</button>
+        </div>
+        <details class="mer">
+          <summary>Mer</summary>
+          <div class="kontroll">
+            <label for="fart">Fart</label>
+            <select id="fart">
+              <option value="0.25">Sakte</option>
+              <option value="1" selected>Vanlig</option>
+              <option value="4">Rask</option>
+            </select>
+          </div>
+          <label class="avkrysning"><input type="checkbox" id="joule"> Vis tall i joule</label>
+        </details>
+      </section>
+
+      <section class="kort" aria-labelledby="regnskap-tittel">
+        <h2 id="regnskap-tittel">Energiregnskap</h2>
+        <p class="hjelpetekst forste">100 % = varmen klossen hadde ved start.</p>
+        <div class="soyler" id="soyler">
+          <div class="soyle hoved">
+            <span class="navn">Varme i karet</span>
+            <span class="spor"><span id="soyle-total" class="fyll total"></span></span>
+            <span id="tall-total" class="tall verdi"></span>
+          </div>
+          <div class="soyle under">
+            <span class="navn">i klossen</span>
+            <span class="spor"><span id="soyle-kloss" class="fyll kloss"></span></span>
+            <span id="tall-kloss" class="tall verdi"></span>
+          </div>
+          <div class="soyle under">
+            <span class="navn">i vannet</span>
+            <span class="spor"><span id="soyle-vann" class="fyll vann"></span></span>
+            <span id="tall-vann" class="tall verdi"></span>
+          </div>
+          <div class="soyle hoved">
+            <span class="navn">Kan gjøre arbeid</span>
+            <span class="spor"><span id="soyle-arbeid" class="fyll arbeid"></span></span>
+            <span id="tall-arbeid" class="tall verdi"></span>
+          </div>
+        </div>
+        <p id="joule-tall" class="hjelpetekst" hidden></p>
+        <details class="forklaring">
+          <summary>Hva betyr «kan gjøre arbeid»?</summary>
+          <p>Energi kan bare gjøre noe nyttig – drive en motor, lyse, løfte – når den strømmer fra noe varmt til noe kaldt. Tallet viser det aller meste en perfekt maskin kunne fått ut av temperaturforskjellene i karet. Når alt har samme temperatur, er det ingen forskjell igjen å bruke. Da er tallet 0, selv om all varmen fortsatt er der.</p>
+          <p>Allerede ved start er tallet lavt. Varme er energi av lav kvalitet. Strøm er energi av høy kvalitet.</p>
+        </details>
+      </section>
+
+      <details class="forenkler">
+        <summary>Hva modellen forenkler</summary>
+        <ul>
+          <li><strong>Vannet står helt stille.</strong> Ekte vann strømmer når det blir varmt, så i et forsøk jevner temperaturen seg ut på noen minutter. I modellen spres varmen bare ved ledning, så det tar mye lengre tid.</li>
+          <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom 10 °C og 90 °C er ca. 13 %.</li>
+          <li>Modellen er et snitt (2D) gjennom karet, 4 mm tykt. Derfor vises energien i prosent, ikke i joule.</li>
+          <li>Karet er perfekt isolert. Et ekte kar slipper ut litt varme hele tiden.</li>
+          <li>«Kan gjøre arbeid» gjelder en tenkt, perfekt maskin. Ekte maskiner får ut mye mindre.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <script type="module" src="kontroller.js"></script>
+</body>
+</html>

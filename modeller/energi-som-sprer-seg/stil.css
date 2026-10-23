@@ -1,0 +1,88 @@
+/* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
+
+.graf-tittel {
+  font-size: 0.95rem;
+  margin: var(--rom-4) 0 var(--rom-2);
+  color: var(--tekst-dempet);
+}
+
+#graf {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.kontroll select {
+  font: inherit;
+  padding: var(--rom-1) var(--rom-2);
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  background: var(--flate);
+}
+
+.hjelpetekst {
+  color: var(--tekst-dempet);
+  font-size: 0.9rem;
+  margin-top: var(--rom-2);
+}
+.hjelpetekst.forste { margin-top: 0; margin-bottom: var(--rom-3); }
+
+.avkrysning {
+  display: flex;
+  align-items: center;
+  gap: var(--rom-2);
+  margin: var(--rom-2) 0 0;
+}
+.avkrysning input { width: 20px; height: 20px; }
+
+/* ---------- Energiregnskap ---------- */
+
+.soyler { display: grid; gap: var(--rom-2); }
+
+/* Navn og tall på én linje, søylen over hele bredden under. */
+.soyle {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "navn verdi" "spor spor";
+  gap: 2px var(--rom-2);
+  align-items: baseline;
+}
+.soyle .navn { grid-area: navn; }
+.soyle .verdi { grid-area: verdi; }
+.soyle .spor { grid-area: spor; }
+.soyle.under { margin-left: var(--rom-3); }
+.soyle.hoved .navn { font-weight: 600; }
+.soyle.under .navn { color: var(--tekst-dempet); font-size: 0.9rem; }
+.soyle .verdi { text-align: right; font-size: 0.9rem; }
+
+.spor {
+  display: block;
+  height: 14px;
+  background: var(--flate-dempet);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.soyle.under .spor { height: 10px; }
+
+.fyll {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 0.15s linear;
+}
+/* Samme farger som i grafen (Okabe–Ito, fargeblind-vennlige). */
+.fyll.total { background: #1f2328; }
+.fyll.kloss { background: #D55E00; }
+.fyll.vann { background: #0072B2; }
+.fyll.arbeid { background: #009E73; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fyll { transition: none; }
+}
+
+.forklaring {
+  margin-top: var(--rom-3);
+  font-size: 0.9rem;
+}
+.forklaring summary { cursor: pointer; color: var(--aksent); }
+.forklaring p { margin: var(--rom-2) 0 0; }

@@ -10,9 +10,12 @@ export const FORSTERKNING = { minT: -20, maksT: 40, minUtslag: 0.25, maksUtslag:
 const redusertBevegelse =
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-/** Utslag i piksler for en temperatur (forsterket, se over). */
-export function utslag(T) {
-  const { minT, maksT, minUtslag, maksUtslag } = FORSTERKNING;
+/**
+ * Utslag i piksler for en temperatur (forsterket, se over).
+ * En modell med et annet temperaturområde kan sende inn sin egen forsterkning.
+ */
+export function utslag(T, forsterkning = FORSTERKNING) {
+  const { minT, maksT, minUtslag, maksUtslag } = forsterkning;
   const a = Math.min(1, Math.max(0, (T - minT) / (maksT - minT)));
   return minUtslag + a * (maksUtslag - minUtslag);
 }
@@ -47,17 +50,19 @@ export function lagPartikler(plasser, fro = 1) {
  * @param {object[]} partikler fra lagPartikler
  * @param {(p: object) => number | null} temperaturFor  temperatur for partikkelens celle (null = ikke tegn)
  * @param {number} tid  sekunder (ekte tid, for jevn bevegelse)
- * @param {{ radius?: number, farge?: (p: object) => string }} [valg]
+ * @param {{ radius?: number, farge?: (p: object) => string, forsterkning?: object }} [valg]
  */
 export function tegnPartikler(ctx, partikler, temperaturFor, tid, valg = {}) {
   const radius = valg.radius ?? 2.4;
   const fart = redusertBevegelse ? 0.15 : 1;
+  const forsterkning = { ...FORSTERKNING, ...valg.forsterkning };
   for (const p of partikler) {
     const T = temperaturFor(p);
     if (T === null || Number.isNaN(T)) continue;
-    const A = utslag(T);
+    const A = utslag(T, forsterkning);
     // Varmere partikler svinger også litt raskere.
-    const w = (10 + 0.25 * (T - FORSTERKNING.minT)) * fart;
+    const andel = Math.min(1, Math.max(0, (T - forsterkning.minT) / (forsterkning.maksT - forsterkning.minT)));
+    const w = (10 + 15 * andel) * fart;
     const x = p.x + A * (Math.sin(w * p.fx * tid + p.px) + 0.5 * Math.sin(1.7 * w * p.fy * tid + p.py)) / 1.5;
     const y = p.y + A * (Math.sin(w * p.fy * tid + p.py) + 0.5 * Math.sin(1.3 * w * p.fx * tid + p.px)) / 1.5;
     ctx.fillStyle = valg.farge ? valg.farge(p) : "rgba(31,35,40,0.7)";

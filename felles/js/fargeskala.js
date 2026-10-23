@@ -9,6 +9,9 @@ const STOPP = [
   [20, [230, 226, 218]],
   [30, [242, 178, 107]],
   [40, [196, 90, 0]],
+  // Over 40 °C (bare "Energi som sprer seg" går så høyt): mørkere brunoransje.
+  [65, [150, 62, 6]],
+  [90, [104, 38, 10]],
 ];
 
 /** RGB-farge for en temperatur i °C, som [r, g, b]. */
@@ -46,6 +49,8 @@ export function tegnFargeskala(ctx, x, y, bredde, hoyde, minT = -20, maksT = 40)
   ctx.fillText(`${minT} °C`, x, y + hoyde + 3);
   ctx.textAlign = "right";
   ctx.fillText(`${maksT} °C`, x + bredde, y + hoyde + 3);
-  ctx.textAlign = "center";
-  ctx.fillText("0 °C", x + (bredde * (0 - minT)) / (maksT - minT), y + hoyde + 3);
+  if (minT < 0 && maksT > 0) {
+    ctx.textAlign = "center";
+    ctx.fillText("0 °C", x + (bredde * (0 - minT)) / (maksT - minT), y + hoyde + 3);
+  }
 }

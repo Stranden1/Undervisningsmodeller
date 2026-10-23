@@ -92,6 +92,54 @@ export function kanGjoreArbeid(deler) {
   return Math.max(0, sumCT - sumC * Math.exp(sumClnT / sumC));
 }
 
+/** Tomt, lukket kar fylt med vann. Ingen varmeovergang mot luft (h = 0), ingen luft langs kanten. */
+function lagLukketKar(data, vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const gitter = lagVarmegitter({ nx, ny, dx: KAR.dx, data, h: 0, kantErLuft: false });
+  gitter.fyllRektangel(0, 0, nx, ny, "vann", VANN_START);
+  return gitter;
+}
+
+/** Varmekapasitet per celle, regnet én gang. Materialene endrer seg ikke underveis. */
+function lagCelleliste(gitter, data, erDel) {
+  const celler = [];
+  for (let y = 0; y < gitter.ny; y++) {
+    for (let x = 0; x < gitter.nx; x++) {
+      celler.push({ x, y, C: cellekapasitet(data, gitter.materiale(x, y)), erDel: erDel(x, y) });
+    }
+  }
+  return celler;
+}
+
+/**
+ * Les av temperaturene. "Varme" er energi over vannets starttemperatur (J), delt på
+ * delen (klossen eller varmeelementet) og resten (vannet).
+ */
+function maal(gitter, celler) {
+  let del = 0;
+  let resten = 0;
+  let delCT = 0;
+  let delC = 0;
+  let min = Infinity;
+  let maks = -Infinity;
+  const deler = [];
+  for (const c of celler) {
+    const T = gitter.temperatur(c.x, c.y);
+    const over = c.C * (T - VANN_START);
+    if (c.erDel) {
+      del += over;
+      delCT += c.C * T;
+      delC += c.C;
+    } else {
+      resten += over;
+    }
+    if (T < min) min = T;
+    if (T > maks) maks = T;
+    deler.push([c.C, T]);
+  }
+  return { del, resten, delTemperatur: delCT / delC, min, maks, arbeid: kanGjoreArbeid(deler) };
+}
+
 /**
  * Lag karet med kloss og vann.
  * @param {object} data  materialer.json
@@ -101,62 +149,32 @@ export function lagKar(data, { vannmengde: vannmengdeId = "middels", klossT = KL
   if (!(klossT >= KLOSS_T_MIN && klossT <= KLOSS_T_MAKS)) {
     throw new RangeError(`Klossens temperatur må være mellom ${KLOSS_T_MIN} og ${KLOSS_T_MAKS} °C`);
   }
-  const { nx, ny } = vannmengde(vannmengdeId);
-  // Lukket kar: ingen varmeovergang mot luft (h = 0) og ingen luft langs kanten.
-  const gitter = lagVarmegitter({ nx, ny, dx: KAR.dx, data, h: 0, kantErLuft: false });
-  gitter.fyllRektangel(0, 0, nx, ny, "vann", VANN_START);
+  const gitter = lagLukketKar(data, vannmengdeId);
   const plass = klossPlass(vannmengdeId);
   gitter.fyllRektangel(plass.x, plass.y, plass.side, plass.side, KLOSS_MATERIALE, klossT);
-
-  // Varmekapasitet per celle, regnet én gang. Materialene endrer seg ikke underveis.
-  const celler = [];
-  for (let y = 0; y < ny; y++) {
-    for (let x = 0; x < nx; x++) {
-      const nokkel = gitter.materiale(x, y);
-      celler.push({ x, y, C: cellekapasitet(data, nokkel), erKloss: nokkel === KLOSS_MATERIALE });
-    }
-  }
+  const celler = lagCelleliste(gitter, data, (x, y) => gitter.materiale(x, y) === KLOSS_MATERIALE);
 
   // 100 % = varmen klossen hadde over vannets temperatur ved start.
   // Prosent i stedet for joule: snittet er bare 4 mm tykt, så joule-tallet sier lite.
-  const startVarme = celler.reduce((s, c) => s + (c.erKloss ? c.C * (klossT - VANN_START) : 0), 0);
+  const startVarme = celler.reduce((s, c) => s + (c.erDel ? c.C * (klossT - VANN_START) : 0), 0);
   const blanding = blandingstemperatur(data, vannmengdeId, klossT);
 
   function regnskap() {
-    let kloss = 0;
-    let vann = 0;
-    let min = Infinity;
-    let maks = -Infinity;
-    let klossSum = 0;
-    let klossC = 0;
-    const deler = [];
-    for (const c of celler) {
-      const T = gitter.temperatur(c.x, c.y);
-      const over = c.C * (T - VANN_START);
-      if (c.erKloss) {
-        kloss += over;
-        klossSum += c.C * T;
-        klossC += c.C;
-      } else {
-        vann += over;
-      }
-      if (T < min) min = T;
-      if (T > maks) maks = T;
-      deler.push([c.C, T]);
-    }
-    const arbeid = kanGjoreArbeid(deler);
+    const m = maal(gitter, celler);
+    const varme = m.del + m.resten;
     return {
       tid: gitter.tid,
-      iKlossen: kloss / startVarme,
-      iVannet: vann / startVarme,
-      varmeIKaret: (kloss + vann) / startVarme,
-      kanGjoreArbeid: arbeid / startVarme,
-      kanGjoreArbeidJoule: arbeid,
-      varmeJoule: kloss + vann,
-      klossTemperatur: klossSum / klossC,
-      minTemperatur: min,
-      maksTemperatur: maks,
-      likevekt: maks - min < LIKEVEKT_GRENSE,
+      iKlossen: m.del / startVarme,
+      iVannet: m.resten / startVarme,
+      varmeIKaret: varme / startVarme,
+      energiIAlt: varme / startVarme,
+      kanGjoreArbeid: m.arbeid / startVarme,
+      kanGjoreArbeidJoule: m.arbeid,
+      varmeJoule: varme,
+      klossTemperatur: m.delTemperatur,
+      minTemperatur: m.min,
+      maksTemperatur: m.maks,
+      likevekt: m.maks - m.min < LIKEVEKT_GRENSE,
     };
   }
 
@@ -169,5 +187,133 @@ export function lagKar(data, { vannmengde: vannmengdeId = "middels", klossT = KL
     regnskap,
     steg: (dt) => gitter.steg(dt),
     stegMedBudsjett: (dt, maksDelsteg) => gitter.stegMedBudsjett(dt, maksDelsteg),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Fane 2: dyppekoker
+// ---------------------------------------------------------------------------
+
+// Et varmeelement av rustfritt stål midt i vannet får strøm i en fast tid og slås så av.
+// Energien er like stor som varmen kobberklossen på 90 °C kom med, så fanene kan
+// sammenlignes. Strøm er energi av høyeste kvalitet: alt kan i prinsippet gjøre arbeid.
+//
+// Elementet er 5 × 5 celler (2 cm) og står på i 5 min. Prøvekjørt 23. okt.: da blir det
+// høyst ca. 75 °C. Mindre element eller kortere tid ga 95–190 °C, og koking er ikke med
+// i modellen. Effekten er derfor valgt etter dette, ikke etter en ekte dyppekoker.
+export const ELEMENT_MATERIALE = "rustfritt_stal";
+export const DYPPEKOKER = { side: 5, paaTid: 300 };
+
+/** Hvor varmeelementet står: midt i karet. */
+export function elementPlass(vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const side = DYPPEKOKER.side;
+  return { x: Math.floor((nx - side) / 2), y: Math.floor((ny - side) / 2), side };
+}
+
+/** Elektrisk energi (J i snittet): det samme som kobberklossen på 90 °C har over vannets temperatur. */
+export function dyppekokerEnergi(data) {
+  return KAR.kloss * KAR.kloss * cellekapasitet(data, KLOSS_MATERIALE) * (KLOSS_T_MAKS - VANN_START);
+}
+
+/** Temperaturen alt ender på når all strømmen er blitt varme i vann og element (håndregning). */
+export function dyppekokerSluttemperatur(data, vannmengdeId) {
+  const { nx, ny } = vannmengde(vannmengdeId);
+  const elementCeller = DYPPEKOKER.side ** 2;
+  const C =
+    elementCeller * cellekapasitet(data, ELEMENT_MATERIALE) +
+    (nx * ny - elementCeller) * cellekapasitet(data, "vann");
+  return VANN_START + dyppekokerEnergi(data) / C;
+}
+
+/**
+ * Lag karet med vann og dyppekoker.
+ * @param {object} data  materialer.json
+ * @param {{ vannmengde?: string }} valg
+ */
+export function lagDyppekoker(data, { vannmengde: vannmengdeId = "middels" } = {}) {
+  const gitter = lagLukketKar(data, vannmengdeId);
+  const plass = elementPlass(vannmengdeId);
+  gitter.fyllRektangel(plass.x, plass.y, plass.side, plass.side, ELEMENT_MATERIALE, VANN_START);
+  const celler = lagCelleliste(gitter, data, (x, y) => gitter.materiale(x, y) === ELEMENT_MATERIALE);
+  const elementCeller = celler.filter((c) => c.erDel);
+
+  const strom = dyppekokerEnergi(data); // J
+  const effekt = strom / DYPPEKOKER.paaTid; // W i snittet
+  let paa = true;
+  let slattAvVed = null;
+
+  function settEffekt(watt) {
+    for (const c of elementCeller) gitter.settEffekt(c.x, c.y, watt / elementCeller.length);
+  }
+  settEffekt(effekt);
+
+  /** Tid (s) til all strømmen er levert. Motoren teller levert energi selv. */
+  function tidIgjen() {
+    return Math.max(0, (strom - gitter.energiregnskap.effekt) / effekt);
+  }
+  function slaaAvHvisFerdig() {
+    // Liten margin for avrunding: 1 µs med strøm er ingenting.
+    if (paa && tidIgjen() < 1e-6) {
+      settEffekt(0);
+      paa = false;
+      slattAvVed = gitter.tid;
+    }
+  }
+
+  /** Simuler dt sekunder. Strømmen slås av nøyaktig når all energien er levert. */
+  function steg(dt) {
+    let igjen = dt;
+    if (paa) {
+      const d = Math.min(igjen, tidIgjen());
+      if (d > 0) gitter.steg(d);
+      igjen -= d;
+      slaaAvHvisFerdig();
+    }
+    if (!paa && igjen > 0) gitter.steg(igjen);
+  }
+
+  /** For animasjon. Stopper ved avslåingen, så strømmen aldri står på for lenge. */
+  function stegMedBudsjett(dt, maksDelsteg) {
+    const d = paa ? Math.min(dt, tidIgjen()) : dt;
+    const simulert = d > 0 ? gitter.stegMedBudsjett(d, maksDelsteg) : 0;
+    slaaAvHvisFerdig();
+    return simulert;
+  }
+
+  function regnskap() {
+    const m = maal(gitter, celler);
+    const levert = gitter.energiregnskap.effekt;
+    const igjen = strom - levert;
+    const varme = m.del + m.resten;
+    return {
+      tid: gitter.tid,
+      paa,
+      slattAvVed,
+      somStrom: igjen / strom,
+      iElementet: m.del / strom,
+      iVannet: m.resten / strom,
+      varmeIKaret: varme / strom,
+      energiIAlt: (igjen + varme) / strom,
+      // Strøm kan i prinsippet bli til arbeid uten tap. Varme bare til en liten del.
+      kanGjoreArbeid: (igjen + m.arbeid) / strom,
+      kanGjoreArbeidJoule: igjen + m.arbeid,
+      varmeJoule: varme,
+      stromLevertJoule: levert,
+      elementTemperatur: m.delTemperatur,
+      minTemperatur: m.min,
+      maksTemperatur: m.maks,
+      likevekt: !paa && m.maks - m.min < LIKEVEKT_GRENSE,
+    };
+  }
+
+  return {
+    gitter,
+    vannmengde: vannmengdeId,
+    /** Temperaturen alt skal ende på (håndregning). */
+    blandingstemperatur: dyppekokerSluttemperatur(data, vannmengdeId),
+    regnskap,
+    steg,
+    stegMedBudsjett,
   };
 }

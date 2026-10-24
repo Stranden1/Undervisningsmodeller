@@ -5,6 +5,7 @@ import { lagSnoforsok, overflateOgVolum, OPPDELINGER, SNO } from "./modell.js";
 import { lagVisning, beskriv, STORRELSE } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
 import { koblTilTutor } from "../../../felles/js/tilstand.js";
 import { lagGraf } from "../../../felles/js/graf.js";
 import { klargjorLerret } from "../../../felles/js/lerret.js";
@@ -17,7 +18,9 @@ const MAKS_DELSTEG = 200; // per skjermbilde
 const MAKS_KJORINGER = 6; // så mange kurver beholdes i grafen
 const MAALING_HVER = 300; // s modelltid mellom punktene i grafen
 // Fargeblind-vennlige farger (Okabe–Ito), én per oppdeling. Varmekildene vises med strek.
-const FARGE = { 1: "#0072B2", 4: "#009E73", 16: "#E69F00", 64: "#CC79A7", spredt: "#D55E00" };
+// Svart i stedet for oransje (#E69F00) for 16: oransje hadde bare 2,3:1 mot hvitt, og en
+// mørkere oransje blir lik den rødoransje (spredt) for fargeblinde.
+const FARGE = { 1: "#0072B2", 4: "#009E73", 16: "#000000", 64: "#CC79A7", spredt: "#D55E00" };
 const strekFor = (sol, underlag) => (sol && underlag ? [10, 3, 2, 3] : sol ? [7, 4] : underlag ? [2, 3] : []);
 
 const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
@@ -92,7 +95,8 @@ function oppdaterTall() {
   const masse = (blokk.volum * 1e-6 * data.materialer[SNO].rho).toFixed(1).replace(".", ",");
   $("tall-tabell").innerHTML =
     `<caption class="kun-skjermleser">Overflate og volum for hver oppdeling</caption>` +
-    `<tr><th>Biter i snittet</th><th>Terninger</th><th>Sidekant</th><th>Overflate (cm²)</th><th>Per volum</th></tr>` +
+    // &shy; = myk bindestrek: lange ord deles bare når skjermen er smal, så tabellen får plass.
+    `<tr><th>Biter i snittet</th><th>Ter&shy;ninger</th><th>Side&shy;kant</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
     rader.join("") +
     `<tr><td colspan="5">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
 }
@@ -210,7 +214,7 @@ function sjekkResultat() {
 // Tekst
 // ---------------------------------------------------------------------------
 
-function oppdaterTekst(beskrivOgsa = false) {
+function oppdaterTekst(beskrivOgsa = false, lesOpp = true) {
   const fartTekst = { 600: "10 min", 3600: "1 time", 14400: "4 timer" }[t.fart] ?? formaterTid(t.fart);
   let tekst = `Tid i modellen: ${formaterTid(t.forsok.tid)} · 1 s på skjermen = ${fartTekst} i modellen`;
   if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
@@ -219,7 +223,7 @@ function oppdaterTekst(beskrivOgsa = false) {
   $("tid").textContent = tekst;
   if (beskrivOgsa) {
     const b = beskriv(t.forsok);
-    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+    settBeskrivelse($("beskrivelse"), b, lesOpp);
   }
 }
 
@@ -348,7 +352,7 @@ function animer(naa) {
     sisteTekst = animTid;
     const beskrivOgsa = animTid - sisteBeskrivelse > 4;
     if (beskrivOgsa) sisteBeskrivelse = animTid;
-    oppdaterTekst(beskrivOgsa);
+    oppdaterTekst(beskrivOgsa, false);
   }
   requestAnimationFrame(animer);
 }

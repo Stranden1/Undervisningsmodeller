@@ -76,6 +76,7 @@ Undervisningsmodeller/
 │   │   ├── graf.js         ← enkel sanntidsgraf
 │   │   ├── format.js       ← tall og tid med norsk desimalkomma
 │   │   ├── forutsi.js      ← "gjett først"-komponent
+│   │   ├── beskrivelse.js  ← tekstbeskrivelsen: leses opp bare når eleven trykker noe
 │   │   └── tilstand.js     ← tilstand ut/inn for KI-tutor
 │   ├── tester/
 │   │   └── varmegitter.test.js ← fysiske tester for varmemotoren

@@ -92,8 +92,9 @@ a { color: var(--aksent); }
 }
 
 .topp .tilbake {
-  display: inline-block;
-  margin-bottom: var(--rom-2);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* stort nok for fingre, som knappene */
   font-size: 0.9rem;
   color: var(--tekst-dempet);
   text-decoration: none;
@@ -230,7 +231,7 @@ a { color: var(--aksent); }
 
 input[type="range"] {
   width: 100%;
-  min-height: 32px;
+  min-height: 44px;
   accent-color: var(--aksent);
 }
 
@@ -244,6 +245,11 @@ select {
 }
 
 /* Avanserte valg skjules bak "Mer" */
+.mer > summary,
+.forenkler > summary {
+  min-height: 44px;
+  padding: 10px 0;
+}
 .mer > summary {
   cursor: pointer;
   color: var(--tekst-dempet);
@@ -304,6 +310,7 @@ select {
 .forutsi .valg {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: var(--rom-2);
   padding: var(--rom-2);
   border-radius: var(--radius);
@@ -358,14 +365,14 @@ select {
   background: var(--advarsel-bg);
   border: 1px solid var(--advarsel-linje);
   border-radius: var(--radius);
-  padding: var(--rom-3) var(--rom-4);
+  padding: var(--rom-1) var(--rom-4);
 }
 .forenkler > summary {
   font-weight: 700;
   cursor: pointer;
 }
 .forenkler ul {
-  margin: var(--rom-2) 0 0;
+  margin: 0 0 var(--rom-3);
   padding-left: 1.2em;
 }
 .forenkler li { margin-bottom: var(--rom-1); }
@@ -447,7 +454,7 @@ select {
   display: flex;
   align-items: center;
   gap: var(--rom-2);
-  margin: var(--rom-1) 0;
+  min-height: 44px; /* hele raden kan trykkes, stort nok for fingre */
 }
 .avkrysning input { width: 20px; height: 20px; }
 
@@ -471,6 +478,13 @@ select {
 }
 .verditabell th:first-child,
 .verditabell td:first-child { text-align: left; }
+/* På smal mobil: tettere celler så tabellen får plass. Blir den likevel for bred,
+   rulles bare tabellen sidelengs, ikke hele siden. */
+.tabell-rull { overflow-x: auto; }
+@media (max-width: 400px) {
+  .verditabell th,
+  .verditabell td { padding: 3px 2px; }
+}
 .verditabell tr.valgt td {
   background: var(--aksent-lys);
   font-weight: 700;
@@ -542,7 +556,7 @@ select {
       <section class="kort" aria-labelledby="tall-tittel">
         <h2 id="tall-tittel">Overflate og volum</h2>
         <p id="tall-hoved" class="tall-hoved"></p>
-        <table class="verditabell" id="tall-tabell"></table>
+        <div class="tabell-rull"><table class="verditabell" id="tall-tabell"></table></div>
         <p class="hjelpetekst">Tallene gjelder ekte terninger med samme sidekant. Snittet på skjermen viser bare ett lag, så der ser du færre biter.</p>
       </section>
 
@@ -1611,7 +1625,7 @@ const STORRELSE = { bredde: 760, hoyde: 380 };
 const CELLE = 10;
 const X0 = (STORRELSE.bredde - GEOMETRI.bredde * CELLE) / 2;
 const Y0 = 70;
-const SOLFARGE = "#c98a00";
+const SOLFARGE = "#9a6c00"; // mørk gul: 4,6:1 mot hvitt, så sol-teksten kan leses (#c98a00 hadde 2,9:1)
 
 function lagVisning(data) {
   let partikler = null;
@@ -1920,6 +1934,32 @@ function lagForutsi(element, { sporsmal, valg, vedLaas }) {
 
 return { lagForutsi };
 })();
+// ---- felles/js/beskrivelse.js ----
+__moduler["felles/js/beskrivelse.js"] = await (async () => {
+// Tekstbeskrivelsen under lerretet: hva som skjer, med ord. Leses også av skjermleser.
+//
+// Mens modellen kjører, endres teksten ofte. Leser skjermleseren opp hver endring, blir
+// det mas som drukner alt annet eleven gjør. Derfor leses teksten bare opp når eleven
+// selv gjør noe (Start, Pause, Nullstill, nytt valg) eller forsøket er ferdig. Underveis
+// oppdateres den stille, så den er riktig når eleven leser den selv.
+//
+// Bruk: <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+//   settBeskrivelse(el, tekst, true);   // eleven trykket noe: les opp
+//   settBeskrivelse(el, tekst, false);  // løkka: bare oppdater
+
+/**
+ * @param {HTMLElement} element
+ * @param {string} tekst
+ * @param {boolean} lesOpp
+ */
+function settBeskrivelse(element, tekst, lesOpp) {
+  if (tekst === element.textContent) return;
+  element.setAttribute("aria-live", lesOpp ? "polite" : "off");
+  element.textContent = tekst;
+}
+
+return { settBeskrivelse };
+})();
 // ---- felles/js/tilstand.js ----
 __moduler["felles/js/tilstand.js"] = await (async () => {
 // Tilstand ut og inn, slik at en KI-tutor senere kan lese hva eleven gjør.
@@ -2196,6 +2236,7 @@ const { lagSnoforsok, overflateOgVolum, OPPDELINGER, SNO } = __moduler["modeller
 const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/naturfag/overflate-og-volum/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
+const { settBeskrivelse } = __moduler["felles/js/beskrivelse.js"];
 const { koblTilTutor } = __moduler["felles/js/tilstand.js"];
 const { lagGraf } = __moduler["felles/js/graf.js"];
 const { klargjorLerret } = __moduler["felles/js/lerret.js"];
@@ -2208,7 +2249,9 @@ const MAKS_DELSTEG = 200; // per skjermbilde
 const MAKS_KJORINGER = 6; // så mange kurver beholdes i grafen
 const MAALING_HVER = 300; // s modelltid mellom punktene i grafen
 // Fargeblind-vennlige farger (Okabe–Ito), én per oppdeling. Varmekildene vises med strek.
-const FARGE = { 1: "#0072B2", 4: "#009E73", 16: "#E69F00", 64: "#CC79A7", spredt: "#D55E00" };
+// Svart i stedet for oransje (#E69F00) for 16: oransje hadde bare 2,3:1 mot hvitt, og en
+// mørkere oransje blir lik den rødoransje (spredt) for fargeblinde.
+const FARGE = { 1: "#0072B2", 4: "#009E73", 16: "#000000", 64: "#CC79A7", spredt: "#D55E00" };
 const strekFor = (sol, underlag) => (sol && underlag ? [10, 3, 2, 3] : sol ? [7, 4] : underlag ? [2, 3] : []);
 
 const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
@@ -2283,7 +2326,8 @@ function oppdaterTall() {
   const masse = (blokk.volum * 1e-6 * data.materialer[SNO].rho).toFixed(1).replace(".", ",");
   $("tall-tabell").innerHTML =
     `<caption class="kun-skjermleser">Overflate og volum for hver oppdeling</caption>` +
-    `<tr><th>Biter i snittet</th><th>Terninger</th><th>Sidekant</th><th>Overflate (cm²)</th><th>Per volum</th></tr>` +
+    // &shy; = myk bindestrek: lange ord deles bare når skjermen er smal, så tabellen får plass.
+    `<tr><th>Biter i snittet</th><th>Ter&shy;ninger</th><th>Side&shy;kant</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
     rader.join("") +
     `<tr><td colspan="5">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
 }
@@ -2401,7 +2445,7 @@ function sjekkResultat() {
 // Tekst
 // ---------------------------------------------------------------------------
 
-function oppdaterTekst(beskrivOgsa = false) {
+function oppdaterTekst(beskrivOgsa = false, lesOpp = true) {
   const fartTekst = { 600: "10 min", 3600: "1 time", 14400: "4 timer" }[t.fart] ?? formaterTid(t.fart);
   let tekst = `Tid i modellen: ${formaterTid(t.forsok.tid)} · 1 s på skjermen = ${fartTekst} i modellen`;
   if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
@@ -2410,7 +2454,7 @@ function oppdaterTekst(beskrivOgsa = false) {
   $("tid").textContent = tekst;
   if (beskrivOgsa) {
     const b = beskriv(t.forsok);
-    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+    settBeskrivelse($("beskrivelse"), b, lesOpp);
   }
 }
 
@@ -2539,7 +2583,7 @@ function animer(naa) {
     sisteTekst = animTid;
     const beskrivOgsa = animTid - sisteBeskrivelse > 4;
     if (beskrivOgsa) sisteBeskrivelse = animTid;
-    oppdaterTekst(beskrivOgsa);
+    oppdaterTekst(beskrivOgsa, false);
   }
   requestAnimationFrame(animer);
 }

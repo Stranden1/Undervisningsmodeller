@@ -92,8 +92,9 @@ a { color: var(--aksent); }
 }
 
 .topp .tilbake {
-  display: inline-block;
-  margin-bottom: var(--rom-2);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* stort nok for fingre, som knappene */
   font-size: 0.9rem;
   color: var(--tekst-dempet);
   text-decoration: none;
@@ -230,7 +231,7 @@ a { color: var(--aksent); }
 
 input[type="range"] {
   width: 100%;
-  min-height: 32px;
+  min-height: 44px;
   accent-color: var(--aksent);
 }
 
@@ -244,6 +245,11 @@ select {
 }
 
 /* Avanserte valg skjules bak "Mer" */
+.mer > summary,
+.forenkler > summary {
+  min-height: 44px;
+  padding: 10px 0;
+}
 .mer > summary {
   cursor: pointer;
   color: var(--tekst-dempet);
@@ -304,6 +310,7 @@ select {
 .forutsi .valg {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: var(--rom-2);
   padding: var(--rom-2);
   border-radius: var(--radius);
@@ -358,14 +365,14 @@ select {
   background: var(--advarsel-bg);
   border: 1px solid var(--advarsel-linje);
   border-radius: var(--radius);
-  padding: var(--rom-3) var(--rom-4);
+  padding: var(--rom-1) var(--rom-4);
 }
 .forenkler > summary {
   font-weight: 700;
   cursor: pointer;
 }
 .forenkler ul {
-  margin: var(--rom-2) 0 0;
+  margin: 0 0 var(--rom-3);
   padding-left: 1.2em;
 }
 .forenkler li { margin-bottom: var(--rom-1); }
@@ -431,7 +438,7 @@ select {
   display: flex;
   align-items: center;
   gap: var(--rom-2);
-  margin: var(--rom-2) 0 0;
+  min-height: 44px; /* hele raden kan trykkes, stort nok for fingre */
 }
 .avkrysning input { width: 20px; height: 20px; }
 
@@ -481,10 +488,10 @@ select {
 }
 
 .forklaring {
-  margin-top: var(--rom-3);
+  margin-top: var(--rom-1);
   font-size: 0.9rem;
 }
-.forklaring summary { cursor: pointer; color: var(--aksent); }
+.forklaring summary { cursor: pointer; color: var(--aksent); min-height: 44px; padding: 11px 0; }
 .forklaring p { margin: var(--rom-2) 0 0; }
 
 </style>
@@ -2093,6 +2100,32 @@ function lagForutsi(element, { sporsmal, valg, vedLaas }) {
 
 return { lagForutsi };
 })();
+// ---- felles/js/beskrivelse.js ----
+__moduler["felles/js/beskrivelse.js"] = await (async () => {
+// Tekstbeskrivelsen under lerretet: hva som skjer, med ord. Leses også av skjermleser.
+//
+// Mens modellen kjører, endres teksten ofte. Leser skjermleseren opp hver endring, blir
+// det mas som drukner alt annet eleven gjør. Derfor leses teksten bare opp når eleven
+// selv gjør noe (Start, Pause, Nullstill, nytt valg) eller forsøket er ferdig. Underveis
+// oppdateres den stille, så den er riktig når eleven leser den selv.
+//
+// Bruk: <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
+//   settBeskrivelse(el, tekst, true);   // eleven trykket noe: les opp
+//   settBeskrivelse(el, tekst, false);  // løkka: bare oppdater
+
+/**
+ * @param {HTMLElement} element
+ * @param {string} tekst
+ * @param {boolean} lesOpp
+ */
+function settBeskrivelse(element, tekst, lesOpp) {
+  if (tekst === element.textContent) return;
+  element.setAttribute("aria-live", lesOpp ? "polite" : "off");
+  element.textContent = tekst;
+}
+
+return { settBeskrivelse };
+})();
 // ---- felles/js/tilstand.js ----
 __moduler["felles/js/tilstand.js"] = await (async () => {
 // Tilstand ut og inn, slik at en KI-tutor senere kan lese hva eleven gjør.
@@ -2369,6 +2402,7 @@ const { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } = __moduler["model
 const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/naturfag/energi-som-sprer-seg/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
+const { settBeskrivelse } = __moduler["felles/js/beskrivelse.js"];
 const { koblTilTutor } = __moduler["felles/js/tilstand.js"];
 const { lagGraf } = __moduler["felles/js/graf.js"];
 const { klargjorLerret } = __moduler["felles/js/lerret.js"];
@@ -2588,7 +2622,7 @@ function maal(tving = false) {
   verdier.forEach((v, i) => graf.leggTil(i, min, v * 100));
 }
 
-function oppdaterTekst(beskrivOgsa = false) {
+function oppdaterTekst(beskrivOgsa = false, lesOpp = true) {
   let tekst = `Tid i modellen: ${formaterTid(t.kar.gitter.tid)} · 1 s på skjermen = ${formaterTid(t.fart)} i modellen`;
   if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
     tekst += ` (maskinen klarer bare ca. ${formaterTid(t.maaltFart)} nå)`;
@@ -2596,7 +2630,7 @@ function oppdaterTekst(beskrivOgsa = false) {
   $("tid").textContent = tekst;
   if (beskrivOgsa) {
     const b = beskriv(t.kar, t.fane);
-    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+    settBeskrivelse($("beskrivelse"), b, lesOpp);
   }
 }
 
@@ -2630,8 +2664,11 @@ function velgFane(navn, fokus = false) {
 faneKnapper.forEach((knapp, i) => {
   knapp.addEventListener("click", () => velgFane(knapp.id.replace("fane-", "")));
   knapp.addEventListener("keydown", (e) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    const neste = faneKnapper[(i + (e.key === "ArrowRight" ? 1 : faneKnapper.length - 1)) % faneKnapper.length];
+    // Piltastene går til nabofanen, Home og End til første og siste (vanlig for faner).
+    const steg = { ArrowRight: i + 1, ArrowLeft: i + faneKnapper.length - 1, Home: 0, End: faneKnapper.length - 1 }[e.key];
+    if (steg === undefined) return;
+    e.preventDefault();
+    const neste = faneKnapper[steg % faneKnapper.length];
     velgFane(neste.id.replace("fane-", ""), true);
   });
 });
@@ -2767,7 +2804,7 @@ function animer(naa) {
     oppdaterRegnskap();
     const beskrivOgsa = animTid - sisteBeskrivelse > 4;
     if (beskrivOgsa) sisteBeskrivelse = animTid;
-    oppdaterTekst(beskrivOgsa);
+    oppdaterTekst(beskrivOgsa, false);
   }
   requestAnimationFrame(animer);
 }

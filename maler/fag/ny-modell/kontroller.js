@@ -4,6 +4,7 @@
 import { lagModell } from "./modell.js";
 import { tegn, beskriv } from "./visning.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
 import { koblTilTutor } from "../../../felles/js/tilstand.js";
 
 const lerret = document.getElementById("lerret");
@@ -62,9 +63,10 @@ function oppdaterGlider() {
   tegnAlt();
 }
 
-function tegnAlt() {
+/** lesOpp = true når eleven har trykket noe. Ellers oppdateres beskrivelsen stille. */
+function tegnAlt(lesOpp = false) {
   tegn(ctx, modell.tilstand);
-  beskrivelse.textContent = beskriv(modell.tilstand);
+  settBeskrivelse(beskrivelse, beskriv(modell.tilstand), lesOpp);
 }
 
 function animer(naa) {
@@ -86,6 +88,7 @@ startKnapp.addEventListener("click", () => {
   startKnapp.textContent = kjorer ? "Pause" : "Start";
   forrigeTid = null;
   if (kjorer) requestAnimationFrame(animer);
+  tegnAlt(true);
   tutor.sendHendelse(kjorer ? "start" : "pause");
 });
 
@@ -96,7 +99,7 @@ nullstillKnapp.addEventListener("click", () => {
   startKnapp.disabled = true;
   forutsi.nullstill();
   modell = lagNy();
-  tegnAlt();
+  tegnAlt(true);
   tutor.sendHendelse("nullstill");
 });
 

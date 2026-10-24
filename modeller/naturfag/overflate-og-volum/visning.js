@@ -11,7 +11,7 @@ export const STORRELSE = { bredde: 760, hoyde: 380 };
 const CELLE = 10;
 const X0 = (STORRELSE.bredde - GEOMETRI.bredde * CELLE) / 2;
 const Y0 = 70;
-const SOLFARGE = "#c98a00";
+const SOLFARGE = "#9a6c00"; // mørk gul: 4,6:1 mot hvitt, så sol-teksten kan leses (#c98a00 hadde 2,9:1)
 
 export function lagVisning(data) {
   let partikler = null;

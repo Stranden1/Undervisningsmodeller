@@ -22,6 +22,7 @@ import {
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { formaterTall } from "../../../felles/js/format.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
 import { koblTilTutor } from "../../../felles/js/tilstand.js";
 import { lagGraf } from "../../../felles/js/graf.js";
 import { klargjorLerret } from "../../../felles/js/lerret.js";
@@ -179,15 +180,15 @@ function oppdaterFoles() {
   });
 }
 
-/** Tidslinja oppdateres ofte. Beskrivelsen (lest av skjermleser) bare når beskriv = true. */
-function oppdaterTaPaaTekst(beskriv = false) {
+/** Tidslinja oppdateres ofte. Beskrivelsen bare når beskriv = true, og leses opp bare når lesOpp = true. */
+function oppdaterTaPaaTekst(beskriv = false, lesOpp = true) {
   const tid = tp.modell.tid;
   const fartTekst = tp.fart === 1 ? "sanntid" : "¼ fart (sakte film)";
   $("tapaa-tid").textContent = tp.berort
     ? `Tid siden fingeren tok på: ${tid.toFixed(1).replace(".", ",")} s · ${fartTekst}`
     : "Trykk Start for å legge fingeren på klossene.";
   const tekst = beskrivTaPaa(data, tp.modell, tp.berort);
-  if (beskriv && tekst !== $("tapaa-beskrivelse").textContent) $("tapaa-beskrivelse").textContent = tekst;
+  if (beskriv) settBeskrivelse($("tapaa-beskrivelse"), tekst, lesOpp);
 }
 
 function stegTaPaa(dtEkte) {
@@ -212,6 +213,7 @@ function stegTaPaa(dtEkte) {
     tp.ferdig = true;
     $("tapaa-start").textContent = "Ferdig";
     $("tapaa-start").disabled = true;
+    oppdaterTaPaaTekst(true); // les opp sluttbildet
     tutor.sendHendelse("ferdig", { fane: "tapaa" });
   }
 }
@@ -307,7 +309,7 @@ function leggTilIsbitMaaling() {
   ib.modell.scener.forEach((s, i) => ib.graf.leggTil(i, t / 60, s.smeltetAndel() * 100));
 }
 
-function oppdaterIsbitTekst(beskriv = false) {
+function oppdaterIsbitTekst(beskriv = false, lesOpp = true) {
   const t = ib.modell.tid;
   let tekst = `Tid i modellen: ${formaterTid(t)} · 1 s på skjermen = ${ib.fart} s i modellen`;
   if (ib.kjorer && ib.maaltFart < 0.85 * ib.fart) {
@@ -315,7 +317,7 @@ function oppdaterIsbitTekst(beskriv = false) {
   }
   $("isbit-tid").textContent = tekst;
   const beskrivelse = beskrivIsbit(data, ib.modell);
-  if (beskriv && beskrivelse !== $("isbit-beskrivelse").textContent) $("isbit-beskrivelse").textContent = beskrivelse;
+  if (beskriv) settBeskrivelse($("isbit-beskrivelse"), beskrivelse, lesOpp);
 }
 
 function stegIsbit(dtEkte) {
@@ -340,6 +342,7 @@ function stegIsbit(dtEkte) {
     ib.ferdig = true;
     $("isbit-start").textContent = "Ferdig";
     $("isbit-start").disabled = true;
+    oppdaterIsbitTekst(true); // les opp sluttbildet
     tutor.sendHendelse("ferdig", { fane: "isbit" });
   }
 }
@@ -395,8 +398,11 @@ function velgFane(navn, fokus = false) {
 faner.forEach((f, i) => {
   f.addEventListener("click", () => velgFane(f.id.replace("fane-", "")));
   f.addEventListener("keydown", (e) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    const neste = faner[(i + (e.key === "ArrowRight" ? 1 : faner.length - 1)) % faner.length];
+    // Piltastene går til nabofanen, Home og End til første og siste (vanlig for faner).
+    const steg = { ArrowRight: i + 1, ArrowLeft: i + faner.length - 1, Home: 0, End: faner.length - 1 }[e.key];
+    if (steg === undefined) return;
+    e.preventDefault();
+    const neste = faner[steg % faner.length];
     velgFane(neste.id.replace("fane-", ""), true);
   });
 });
@@ -460,15 +466,15 @@ function animer(naa) {
     if (ib.kjorer) ib.graf.tegn();
   }
 
-  // Tall oppdateres fem ganger i sekundet. Beskrivelsen, som leses av skjermleser,
-  // bare hvert fjerde sekund, så den ikke drukner alt annet.
+  // Tall oppdateres fem ganger i sekundet, beskrivelsen hvert fjerde sekund. Den
+  // oppdateres stille her; skjermleseren leser den når eleven trykker noe.
   if (animTid - sisteTekst > 0.2) {
     sisteTekst = animTid;
     const beskriv = animTid - sisteBeskrivelse > 4;
     if (beskriv) sisteBeskrivelse = animTid;
     oppdaterFoles();
-    if (aktivFane === "tapaa") oppdaterTaPaaTekst(beskriv);
-    else oppdaterIsbitTekst(beskriv);
+    if (aktivFane === "tapaa") oppdaterTaPaaTekst(beskriv, false);
+    else oppdaterIsbitTekst(beskriv, false);
   }
   requestAnimationFrame(animer);
 }

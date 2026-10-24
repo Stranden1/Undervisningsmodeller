@@ -5,6 +5,7 @@ import { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } from "./modell.js
 import { lagVisning, beskriv, STORRELSE } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
+import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
 import { koblTilTutor } from "../../../felles/js/tilstand.js";
 import { lagGraf } from "../../../felles/js/graf.js";
 import { klargjorLerret } from "../../../felles/js/lerret.js";
@@ -224,7 +225,7 @@ function maal(tving = false) {
   verdier.forEach((v, i) => graf.leggTil(i, min, v * 100));
 }
 
-function oppdaterTekst(beskrivOgsa = false) {
+function oppdaterTekst(beskrivOgsa = false, lesOpp = true) {
   let tekst = `Tid i modellen: ${formaterTid(t.kar.gitter.tid)} · 1 s på skjermen = ${formaterTid(t.fart)} i modellen`;
   if (t.kjorer && t.maaltFart < 0.85 * t.fart) {
     tekst += ` (maskinen klarer bare ca. ${formaterTid(t.maaltFart)} nå)`;
@@ -232,7 +233,7 @@ function oppdaterTekst(beskrivOgsa = false) {
   $("tid").textContent = tekst;
   if (beskrivOgsa) {
     const b = beskriv(t.kar, t.fane);
-    if (b !== $("beskrivelse").textContent) $("beskrivelse").textContent = b;
+    settBeskrivelse($("beskrivelse"), b, lesOpp);
   }
 }
 
@@ -266,8 +267,11 @@ function velgFane(navn, fokus = false) {
 faneKnapper.forEach((knapp, i) => {
   knapp.addEventListener("click", () => velgFane(knapp.id.replace("fane-", "")));
   knapp.addEventListener("keydown", (e) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    const neste = faneKnapper[(i + (e.key === "ArrowRight" ? 1 : faneKnapper.length - 1)) % faneKnapper.length];
+    // Piltastene går til nabofanen, Home og End til første og siste (vanlig for faner).
+    const steg = { ArrowRight: i + 1, ArrowLeft: i + faneKnapper.length - 1, Home: 0, End: faneKnapper.length - 1 }[e.key];
+    if (steg === undefined) return;
+    e.preventDefault();
+    const neste = faneKnapper[steg % faneKnapper.length];
     velgFane(neste.id.replace("fane-", ""), true);
   });
 });
@@ -403,7 +407,7 @@ function animer(naa) {
     oppdaterRegnskap();
     const beskrivOgsa = animTid - sisteBeskrivelse > 4;
     if (beskrivOgsa) sisteBeskrivelse = animTid;
-    oppdaterTekst(beskrivOgsa);
+    oppdaterTekst(beskrivOgsa, false);
   }
   requestAnimationFrame(animer);
 }

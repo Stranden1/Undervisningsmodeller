@@ -47,7 +47,7 @@
   display: flex;
   align-items: center;
   gap: var(--rom-2);
-  margin: var(--rom-1) 0;
+  min-height: 44px; /* hele raden kan trykkes, stort nok for fingre */
 }
 .avkrysning input { width: 20px; height: 20px; }
 
@@ -71,6 +71,13 @@
 }
 .verditabell th:first-child,
 .verditabell td:first-child { text-align: left; }
+/* På smal mobil: tettere celler så tabellen får plass. Blir den likevel for bred,
+   rulles bare tabellen sidelengs, ikke hele siden. */
+.tabell-rull { overflow-x: auto; }
+@media (max-width: 400px) {
+  .verditabell th,
+  .verditabell td { padding: 3px 2px; }
+}
 .verditabell tr.valgt td {
   background: var(--aksent-lys);
   font-weight: 700;

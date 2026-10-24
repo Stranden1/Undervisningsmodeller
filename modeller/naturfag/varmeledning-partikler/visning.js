@@ -111,7 +111,8 @@ export function lagTaPaaVisning(data) {
           ctx.font = "600 15px system-ui, sans-serif";
           ctx.textAlign = "left";
           ctx.textBaseline = "middle";
-          ctx.fillText("varme", fingerX + fingerB + 8, yKontakt + 6);
+          // Over klossen, på hvit bakgrunn (4,7:1). På kanten av klossen var den vanskelig å lese.
+          ctx.fillText("varme", fingerX + fingerB + 8, yKontakt - 12);
         }
       }
 

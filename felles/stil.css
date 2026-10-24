@@ -84,8 +84,9 @@ a { color: var(--aksent); }
 }
 
 .topp .tilbake {
-  display: inline-block;
-  margin-bottom: var(--rom-2);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* stort nok for fingre, som knappene */
   font-size: 0.9rem;
   color: var(--tekst-dempet);
   text-decoration: none;
@@ -222,7 +223,7 @@ a { color: var(--aksent); }
 
 input[type="range"] {
   width: 100%;
-  min-height: 32px;
+  min-height: 44px;
   accent-color: var(--aksent);
 }
 
@@ -236,6 +237,11 @@ select {
 }
 
 /* Avanserte valg skjules bak "Mer" */
+.mer > summary,
+.forenkler > summary {
+  min-height: 44px;
+  padding: 10px 0;
+}
 .mer > summary {
   cursor: pointer;
   color: var(--tekst-dempet);
@@ -296,6 +302,7 @@ select {
 .forutsi .valg {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: var(--rom-2);
   padding: var(--rom-2);
   border-radius: var(--radius);
@@ -350,14 +357,14 @@ select {
   background: var(--advarsel-bg);
   border: 1px solid var(--advarsel-linje);
   border-radius: var(--radius);
-  padding: var(--rom-3) var(--rom-4);
+  padding: var(--rom-1) var(--rom-4);
 }
 .forenkler > summary {
   font-weight: 700;
   cursor: pointer;
 }
 .forenkler ul {
-  margin: var(--rom-2) 0 0;
+  margin: 0 0 var(--rom-3);
   padding-left: 1.2em;
 }
 .forenkler li { margin-bottom: var(--rom-1); }

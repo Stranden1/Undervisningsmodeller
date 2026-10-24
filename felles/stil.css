@@ -16,7 +16,7 @@
   --aksent: #1f5fa8;
   --aksent-mork: #17487f;
   --aksent-lys: #e3ecf7;
-  --fokus: #f2a900;
+  --fokus: #17487f;     /* minst 7,7:1 mot alle bakgrunnene; den gule (#f2a900) hadde bare 1,9:1 */
 
   /* Betydningsfarger (fargeblind-vennlige) */
   --kald: #2b6cb0;      /* blå */

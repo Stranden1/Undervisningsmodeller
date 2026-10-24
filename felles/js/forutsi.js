@@ -10,8 +10,26 @@
 //     vedLaas: (valgId) => { /* nå kan Play slås på */ },
 //   });
 //   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.");
+//
+// Skjermleser: låsing flytter fokus til gjetningen, og resultatet og en ny runde
+// leses opp gjennom en skjult statuslinje. Statuslinja må finnes før teksten
+// endres, ellers leses den ikke. Derfor beholdes den når komponenten lages på
+// nytt i samme element (modellene gjør det hver gang forsøket endres).
 
 let teller = 0;
+
+/** Elementer der eleven har låst en gjetning som ennå ikke er forkastet. */
+const laast = new WeakSet();
+
+function hentStatuslinje(element) {
+  let melding = element.querySelector(":scope > .forutsi-melding");
+  if (!melding) {
+    melding = document.createElement("p");
+    melding.className = "forutsi-melding kun-skjermleser";
+    melding.setAttribute("role", "status");
+  }
+  return melding;
+}
 
 /**
  * @param {HTMLElement} element
@@ -25,10 +43,25 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
   let gjetning = null;
 
   element.classList.add("forutsi");
+  const melding = hentStatuslinje(element);
+  const innhold = document.createElement("div");
+  element.replaceChildren(innhold, melding);
+
+  /** Les opp en kort tekst. Tømmes først, så samme tekst to ganger også leses. */
+  function lesOpp(tekst) {
+    melding.textContent = "";
+    setTimeout(() => (melding.textContent = tekst), 100);
+  }
 
   function tegnSporsmal() {
+    // En låst gjetning som forkastes (nytt forsøk eller Nullstill) skal ikke
+    // forsvinne i stillhet: Start blir grå, og eleven må vite hvorfor.
+    if (laast.has(element)) {
+      laast.delete(element);
+      lesOpp("Nytt forsøk. Gjett på nytt før du trykker Start.");
+    }
     gjetning = null;
-    element.innerHTML = "";
+    innhold.innerHTML = "";
 
     const skjema = document.createElement("form");
     const felt = document.createElement("fieldset");
@@ -67,17 +100,22 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
     });
 
     skjema.append(felt, knapp);
-    element.append(skjema);
+    innhold.append(skjema);
   }
 
   function tegnLaast() {
-    element.innerHTML = "";
+    laast.add(element);
+    innhold.innerHTML = "";
     const p = document.createElement("p");
     p.className = "laast";
     p.textContent = `Din gjetning: ${tekstFor(gjetning)}`;
     const hint = document.createElement("p");
     hint.textContent = "Trykk Start og se hva som skjer.";
-    element.append(p, hint);
+    innhold.append(p, hint);
+    // Knappen som hadde fokus er borte. Flytt fokus hit, så tastaturet ikke mister
+    // plassen og skjermleseren leser gjetningen.
+    p.tabIndex = -1;
+    p.focus();
   }
 
   function tekstFor(id) {
@@ -93,7 +131,8 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
     erLaast: () => gjetning !== null,
     /** Vis gjetningen ved siden av det som faktisk skjedde. */
     visResultat(fasitId, forklaring = "") {
-      element.innerHTML = "";
+      const haddeFokus = innhold.contains(document.activeElement);
+      innhold.innerHTML = "";
       const liste = document.createElement("dl");
       liste.className = "sammenligning";
       const rader = [
@@ -107,12 +146,19 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
         dd.textContent = verdi;
         liste.append(dt, dd);
       }
-      element.append(liste);
+      innhold.append(liste);
       if (forklaring) {
         const p = document.createElement("p");
         p.textContent = forklaring;
-        element.append(p);
+        innhold.append(p);
       }
+      // Fokus flyttes bare hvis det sto på gjetningen, som nå er borte. Ellers kan
+      // eleven være et annet sted på siden, og da holder det å lese opp.
+      if (haddeFokus) {
+        liste.tabIndex = -1;
+        liste.focus();
+      }
+      lesOpp(`Du gjettet: ${tekstFor(gjetning)}. Det skjedde: ${tekstFor(fasitId)}. ${forklaring}`);
     },
     /** Start på nytt med samme spørsmål. */
     nullstill: tegnSporsmal,

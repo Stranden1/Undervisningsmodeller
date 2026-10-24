@@ -20,6 +20,7 @@ import {
   materialNavn,
 } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
+import { formaterTall } from "../../../felles/js/format.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
 import { koblTilTutor } from "../../../felles/js/tilstand.js";
 import { lagGraf } from "../../../felles/js/graf.js";
@@ -130,7 +131,8 @@ function byggTaPaa() {
 function tegnVerditabell(venstre, hoyre) {
   const rader = [...new Set(["hud", venstre, hoyre])].map((m) => {
     const v = data.materialer[m];
-    return `<tr><td>${v.navn}</td><td>${tall.format(v.k)}</td><td>${tall.format(v.rho)}</td><td>${tall.format(v.c)}</td></tr>`;
+    // k med inntil tre desimaler, ellers blir isopor (0,033) til 0 og ser ut som at den ikke leder varme.
+    return `<tr><td>${v.navn}</td><td>${formaterTall(v.k, 3)}</td><td>${tall.format(v.rho)}</td><td>${tall.format(v.c)}</td></tr>`;
   });
   $("tapaa-verdier").innerHTML =
     "<caption class='kun-skjermleser'>Materialverdier</caption>" +

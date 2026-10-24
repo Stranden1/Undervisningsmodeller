@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/naturfag/varmeledning-partikler/ (2026-10-23). Ikke rediger for hånd. -->
+<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/naturfag/varmeledning-partikler/ (2026-10-24). Ikke rediger for hånd. -->
 <html lang="nb">
 <head>
   <meta charset="utf-8">
@@ -2329,6 +2329,7 @@ __moduler["modeller/naturfag/varmeledning-partikler/kontroller.js"] = await (asy
 const { lagTaPaa, lagIsbit, kaldestKloss, forstSmeltet, TA_PAA_MATERIALER, ROMTEMPERATUR } = __moduler["modeller/naturfag/varmeledning-partikler/modell.js"];
 const { lagTaPaaVisning, lagIsbitVisning, TA_PAA_STORRELSE, ISBIT_STORRELSE, beskrivTaPaa, beskrivIsbit, formaterTid, materialNavn } = __moduler["modeller/naturfag/varmeledning-partikler/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
+const { formaterTall } = __moduler["felles/js/format.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
 const { koblTilTutor } = __moduler["felles/js/tilstand.js"];
 const { lagGraf } = __moduler["felles/js/graf.js"];
@@ -2439,7 +2440,8 @@ function byggTaPaa() {
 function tegnVerditabell(venstre, hoyre) {
   const rader = [...new Set(["hud", venstre, hoyre])].map((m) => {
     const v = data.materialer[m];
-    return `<tr><td>${v.navn}</td><td>${tall.format(v.k)}</td><td>${tall.format(v.rho)}</td><td>${tall.format(v.c)}</td></tr>`;
+    // k med inntil tre desimaler, ellers blir isopor (0,033) til 0 og ser ut som at den ikke leder varme.
+    return `<tr><td>${v.navn}</td><td>${formaterTall(v.k, 3)}</td><td>${tall.format(v.rho)}</td><td>${tall.format(v.c)}</td></tr>`;
   });
   $("tapaa-verdier").innerHTML =
     "<caption class='kun-skjermleser'>Materialverdier</caption>" +

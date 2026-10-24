@@ -89,7 +89,7 @@ export function lagVisning() {
     ctx.font = "15px system-ui, sans-serif";
     ctx.textBaseline = "top";
     ctx.textAlign = "left";
-    ctx.fillText("Isolert kar: ingen varme går inn eller ut", 12, 12);
+    ctx.fillText("Varmeisolert kar: ingen varme går inn eller ut", 12, 12);
 
     // Merkelapper til høyre for karet
     const lx = x0 + karB + VEGG + 18;
@@ -137,7 +137,7 @@ function tegnLedning(ctx, r, x, yElement, yKar) {
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = paa ? STROMFARGE : "#5b616b";
-  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % igjen` : "Strøm av";
+  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % igjen å levere` : "Strøm av";
   ctx.fillText(tekst, x + 10, topp + 4);
 }
 
@@ -168,7 +168,7 @@ export function beskriv(kar, fane) {
     if (r.tid === 0) {
       return `Vannet og varmeelementet er ${formaterGrader(VANN_START, 0)}. All energien er ennå strøm, og alt av den kan gjøre arbeid.`;
     }
-    const strom = r.paa ? `${pst(r.somStrom)} av energien er fortsatt strøm, ` : "Strømmen er slått av. ";
+    const strom = r.paa ? `${pst(r.somStrom)} av energien er ennå ikke levert som strøm, ` : "Strømmen er slått av. ";
     return (
       `Etter ${formaterTid(r.tid)} er elementet ${formaterGrader(r.elementTemperatur)}. ${strom}` +
       `${pst(r.varmeIKaret)} er varme i karet – til sammen ${pst(r.energiIAlt)}. ${arbeid}${slutt}`

@@ -61,8 +61,15 @@ Typiske tall (middels vannmengde):
 | Varm kloss, «kan gjøre arbeid» | ca. 10 % | ca. 2 % etter 5 min | 0 % (alt er 21,1 °C) |
 | Dyppekoker, «kan gjøre arbeid» | 100 % (strøm) | ca. 5 % når strømmen slås av | 0 % (alt er 20,8 °C) |
 
-Legg merke til: varme er energi av lav kvalitet allerede fra start. Selv 90 °C varm
+Legg merke til: energien i varme ting har lav kvalitet allerede fra start. Selv 90 °C varm
 kobber kan bare gi ca. 10 % som arbeid her. Strøm er 100 %.
+
+**Hva 100 % og 0 % betyr.** Regnskapet følger energien *over* nivået ved 10 °C: det klossen
+(eller strømmen) har ekstra. Vannet hadde også energi fra før, men den regnes ikke med.
+«Kan gjøre arbeid» gjelder bare temperaturforskjeller *inne i* karet. 0 % betyr ikke at det
+lunkne vannet er verdiløst – det kan fortsatt varme noe som er kaldere utenfor karet. Det er
+lurt å si dette høyt, ellers kan elevene tro at energi bare kan gjøre arbeid når den går fra
+varmt til kaldt. (En fallende stein gjør også arbeid.)
 
 Farten starter lavt (1 s på skjermen = 10 s i modellen) og øker etter hvert, fordi det
 meste skjer de første minuttene. Skjermen viser hele tiden hvor fort tiden går. Et helt

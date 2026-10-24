@@ -36,8 +36,9 @@ const FANER = {
   kloss: {
     toppfart: { lite: 60, middels: 180, mye: 180 },
     lag: (vannmengde) => lagKar(data, { vannmengde, klossT: Number($("klosst").value) }),
-    oppsett: "Vannet er alltid 10 °C ved start. Karet er isolert: ingen varme går inn eller ut.",
-    hundre: "100 % = varmen klossen hadde ved start.",
+    oppsett: "Vannet er alltid 10 °C ved start. Karet er varmeisolert: ingen varme går inn eller ut.",
+    hundre:
+      "100 % = varmen klossen hadde ekstra ved start, fordi den var varmere enn vannet. Vannet hadde også energi fra før, men den regner vi ikke med.",
     yTekst: "% av varmen klossen hadde",
     soyler: [
       { navn: "Varme i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.total },
@@ -61,7 +62,7 @@ const FANER = {
         tekst:
           `All varmen er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
           `Men den er spredt fra ${k.side * k.side} til ${kar.gitter.nx * kar.gitter.ny} partikler i snittet, så temperaturen ble bare ` +
-          `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å gjøre arbeid: ` +
+          `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å få arbeid ut av temperaturforskjellene i karet: ` +
           `fra ${prosent(t.startArbeid, 1)} til ${prosent(r.kanGjoreArbeid, 1)}. Energien har fått lavere kvalitet.`,
       };
     },
@@ -70,8 +71,9 @@ const FANER = {
   dyppekoker: {
     toppfart: { lite: 70, middels: 215, mye: 215 },
     lag: (vannmengde) => lagDyppekoker(data, { vannmengde }),
-    oppsett: "Vannet er 10 °C ved start. Dyppekokeren får strøm i 5 minutter og slås så av. Karet er isolert.",
-    hundre: "100 % = energien strømmen gir. Det er like mye som kobberklossen på 90 °C hadde.",
+    oppsett: "Vannet er 10 °C ved start. Dyppekokeren får strøm i 5 minutter og slås så av. Karet er varmeisolert.",
+    hundre:
+      "100 % = energien strømmen gir. Det er like mye som kobberklossen på 90 °C hadde ekstra. Vannets energi fra før regner vi ikke med.",
     yTekst: "% av energien fra strømmen",
     soyler: [
       { navn: "Energi i alt", verdi: (r) => r.energiIAlt, farge: FARGE.total },
@@ -83,7 +85,7 @@ const FANER = {
       `kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
     forutsi: () => ({
       sporsmal:
-        "Strøm kan i prinsippet gjøre arbeid uten tap: 100 %. Dyppekokeren gjør strømmen om til varme i vannet. Når alt har fått samme temperatur: hvor mye av energien kan fortsatt gjøre arbeid?",
+        "Strøm kan i prinsippet gjøre arbeid uten tap: 100 %. Dyppekokeren gjør strømmen om til varme i vannet. Når alt i karet har fått samme temperatur: hvor mye av energien kan fortsatt gjøre arbeid i karet?",
       valg: [
         { id: "alt", tekst: "Fortsatt 100 % – energien er jo bevart" },
         { id: "halve", tekst: "Omtrent halvparten" },
@@ -94,8 +96,9 @@ const FANER = {
     fasit: (kar, r) => ({
       id: "ingenting",
       tekst:
-        `Ved start var all energien strøm, og alt kunne gjøre arbeid. Da strømmen ble slått av, var bare ` +
-        `${prosent(t.arbeidVedAvslaaing ?? 0, 1)} igjen. Nå er det ${prosent(r.kanGjoreArbeid, 1)}. ` +
+        `Ved start var all energien strøm, og alt kunne gjøre arbeid. Da strømmen ble slått av, kunne bare ` +
+        `${prosent(t.arbeidVedAvslaaing ?? 0, 1)} fortsatt bli arbeid. Nå er det ${prosent(r.kanGjoreArbeid, 1)}, ` +
+        `fordi det ikke finnes noen temperaturforskjell igjen i karet. ` +
         `Energien i alt er fortsatt ${prosent(r.energiIAlt)} – den er blitt varme spredt i hele karet, ` +
         `${formaterGrader(kar.blandingstemperatur)}. Strøm er energi av høy kvalitet. Lunkent vann har lav kvalitet.`,
     }),

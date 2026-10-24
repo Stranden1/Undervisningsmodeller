@@ -78,7 +78,9 @@ går raskere enn i virkeligheten, og hvor mye raskere står på skjermen.
   varmeovergangstall (10 W/m²·K, stille luft innendørs).
 - **Fingeren** er et 2 mm hudlag. Blodet holder baksiden på 33 °C. Kontakten er perfekt,
   uten luftlommer – i virkeligheten er huden ujevn, og kontakten blir dårligere.
-- **Smeltevannet** blir liggende der isen smeltet. Det renner ikke av.
+- **Smeltevannet renner bort med en gang**, og isen synker ned mot klossen. Ellers ville
+  vannet ligge som et isolerende lag mellom is og kloss (vann leder varme nesten fire
+  ganger dårligere enn is). Vannet som tegnes ved siden av isbiten, er bare pynt.
 - **"Føles som"** er en tolkning: følelsen avhenger også av hvor fort varmen forsvinner,
   hvor stor flate du berører, og hvor lenge.
 

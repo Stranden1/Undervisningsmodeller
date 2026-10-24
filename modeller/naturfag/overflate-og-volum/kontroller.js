@@ -195,6 +195,17 @@ function sjekkResultat() {
         : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?"
     );
     tutor.sendHendelse("resultat", { oppdeling: "1", fasit, gjetning });
+    // Ved vanlig fart skjer dette etter under ett sekund. Stopp, så eleven rekker å se
+    // hvor smeltingen begynner før resten av blokken tar over bildet.
+    t.kjorer = false;
+    startKnapp.textContent = "Fortsett";
+    oppdaterTekst();
+    settBeskrivelse(
+      $("beskrivelse"),
+      `${beskriv(f)} Modellen har stoppet, så du kan se hvor snøen begynner å smelte. Trykk Fortsett for å se resten.`,
+      true
+    );
+    tutor.sendHendelse("pause", { oppdeling: "1", automatisk: true });
     return;
   }
   if (f.smeltetVed === null || !t.referanse || t.referanse.smeltetVed === null) return;

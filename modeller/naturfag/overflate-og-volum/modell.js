@@ -14,7 +14,7 @@ export const UNDERLAG_T = 5; // °C, varm bakke under bitene
 
 /**
  * Oppdelingene eleven kan velge. deling = antall biter langs hver side i snittet.
- * I snittet blir det deling² biter; i ekte terninger deling³.
+ * I snittet blir det deling² biter (staver, se GEOMETRI.dybde).
  */
 export const OPPDELINGER = [
   { id: "1", navn: "Én blokk", deling: 1 },
@@ -24,10 +24,13 @@ export const OPPDELINGER = [
   { id: "spredt", navn: "Spredt utover", deling: null },
 ];
 
-// Geometri i celler. dx = 1 cm. Blokken er 16 × 16 cm.
+// Geometri i celler. dx = 1 cm. Blokken er 16 × 16 cm i snittet.
 export const GEOMETRI = {
   dx: 0.01,
   side: 16,
+  // Snittet regner som om alt går like langt inn i skjermen: blokken er en terning på
+  // 16 cm, og bitene er staver som er 16 cm lange. Forsiden og baksiden får ingen varme.
+  dybde: 16,
   mellomrom: 1, // luft mellom bitene
   spredtHoyde: 4, // det spredte laget er 4 cm tykt (64 cm bredt)
   bredde: 70,
@@ -58,25 +61,22 @@ export function lagBiter(oppdelingId) {
 }
 
 /**
- * Overflate og volum for ekte terninger med samme sidekant og samme totale volum
- * som i modellen (blokken er 16 cm). Det spredte laget regnes som en kvadratisk plate.
+ * Overflate og volum for nøyaktig de bitene simuleringen regner på: staver med
+ * tverrsnittet fra snittet og lengden GEOMETRI.dybde. Overflaten er den varmen kan
+ * komme inn gjennom i modellen, altså sidene rundt. Endene (forside og bakside) er ikke med.
+ * Mål i cm, cm² og cm³ (dx = 1 cm).
  */
 export function overflateOgVolum(oppdelingId) {
   const G = GEOMETRI;
-  const a0 = G.side; // cm
-  const volum = a0 ** 3; // cm³
-  const valg = OPPDELINGER.find((o) => o.id === oppdelingId);
-  if (valg.deling === null) {
-    const t = G.spredtHoyde;
-    const grunnflate = volum / t;
-    const side = Math.sqrt(grunnflate);
-    const overflate = 2 * grunnflate + 4 * side * t;
-    return { sidekant: null, tykkelse: t, antall: 1, overflate, volum, perVolum: overflate / volum };
+  const biter = lagBiter(oppdelingId);
+  let overflate = 0;
+  let volum = 0;
+  for (const b of biter) {
+    overflate += 2 * (b.b + b.h) * G.dybde;
+    volum += b.b * b.h * G.dybde;
   }
-  const a = a0 / valg.deling;
-  const antall = valg.deling ** 3;
-  const overflate = antall * 6 * a * a;
-  return { sidekant: a, tykkelse: null, antall, overflate, volum, perVolum: overflate / volum };
+  const { b, h } = biter[0];
+  return { antall: biter.length, bredde: b, hoyde: h, lengde: G.dybde, overflate, volum, perVolum: overflate / volum };
 }
 
 /**

@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { lagSnoforsok, smeltetid, lagBiter, overflateOgVolum, OPPDELINGER } from "../modell.js";
+import { lagSnoforsok, smeltetid, lagBiter, overflateOgVolum, OPPDELINGER, GEOMETRI } from "../modell.js";
 
 const data = JSON.parse(readFileSync(new URL("../../../../felles/data/materialer.json", import.meta.url), "utf8"));
 const timer = (s) => `${(s / 3600).toFixed(1)} t`;
@@ -91,11 +91,47 @@ test("Energiregnskapet går opp med luft, sol og underlag", () => {
   assert.ok(r.effekt > 0 && r.underlag > 0 && r.luft > 0);
 });
 
-test("Overflate per volum dobles når sidekanten halveres (terninger)", () => {
+test("Overflate per volum dobles når sidekanten halveres (staver)", () => {
   const tall = ["1", "4", "16", "64"].map(overflateOgVolum);
   for (let i = 1; i < tall.length; i++) {
     assert.ok(Math.abs(tall[i].perVolum / tall[i - 1].perVolum - 2) < 1e-12);
     assert.equal(tall[i].volum, tall[0].volum);
-    assert.equal(tall[i].antall, 8 * tall[i - 1].antall);
+    assert.equal(tall[i].antall, 4 * tall[i - 1].antall);
   }
+});
+
+// Tabellen og simuleringen skal beskrive samme gjenstand. Overflaten telles her uavhengig
+// av tabellen: fra varmemotorens egne luftflater, altså de flatene varmen faktisk går inn
+// gjennom. Hver flate er dx × dybde.
+test("Tabellen beskriver det simuleringen regner på: samme overflate, volum og masse", () => {
+  const dxCm = GEOMETRI.dx * 100;
+  const rho = data.materialer.pakket_sno.rho;
+  for (const o of OPPDELINGER) {
+    const g = lagSnoforsok(data, { oppdeling: o.id }).gitter;
+    let flater = 0;
+    let celler = 0;
+    for (let y = 0; y < g.ny; y++) {
+      for (let x = 0; x < g.nx; x++) {
+        if (g.erTom(x, y)) continue;
+        flater += g.antallLuftflater(x, y);
+        celler++;
+      }
+    }
+    const tabell = overflateOgVolum(o.id);
+    assert.equal(tabell.overflate, flater * dxCm * GEOMETRI.dybde, `overflate, ${o.id}`);
+    assert.equal(tabell.volum, celler * dxCm * dxCm * GEOMETRI.dybde, `volum, ${o.id}`);
+    assert.equal(tabell.antall, lagBiter(o.id).length, `antall, ${o.id}`);
+
+    // Simuleringen regner på et snitt som er én celle tykt. Ganget opp til hele dybden
+    // skal massen bli den samme som tabellen oppgir (volum × tetthet).
+    const f = lagSnoforsok(data, { oppdeling: o.id });
+    const masseHele = f.startMasse * (GEOMETRI.dybde / dxCm);
+    assert.ok(Math.abs(masseHele - tabell.volum * 1e-6 * rho) < 1e-12, `masse, ${o.id}`);
+  }
+});
+
+test("Spredt utover: tabellen gir samme forhold til én blokk som simuleringen", () => {
+  // Laget er 64 × 4 cm i snittet: omkrets 136 cm mot blokkens 64 cm, samme areal.
+  const forhold = overflateOgVolum("spredt").perVolum / overflateOgVolum("1").perVolum;
+  assert.ok(Math.abs(forhold - 136 / 64) < 1e-12);
 });

@@ -39,8 +39,12 @@ tidligere kjøringer blir liggende i grafen så de kan sammenlignes.
 Varmekilder: lufta er alltid med. Sol (på oversiden) og varmt underlag (+5 °C, under
 bitene) kan slås på.
 
-Tallpanelet viser overflate og volum for terninger med samme sidekant, og hvor mye
-overflate det er per volum.
+Tallpanelet viser overflate og volum for nøyaktig det modellen regner på, og hvor mye
+overflate det er per volum. Blokken går 16 cm inn i skjermen og deles bare i retningene
+eleven ser – som pommes frites. «4 biter» er altså 4 staver på 8 × 8 × 16 cm, og det
+spredte laget er 64 cm bredt, 4 cm tykt og 16 cm langt. Overflaten er sidene rundt hver
+stav; endene regnes ikke med, fordi modellen ikke slipper varme inn der. En test sjekker
+at tabellen og simuleringen har samme overflate, volum og masse.
 
 ## Elevoppgaver (forutsi – observer – forklar)
 1. **Forutsi (én blokk):** Hvor begynner blokken å smelte? Skriv svaret og hvorfor.
@@ -67,9 +71,11 @@ overflate det er per volum.
   raskere. Små poteter koker fortere.
 
 ## Hva modellen forenkler
-- **Et snitt (2D).** Modellen regner i et snitt, så bitene er egentlig lange staver.
-  Snittet viser ett lag; i virkeligheten blir det 8 terninger hver gang sidekanten
-  halveres, mens snittet viser 4 biter. Tallpanelet viser tall for ekte terninger.
+- **Et snitt (2D).** Modellen regner i et snitt, så bitene er staver som går 16 cm inn
+  i skjermen. Forsiden og baksiden får ingen varme. Tallpanelet viser tall for de samme
+  stavene. Skjærer man en ekte blokk i alle retninger, blir det terninger: 8 hver gang
+  sidekanten halveres, og enda mer overflate. Det er et godt spørsmål til elevene: ville
+  terningene smeltet enda raskere enn stavene? Hvorfor?
 - **Bitene ligger på rister** med luft rundt, så hver bit får luft på alle sider. Med
   varmt underlag ligger hver bit på et underlag som holder +5 °C.
 - **Sola** treffer oversiden av hver bit rett ovenfra. Skygge fra andre biter regnes

@@ -77,28 +77,27 @@ function oppdaterTall() {
   const n = overflateOgVolum(id);
   const forhold = n.perVolum / blokk.perVolum;
   const perVolum = `${formaterTall(n.perVolum, 3)} cm² per cm³`;
+  const ganger = `${formaterTall(forhold, 1)} ganger så mye som én blokk`;
   let tekst;
-  if (id === "1") tekst = `Én terning med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum}.`;
+  if (id === "1") tekst = `Én blokk, ${n.bredde} × ${n.hoyde} × ${n.lengde} cm. Overflate per volum: ${perVolum}.`;
   else if (id === "spredt")
-    tekst = `Et lag som er ${n.tykkelse} cm tykt. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+    tekst = `Et lag som er ${n.hoyde} cm tykt, ${n.bredde} cm bredt og ${n.lengde} cm langt. Overflate per volum: ${perVolum} – ${ganger}.`;
   else
-    tekst = `${formaterTall(n.antall)} terninger med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+    tekst = `${formaterTall(n.antall)} staver, ${n.bredde} × ${n.hoyde} cm og ${n.lengde} cm lange. Overflate per volum: ${perVolum} – ${ganger}.`;
   $("tall-hoved").textContent = tekst;
 
   const rader = OPPDELINGER.map((o) => {
     const v = overflateOgVolum(o.id);
-    const side = v.sidekant !== null ? `${v.sidekant} cm` : `lag ${v.tykkelse} cm`;
-    const antall = o.deling !== null ? formaterTall(v.antall) : "–";
-    const kort = o.deling !== null ? String(o.deling ** 2) : "Spredt";
-    return `<tr class="${o.id === id ? "valgt" : ""}"><td>${kort}</td><td>${antall}</td><td>${side}</td><td>${formaterTall(v.overflate, 0)}</td><td>${formaterTall(v.perVolum, 3)}</td></tr>`;
+    const kort = o.deling !== null ? formaterTall(v.antall) : "Spredt";
+    return `<tr class="${o.id === id ? "valgt" : ""}"><td>${kort}</td><td>${v.bredde}&nbsp;×&nbsp;${v.hoyde}&nbsp;cm</td><td>${formaterTall(v.overflate, 0)}</td><td>${formaterTall(v.perVolum, 3)}</td></tr>`;
   });
   const masse = (blokk.volum * 1e-6 * data.materialer[SNO].rho).toFixed(1).replace(".", ",");
   $("tall-tabell").innerHTML =
     `<caption class="kun-skjermleser">Overflate og volum for hver oppdeling</caption>` +
     // &shy; = myk bindestrek: lange ord deles bare når skjermen er smal, så tabellen får plass.
-    `<tr><th>Biter i snittet</th><th>Ter&shy;ninger</th><th>Side&shy;kant</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
+    `<tr><th>Biter</th><th>Tverr&shy;snitt</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
     rader.join("") +
-    `<tr><td colspan="5">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
+    `<tr><td colspan="4">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
 }
 
 // ---------------------------------------------------------------------------

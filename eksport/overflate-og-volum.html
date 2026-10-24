@@ -557,14 +557,14 @@ select {
         <h2 id="tall-tittel">Overflate og volum</h2>
         <p id="tall-hoved" class="tall-hoved"></p>
         <div class="tabell-rull"><table class="verditabell" id="tall-tabell"></table></div>
-        <p class="hjelpetekst">Tallene gjelder ekte terninger med samme sidekant. Snittet på skjermen viser bare ett lag, så der ser du færre biter.</p>
+        <p class="hjelpetekst">Blokken går 16 cm inn i skjermen. Den deles bare i retningene du ser, som når du skjærer pommes frites. Bitene er derfor staver som er 16 cm lange. Overflaten er sidene rundt hver stav – endene regnes ikke med.</p>
       </section>
 
       <details class="forenkler">
         <summary>Hva modellen forenkler</summary>
         <ul>
           <li><strong>Vibrasjonen er kraftig forsterket.</strong> Ekte forskjell i utslag mellom −5 °C og 0 °C er bare ca. 1 %.</li>
-          <li>Modellen er et snitt (2D), så bitene er egentlig lange staver. Når sidekanten halveres, blir det 8 terninger i virkeligheten, men 4 biter i snittet.</li>
+          <li>Modellen er et snitt (2D). Bitene er staver som går 16 cm inn i skjermen, og forsiden og baksiden får ingen varme. Skjærer du en ekte blokk i alle retninger, blir det terninger: 8 hver gang sidekanten halveres, og enda mer overflate.</li>
           <li>Bitene ligger på rister med luft rundt. Med varmt underlag ligger hver bit på et underlag som holder +5 °C.</li>
           <li>Sola skinner rett ovenfra på hver bit. Skygge fra andre biter regnes ikke med.</li>
           <li>Smeltevannet renner bort med en gang, og snøen over synker ned.</li>
@@ -1162,7 +1162,7 @@ const UNDERLAG_T = 5; // °C, varm bakke under bitene
 
 /**
  * Oppdelingene eleven kan velge. deling = antall biter langs hver side i snittet.
- * I snittet blir det deling² biter; i ekte terninger deling³.
+ * I snittet blir det deling² biter (staver, se GEOMETRI.dybde).
  */
 const OPPDELINGER = [
   { id: "1", navn: "Én blokk", deling: 1 },
@@ -1172,10 +1172,13 @@ const OPPDELINGER = [
   { id: "spredt", navn: "Spredt utover", deling: null },
 ];
 
-// Geometri i celler. dx = 1 cm. Blokken er 16 × 16 cm.
+// Geometri i celler. dx = 1 cm. Blokken er 16 × 16 cm i snittet.
 const GEOMETRI = {
   dx: 0.01,
   side: 16,
+  // Snittet regner som om alt går like langt inn i skjermen: blokken er en terning på
+  // 16 cm, og bitene er staver som er 16 cm lange. Forsiden og baksiden får ingen varme.
+  dybde: 16,
   mellomrom: 1, // luft mellom bitene
   spredtHoyde: 4, // det spredte laget er 4 cm tykt (64 cm bredt)
   bredde: 70,
@@ -1206,25 +1209,22 @@ function lagBiter(oppdelingId) {
 }
 
 /**
- * Overflate og volum for ekte terninger med samme sidekant og samme totale volum
- * som i modellen (blokken er 16 cm). Det spredte laget regnes som en kvadratisk plate.
+ * Overflate og volum for nøyaktig de bitene simuleringen regner på: staver med
+ * tverrsnittet fra snittet og lengden GEOMETRI.dybde. Overflaten er den varmen kan
+ * komme inn gjennom i modellen, altså sidene rundt. Endene (forside og bakside) er ikke med.
+ * Mål i cm, cm² og cm³ (dx = 1 cm).
  */
 function overflateOgVolum(oppdelingId) {
   const G = GEOMETRI;
-  const a0 = G.side; // cm
-  const volum = a0 ** 3; // cm³
-  const valg = OPPDELINGER.find((o) => o.id === oppdelingId);
-  if (valg.deling === null) {
-    const t = G.spredtHoyde;
-    const grunnflate = volum / t;
-    const side = Math.sqrt(grunnflate);
-    const overflate = 2 * grunnflate + 4 * side * t;
-    return { sidekant: null, tykkelse: t, antall: 1, overflate, volum, perVolum: overflate / volum };
+  const biter = lagBiter(oppdelingId);
+  let overflate = 0;
+  let volum = 0;
+  for (const b of biter) {
+    overflate += 2 * (b.b + b.h) * G.dybde;
+    volum += b.b * b.h * G.dybde;
   }
-  const a = a0 / valg.deling;
-  const antall = valg.deling ** 3;
-  const overflate = antall * 6 * a * a;
-  return { sidekant: a, tykkelse: null, antall, overflate, volum, perVolum: overflate / volum };
+  const { b, h } = biter[0];
+  return { antall: biter.length, bredde: b, hoyde: h, lengde: G.dybde, overflate, volum, perVolum: overflate / volum };
 }
 
 /**
@@ -2308,28 +2308,27 @@ function oppdaterTall() {
   const n = overflateOgVolum(id);
   const forhold = n.perVolum / blokk.perVolum;
   const perVolum = `${formaterTall(n.perVolum, 3)} cm² per cm³`;
+  const ganger = `${formaterTall(forhold, 1)} ganger så mye som én blokk`;
   let tekst;
-  if (id === "1") tekst = `Én terning med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum}.`;
+  if (id === "1") tekst = `Én blokk, ${n.bredde} × ${n.hoyde} × ${n.lengde} cm. Overflate per volum: ${perVolum}.`;
   else if (id === "spredt")
-    tekst = `Et lag som er ${n.tykkelse} cm tykt. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+    tekst = `Et lag som er ${n.hoyde} cm tykt, ${n.bredde} cm bredt og ${n.lengde} cm langt. Overflate per volum: ${perVolum} – ${ganger}.`;
   else
-    tekst = `${formaterTall(n.antall)} terninger med sidekant ${n.sidekant} cm. Overflate per volum: ${perVolum} – ${formaterTall(forhold, 1)} ganger så mye som én blokk.`;
+    tekst = `${formaterTall(n.antall)} staver, ${n.bredde} × ${n.hoyde} cm og ${n.lengde} cm lange. Overflate per volum: ${perVolum} – ${ganger}.`;
   $("tall-hoved").textContent = tekst;
 
   const rader = OPPDELINGER.map((o) => {
     const v = overflateOgVolum(o.id);
-    const side = v.sidekant !== null ? `${v.sidekant} cm` : `lag ${v.tykkelse} cm`;
-    const antall = o.deling !== null ? formaterTall(v.antall) : "–";
-    const kort = o.deling !== null ? String(o.deling ** 2) : "Spredt";
-    return `<tr class="${o.id === id ? "valgt" : ""}"><td>${kort}</td><td>${antall}</td><td>${side}</td><td>${formaterTall(v.overflate, 0)}</td><td>${formaterTall(v.perVolum, 3)}</td></tr>`;
+    const kort = o.deling !== null ? formaterTall(v.antall) : "Spredt";
+    return `<tr class="${o.id === id ? "valgt" : ""}"><td>${kort}</td><td>${v.bredde}&nbsp;×&nbsp;${v.hoyde}&nbsp;cm</td><td>${formaterTall(v.overflate, 0)}</td><td>${formaterTall(v.perVolum, 3)}</td></tr>`;
   });
   const masse = (blokk.volum * 1e-6 * data.materialer[SNO].rho).toFixed(1).replace(".", ",");
   $("tall-tabell").innerHTML =
     `<caption class="kun-skjermleser">Overflate og volum for hver oppdeling</caption>` +
     // &shy; = myk bindestrek: lange ord deles bare når skjermen er smal, så tabellen får plass.
-    `<tr><th>Biter i snittet</th><th>Ter&shy;ninger</th><th>Side&shy;kant</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
+    `<tr><th>Biter</th><th>Tverr&shy;snitt</th><th>Over&shy;flate (cm²)</th><th>Per volum</th></tr>` +
     rader.join("") +
-    `<tr><td colspan="5">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
+    `<tr><td colspan="4">Volum alltid ${formaterTall(blokk.volum)} cm³ (ca. ${masse} kg pakket snø)</td></tr>`;
 }
 
 // ---------------------------------------------------------------------------

@@ -21,9 +21,12 @@
     </section>
 
     <aside class="panel">
-      <div id="forutsi"></div>
+      <div id="forutsi" class="forutsi"></div>
 
-      <section class="kort">
+      <!-- Klassene styring, nokkeltall og forenkler bestemmer plassen på nettbrett og
+           mobil (se felles/stil.css). En graf legges i <section class="kort graf-kort">
+           rett etter scenen. -->
+      <section class="kort styring" aria-label="Oppsett og start">
         <div class="kontroll">
           <label for="starttemperatur">Starttemperatur <output id="starttemperatur-verdi"></output></label>
           <input id="starttemperatur" type="range" min="30" max="90" step="5" value="80">

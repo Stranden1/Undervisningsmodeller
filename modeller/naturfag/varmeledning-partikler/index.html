@@ -27,14 +27,17 @@
               aria-label="En finger legges på to klosser. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
       <p id="tapaa-tid" class="tidsmaler"></p>
       <p id="tapaa-beskrivelse" class="beskrivelse" aria-live="polite"></p>
-      <h2 class="graf-tittel">Temperaturen i huden der fingeren berører klossen</h2>
-      <canvas id="tapaa-graf" role="img" aria-label="Graf over hudtemperaturen i kontaktflaten over tid"></canvas>
     </div>
 
-    <aside class="panel">
-      <div id="tapaa-forutsi"></div>
+    <section class="kort graf-kort" aria-labelledby="tapaa-graf-tittel">
+      <h2 id="tapaa-graf-tittel" class="graf-tittel">Temperaturen i huden der fingeren berører klossen</h2>
+      <canvas id="tapaa-graf" role="img" aria-label="Graf over hudtemperaturen i kontaktflaten over tid"></canvas>
+    </section>
 
-      <section class="kort">
+    <aside class="panel">
+      <div id="tapaa-forutsi" class="forutsi"></div>
+
+      <section class="kort styring" aria-label="Oppsett og start">
         <div class="kontroll">
           <label for="tapaa-venstre">Venstre kloss</label>
           <select id="tapaa-venstre"></select>
@@ -55,7 +58,7 @@
         </details>
       </section>
 
-      <section class="kort" aria-labelledby="foles-tittel">
+      <section class="kort nokkeltall" aria-labelledby="foles-tittel">
         <h2 id="foles-tittel">Føles som</h2>
         <p class="hjelpetekst">Huden kjenner sin egen temperatur – ikke klossens.</p>
         <div id="tapaa-foles"></div>
@@ -82,14 +85,17 @@
               aria-label="To isbiter fra fryseren ligger på en aluminiumskloss og en treplate. Fargene viser temperatur."></canvas>
       <p id="isbit-tid" class="tidsmaler"></p>
       <p id="isbit-beskrivelse" class="beskrivelse" aria-live="polite"></p>
-      <h2 class="graf-tittel">Hvor mye av isen som har smeltet</h2>
-      <canvas id="isbit-graf" role="img" aria-label="Graf over andel smeltet is over tid"></canvas>
     </div>
 
-    <aside class="panel">
-      <div id="isbit-forutsi"></div>
+    <section class="kort graf-kort" aria-labelledby="isbit-graf-tittel">
+      <h2 id="isbit-graf-tittel" class="graf-tittel">Hvor mye av isen som har smeltet</h2>
+      <canvas id="isbit-graf" role="img" aria-label="Graf over andel smeltet is over tid"></canvas>
+    </section>
 
-      <section class="kort">
+    <aside class="panel">
+      <div id="isbit-forutsi" class="forutsi"></div>
+
+      <section class="kort styring" aria-label="Oppsett og start">
         <p>To like isbiter rett fra fryseren (−18 °C). Begge klossene har ligget i rommet og er 20 °C.</p>
         <p id="isbit-forhold" class="forhold"></p>
         <div class="knapperad">

@@ -20,17 +20,20 @@
               aria-label="Snø i luft på 5 grader. Fargene viser temperatur, prikkene er partikler som vibrerer."></canvas>
       <p id="tid" class="tidsmaler"></p>
       <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
-      <h2 class="graf-tittel">Hvor mye av snøen som har smeltet</h2>
+    </div>
+
+    <section class="kort graf-kort" aria-labelledby="graf-tittel">
+      <h2 id="graf-tittel" class="graf-tittel">Hvor mye av snøen som har smeltet</h2>
       <canvas id="graf" role="img" aria-label="Graf over andel smeltet snø over tid, én kurve per kjøring"></canvas>
       <div class="knapperad graf-knapper">
         <button id="tom-graf" class="knapp">Tøm grafen</button>
       </div>
-    </div>
+    </section>
 
     <aside class="panel">
-      <div id="forutsi"></div>
+      <div id="forutsi" class="forutsi"></div>
 
-      <section class="kort">
+      <section class="kort styring" aria-label="Oppsett og start">
         <div class="kontroll">
           <label for="oppdeling">Samme snø <output id="oppdeling-verdi"></output></label>
           <input id="oppdeling" type="range" min="0" max="4" step="1" value="0" list="oppdeling-merker"
@@ -69,7 +72,7 @@
         </details>
       </section>
 
-      <section class="kort" aria-labelledby="tall-tittel">
+      <section class="kort nokkeltall" aria-labelledby="tall-tittel">
         <h2 id="tall-tittel">Overflate og volum</h2>
         <p id="tall-hoved" class="tall-hoved"></p>
         <div class="tabell-rull"><table class="verditabell" id="tall-tabell"></table></div>

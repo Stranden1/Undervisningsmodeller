@@ -1,18 +1,5 @@
 /* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
 
-.graf-tittel {
-  font-size: 0.95rem;
-  margin: var(--rom-4) 0 var(--rom-2);
-  color: var(--tekst-dempet);
-}
-
-#tapaa-graf,
-#isbit-graf {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .forhold {
   font-size: 0.95rem;
   background: var(--flate-dempet);

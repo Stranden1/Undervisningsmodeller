@@ -1,7 +1,7 @@
 // Energi som sprer seg – tegning. Ingen fysikk her, bare lesing av tilstanden.
 
 import { tegnFargeskala } from "../../../felles/js/fargeskala.js";
-import { tegnPartikler, lagPartikler } from "../../../felles/js/partikler.js";
+import { tegnPartikler, lagPartikler, lagVaeske } from "../../../felles/js/partikler.js";
 import { tegnCeller, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
 import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
 import { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } from "./modell.js";
@@ -23,19 +23,39 @@ const DELEN = {
   dyppekoker: { navn: "Varmeelementet", plass: elementPlass, temperatur: (r) => r.elementTemperatur },
 };
 
+// Væskepartiklene holder så stor avstand til vegger og metall at vibrasjonen ikke når over.
+const MARGIN = 3;
+
 export function lagVisning() {
-  let partikler = null;
+  let fast = null;
+  let vaeske = null;
   let forrigeKar = null;
 
-  /** Én partikkel per celle, så eleven ser hvor mange partikler varmen fordeles på. */
+  /**
+   * Én prikk per celle. Metallet får faste plasser i et gitter. Vannet får prikker som
+   * vandrer rundt hverandre, fordi partiklene i en væske ikke har faste plasser.
+   */
   function lagCellePartikler(g) {
-    const plasser = [];
+    const metall = [];
+    const vann = [];
     for (let y = 0; y < g.ny; y++) {
       for (let x = 0; x < g.nx; x++) {
-        plasser.push({ x: (x + 0.5) * CELLE, y: (y + 0.5) * CELLE, cx: x, cy: y });
+        const plass = { x: (x + 0.5) * CELLE, y: (y + 0.5) * CELLE, cx: x, cy: y };
+        (g.materiale(x, y) === "vann" ? vann : metall).push(plass);
       }
     }
-    return lagPartikler(plasser, 7);
+    fast = lagPartikler(metall, 7);
+    vaeske = lagVaeske(vann, CELLE / 2 - MARGIN, 7);
+  }
+
+  /** Er (x, y), i piksler inne i karet, i vannet – med margin til vegger og metall? */
+  function iVannet(g, x, y) {
+    for (const [px, py] of [[x - MARGIN, y - MARGIN], [x + MARGIN, y - MARGIN], [x - MARGIN, y + MARGIN], [x + MARGIN, y + MARGIN]]) {
+      const cx = Math.floor(px / CELLE);
+      const cy = Math.floor(py / CELLE);
+      if (cx < 0 || cy < 0 || cx >= g.nx || cy >= g.ny || g.materiale(cx, cy) !== "vann") return false;
+    }
+    return true;
   }
 
   /**
@@ -48,7 +68,7 @@ export function lagVisning() {
     ctx.clearRect(0, 0, bredde, hoyde);
     const g = kar.gitter;
     if (kar !== forrigeKar) {
-      partikler = lagCellePartikler(g);
+      lagCellePartikler(g);
       forrigeKar = kar;
     }
     const delen = DELEN[fane];
@@ -64,9 +84,20 @@ export function lagVisning() {
     ctx.clearRect(x0, y0, karB, karH);
 
     tegnCeller(ctx, g, x0, y0, CELLE);
+    // Vannprikkene bytter celle når de vandrer, så cellen finnes ut fra hvor de er nå.
+    vaeske.flytt(
+      tid,
+      (p) => g.temperatur(Math.floor(p.x / CELLE), Math.floor(p.y / CELLE)),
+      (x, y) => iVannet(g, x, y),
+      FORSTERKNING
+    );
+    const prikker = [
+      ...fast,
+      ...vaeske.partikler.map((p) => ({ ...p, cx: Math.floor(p.x / CELLE), cy: Math.floor(p.y / CELLE) })),
+    ];
     tegnPartikler(
       ctx,
-      partikler.map((p) => ({ ...p, x: x0 + p.x, y: y0 + p.y })),
+      prikker.map((p) => ({ ...p, x: x0 + p.x, y: y0 + p.y })),
       (p) => g.temperatur(p.cx, p.cy),
       tid,
       { radius: 2.3, farge: (p) => PARTIKKELFARGE[g.materiale(p.cx, p.cy)], forsterkning: FORSTERKNING }

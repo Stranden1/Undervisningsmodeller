@@ -39,8 +39,10 @@ Vg1 studieforberedende:
 
 ## Slik virker modellen
 Et isolert kar med vann (10 °C) sett som et snitt. Ingen varme går inn eller ut. Cellene
-farges etter temperatur, og hver celle har en partikkel som vibrerer kraftigere jo
-varmere den er. To faner, begge med "gjett først" før Start virker.
+farges etter temperatur, og det er én prikk per celle. Prikkene beveger seg raskere jo
+varmere det er der de er. I metallet vibrerer de på faste plasser, som i et fast stoff.
+I vannet vandrer de også rundt hverandre, som i en væske. To faner, begge med "gjett
+først" før Start virker.
 
 **Varm kloss.** En kobberkloss (2,8 cm) ligger midt i vannet. Eleven velger vannmengde
 (lite, middels, mye) og klossens temperatur (40–90 °C).
@@ -108,10 +110,15 @@ i praksis.
   starter med energi av høy kvalitet (vann høyt oppe).
 
 ## Hva modellen forenkler
-- **Vannet står helt stille.** Ekte vann strømmer når det blir varmt, så i et forsøk
+- **Vannet strømmer ikke.** Ekte vann strømmer når det blir varmt, så i et forsøk
   jevner temperaturen seg ut på noen minutter. I modellen spres varmen bare ved
   ledning, så det tar 1–3 timer i modellen.
-- **Vibrasjonen er kraftig forsterket.** Ekte forskjell i utslag mellom 10 °C og 90 °C er
+- **Prikkene er ikke ekte partikler.** Hver prikk står for en celle, et lite område med
+  stoff. Antallet prikker sier derfor ingenting om hvor mange partikler det er. Prikkene
+  i vannet vandrer for å vise at partiklene i en væske ikke har faste plasser. Hver prikk
+  vandrer for seg, så det er ikke strømning. Farten følger temperaturen der prikken er
+  akkurat nå; prikken tar ikke med seg energi når den vandrer. Det er bare tegning.
+- **Bevegelsen er kraftig forsterket.** Ekte forskjell i utslag mellom 10 °C og 90 °C er
   ca. 13 %.
 - **Et snitt (2D), 4 mm tykt.** Derfor vises energien i prosent, ikke i joule.
 - **Karet er perfekt isolert.** Et ekte kar slipper ut litt varme hele tiden.

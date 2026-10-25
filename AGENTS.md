@@ -69,7 +69,7 @@ Undervisningsmodeller/
 │   ├── js/
 │   │   ├── varmegitter.js  ← felles varmemotor (ren fysikk, testes i Node)
 │   │   ├── data.js         ← henter materialer.json (eller innebygd kopi i enkeltfiler)
-│   │   ├── partikler.js    ← tegning av vibrerende partikler
+│   │   ├── partikler.js    ← tegning av partikler: faste plasser (fast stoff) eller vandrende (væske)
 │   │   ├── gittertegning.js ← tegner et varmegitter: celler etter temperatur + partikler
 │   │   ├── fargeskala.js   ← temperatur → farge (blå–oransje, fargeblind-vennlig)
 │   │   ├── lerret.js       ← skarpt canvas på skjermer med høy oppløsning

@@ -1,7 +1,7 @@
 // Energi som sprer seg – faner, knapper, valg og løkka som driver modellen.
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
-import { lagKar, lagDyppekoker, klossPlass, VANNMENGDER, KAR } from "./modell.js";
+import { lagKar, lagDyppekoker, VANNMENGDER, KAR } from "./modell.js";
 import { lagVisning, beskriv, STORRELSE } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
@@ -55,17 +55,14 @@ const FANER = {
         { id: "mer", tekst: "Mer enn klossen hadde" },
       ],
     }),
-    fasit: (kar, r) => {
-      const k = klossPlass(kar.vannmengde);
-      return {
-        id: "alt",
-        tekst:
-          `All varmen er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
-          `Men den er spredt fra ${k.side * k.side} til ${kar.gitter.nx * kar.gitter.ny} partikler i snittet, så temperaturen ble bare ` +
-          `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å få arbeid ut av temperaturforskjellene i karet: ` +
-          `fra ${prosent(t.startArbeid, 1)} til ${prosent(r.kanGjoreArbeid, 1)}. Energien har fått lavere kvalitet.`,
-      };
-    },
+    fasit: (kar, r) => ({
+      id: "alt",
+      tekst:
+        `All varmen er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
+        `Men den er spredt fra den lille klossen til alt vannet, så temperaturen ble bare ` +
+        `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å få arbeid ut av temperaturforskjellene i karet: ` +
+        `fra ${prosent(t.startArbeid, 1)} til ${prosent(r.kanGjoreArbeid, 1)}. Energien har fått lavere kvalitet.`,
+    }),
   },
 
   dyppekoker: {

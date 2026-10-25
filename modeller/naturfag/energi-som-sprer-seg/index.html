@@ -25,14 +25,17 @@
               aria-label="Et lukket kar med vann. Fargene viser temperatur. Prikkene i metallet vibrerer på faste plasser. Prikkene i vannet vibrerer og vandrer rundt hverandre."></canvas>
       <p id="tid" class="tidsmaler"></p>
       <p id="beskrivelse" class="beskrivelse" aria-live="polite"></p>
-      <h2 class="graf-tittel">Energiregnskapet over tid</h2>
-      <canvas id="graf" role="img" aria-label="Graf over energiregnskapet over tid: energien i alt, hvor den er, og hvor mye som kan gjøre arbeid"></canvas>
     </div>
+
+    <section class="kort graf-kort" aria-labelledby="graf-tittel">
+      <h2 id="graf-tittel" class="graf-tittel">Energiregnskapet over tid</h2>
+      <canvas id="graf" role="img" aria-label="Graf over energiregnskapet over tid: energien i alt, hvor den er, og hvor mye som kan gjøre arbeid"></canvas>
+    </section>
 
     <aside class="panel">
       <div id="forutsi"></div>
 
-      <section class="kort">
+      <section class="kort styring" aria-label="Oppsett og start">
         <div class="kontroll">
           <label for="vannmengde">Vannmengde</label>
           <select id="vannmengde"></select>
@@ -61,7 +64,7 @@
         </details>
       </section>
 
-      <section class="kort" aria-labelledby="regnskap-tittel">
+      <section class="kort regnskap" aria-labelledby="regnskap-tittel">
         <h2 id="regnskap-tittel">Energiregnskap</h2>
         <p class="hjelpetekst forste" id="hundre-tekst"></p>
         <div class="soyler" id="soyler">

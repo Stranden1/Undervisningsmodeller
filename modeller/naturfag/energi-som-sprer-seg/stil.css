@@ -1,8 +1,61 @@
 /* Det som bare gjelder denne modellen. Alt felles ligger i felles/stil.css. */
 
+/* ---------- Oppsett av siden ----------
+   PC: karet og grafen til venstre, gjetning, knapper og regnskap til høyre.
+   Nettbrett: gjetning og Start rett under karet, så eleven ser forsøket mens hen
+   gjetter og starter. Mobil: alt i én kolonne, i samme rekkefølge.
+   Prøves her først; virker det, flyttes det til felles/stil.css. */
+
+.modell {
+  grid-template-areas:
+    "scene panel"
+    "graf  panel";
+  grid-template-rows: auto 1fr;
+}
+.scene { grid-area: scene; }
+.graf-kort { grid-area: graf; }
+.panel { grid-area: panel; }
+
+@media (max-width: 860px) {
+  .modell {
+    /* Gjetningen har mest tekst og får den bredeste kolonnen. */
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    /* Styringen strekker seg over to rader, så regnskapet kan ligge rett under
+       gjetningen i stedet for under den høyeste av de to. */
+    grid-template-areas:
+      "scene    scene"
+      "forutsi  styring"
+      "regnskap styring"
+      "graf     graf"
+      "forenkler forenkler";
+    grid-template-rows: auto auto 1fr auto auto;
+  }
+  /* Panelets deler blir egne ruter i rutenettet. */
+  .panel { display: contents; }
+  #forutsi { grid-area: forutsi; }
+  .styring { grid-area: styring; }
+  .regnskap { grid-area: regnskap; }
+  .forenkler { grid-area: forenkler; }
+
+  /* Litt mindre kar og topp, så hele gjetningen med Lås-knappen får plass på
+     første skjerm på et nettbrett på høykant (768 × 1024). */
+  .scene canvas { max-width: 560px; margin: 0 auto; }
+  .topp { padding-top: var(--rom-1); }
+  .topp h1 { margin-bottom: var(--rom-2); }
+  .faner { margin-bottom: var(--rom-3); }
+}
+
+@media (max-width: 600px) {
+  .modell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "scene" "forutsi" "styring" "regnskap" "graf" "forenkler";
+    grid-template-rows: none;
+  }
+}
+
 .graf-tittel {
   font-size: 0.95rem;
-  margin: var(--rom-4) 0 var(--rom-2);
+  margin: 0 0 var(--rom-2);
   color: var(--tekst-dempet);
 }
 

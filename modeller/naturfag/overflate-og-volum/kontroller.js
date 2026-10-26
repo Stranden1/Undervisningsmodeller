@@ -356,7 +356,7 @@ function animer(naa) {
     sjekkResultat();
   }
 
-  visning.tegn(ctx, t.forsok, { tid: animTid });
+  visning.tegn(ctx, t.forsok, { tid: animTid, visVarme: t.startet });
 
   if (animTid - sisteTekst > 0.2) {
     sisteTekst = animTid;

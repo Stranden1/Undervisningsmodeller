@@ -53,6 +53,25 @@ test("Hjørnene når 0 °C før midten av en side", (t) => {
   }
 });
 
+test("De merkede cellene i bildet: hjørnet har luft på to sider, sidemidten på én, og hjørnet når 0 °C først", () => {
+  for (const kilder of [{}, { sol: true }, { underlag: true }]) {
+    const f = lagSnoforsok(data, { oppdeling: "1", ...kilder });
+    const { hjorne, side } = f.merkedeCeller;
+    assert.equal(f.gitter.antallLuftflater(...hjorne), 2);
+    assert.equal(f.gitter.antallLuftflater(...side), 1);
+    let hjorneNull = null;
+    let sideNull = null;
+    while (sideNull === null) {
+      f.steg(30);
+      if (hjorneNull === null && f.gitter.temperatur(...hjorne) >= 0) hjorneNull = f.tid;
+      if (f.gitter.temperatur(...side) >= 0) sideNull = f.tid;
+    }
+    assert.ok(hjorneNull !== null && hjorneNull < sideNull, JSON.stringify(kilder));
+  }
+  // Delt snø har ingen merkede celler.
+  assert.equal(lagSnoforsok(data, { oppdeling: "4" }).merkedeCeller, null);
+});
+
 test("Snøen står på 0 °C mens den smelter, og ingen snø er over 0 °C", () => {
   const f = lagSnoforsok(data, { oppdeling: "4", sol: true });
   const g = f.gitter;

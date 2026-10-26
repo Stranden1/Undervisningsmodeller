@@ -187,6 +187,9 @@ export function lagSnoforsok(data, { oppdeling, sol = false, underlag = false })
     get midtNullVed() {
       return midtNullVed;
     },
+    // To celler som merkes i bildet for én blokk, så eleven kan sammenligne: hjørnet
+    // øverst til venstre og midten av venstre side. Begge er med når fasiten regnes ut.
+    merkedeCeller: blokk ? { hjorne: hjorner()[0], side: sidemidter()[1] } : null,
     smeltetAndel,
     /** Masse snø som er igjen i gitteret (kg), smeltet eller ikke. */
     snoIgjen() {

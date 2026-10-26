@@ -3,7 +3,7 @@
 import { tegnFargeskala, temperaturFarge } from "../../../felles/js/fargeskala.js";
 import { tegnPartikler } from "../../../felles/js/partikler.js";
 import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
-import { formaterTid } from "../../../felles/js/format.js";
+import { formaterTid, formaterGrader } from "../../../felles/js/format.js";
 import { GEOMETRI, OPPDELINGER, LUFT_T, UNDERLAG_T } from "./modell.js";
 
 export const STORRELSE = { bredde: 760, hoyde: 380 };
@@ -12,6 +12,72 @@ const CELLE = 10;
 const X0 = (STORRELSE.bredde - GEOMETRI.bredde * CELLE) / 2;
 const Y0 = 70;
 const SOLFARGE = "#9a6c00"; // mørk gul: 4,6:1 mot hvitt, så sol-teksten kan leses (#c98a00 hadde 2,9:1)
+const MERKEFARGE = "#1f2328";
+const VARMEFARGE = "#D55E00"; // rødoransje (Okabe–Ito), varm ende som fargeskalaen
+const MERKENAVN = { hjorne: "Hjørnecelle", side: "Midt på siden" };
+
+/** "−4,2 °C", eller "0 °C – smelter" når cellen har nådd smeltepunktet. */
+function celleTemperatur(g, x, y) {
+  const T = g.temperatur(x, y);
+  return T >= 0 ? "0 °C – smelter" : formaterGrader(T).replace("-", "−");
+}
+
+function tegnPil(ctx, x1, y1, x2, y2) {
+  const v = Math.atan2(y2 - y1, x2 - x1);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.moveTo(x2 - 6 * Math.cos(v - 0.5), y2 - 6 * Math.sin(v - 0.5));
+  ctx.lineTo(x2, y2);
+  ctx.lineTo(x2 - 6 * Math.cos(v + 0.5), y2 - 6 * Math.sin(v + 0.5));
+  ctx.stroke();
+}
+
+/**
+ * Ring rundt hjørnecellen og cellen midt på siden, med navn og temperatur. Når forsøket
+ * er startet, viser piler hver side der cellen har luft (eller underlag) og får varme inn.
+ */
+function tegnMerkedeCeller(ctx, forsok, visVarme) {
+  const g = forsok.gitter;
+  const tomUtenfor = (x, y) => x < 0 || y < 0 || x >= g.nx || y >= g.ny || g.erTom(x, y);
+  for (const [nokkel, [cx, cy]] of Object.entries(forsok.merkedeCeller)) {
+    if (g.erTom(cx, cy)) continue; // smeltet bort
+    const mx = X0 + (cx + 0.5) * CELLE;
+    const my = Y0 + (cy + 0.5) * CELLE;
+
+    ctx.strokeStyle = MERKEFARGE;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(mx - CELLE / 2 - 1.5, my - CELLE / 2 - 1.5, CELLE + 3, CELLE + 3);
+
+    if (visVarme) {
+      ctx.strokeStyle = VARMEFARGE;
+      ctx.lineWidth = 2.5;
+      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+        if (!tomUtenfor(cx + dx, cy + dy)) continue;
+        tegnPil(ctx, mx + dx * 26, my + dy * 26, mx + dx * 10, my + dy * 10);
+      }
+    }
+
+    ctx.fillStyle = MERKEFARGE;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "top";
+    ctx.font = "600 15px system-ui, sans-serif";
+    ctx.fillText(MERKENAVN[nokkel], mx - 34, my - 18);
+    ctx.font = "15px system-ui, sans-serif";
+    ctx.fillText(celleTemperatur(g, cx, cy), mx - 34, my + 1);
+  }
+
+  if (visVarme) {
+    ctx.strokeStyle = VARMEFARGE;
+    ctx.lineWidth = 2.5;
+    tegnPil(ctx, 12, STORRELSE.hoyde - 22, 36, STORRELSE.hoyde - 22);
+    ctx.fillStyle = MERKEFARGE;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.font = "14px system-ui, sans-serif";
+    ctx.fillText("varme inn gjennom overflaten", 44, STORRELSE.hoyde - 22);
+  }
+}
 
 export function lagVisning(data) {
   let partikler = null;
@@ -20,9 +86,10 @@ export function lagVisning(data) {
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {object} forsok fra lagSnoforsok
-   * @param {{ tid: number }} vis  ekte tid (for jevn vibrasjon)
+   * @param {{ tid: number, visVarme?: boolean }} vis  ekte tid (for jevn vibrasjon), og om
+   *   pilene for varme inn skal vises (først etter at eleven har gjettet og startet)
    */
-  function tegn(ctx, forsok, { tid }) {
+  function tegn(ctx, forsok, { tid, visVarme = false }) {
     const { bredde, hoyde } = STORRELSE;
     ctx.clearRect(0, 0, bredde, hoyde);
     if (forsok !== forrigeForsok) {
@@ -98,6 +165,7 @@ export function lagVisning(data) {
       tid,
       { radius: 2.6, farge: (p) => PARTIKKELFARGE[g.materiale(p.cx, p.cy)] }
     );
+    if (forsok.merkedeCeller) tegnMerkedeCeller(ctx, forsok, visVarme);
 
     // Tekst under
     ctx.textAlign = "center";
@@ -125,6 +193,13 @@ export function lagVisning(data) {
 export function beskriv(forsok) {
   const valg = OPPDELINGER.find((o) => o.id === forsok.oppdeling);
   const deler = [`${valg.navn}. Etter ${formaterTid(forsok.tid)} er ${Math.round(forsok.smeltetAndel() * 100)} % av snøen smeltet.`];
+  const m = forsok.merkedeCeller;
+  if (m) {
+    const g = forsok.gitter;
+    const tekst = (navn, [x, y]) =>
+      g.erTom(x, y) ? `${navn} har smeltet bort` : `${navn} er ${celleTemperatur(g, x, y)}`;
+    deler.push(`${tekst("Den merkede hjørnecellen", m.hjorne)}. ${tekst("Den merkede cellen midt på siden", m.side)}.`);
+  }
   if (forsok.hjorneNullVed !== null) deler.push(`Hjørnene nådde 0 °C etter ${formaterTid(forsok.hjorneNullVed)}.`);
   if (forsok.midtNullVed !== null) deler.push(`Midten av sidene nådde 0 °C etter ${formaterTid(forsok.midtNullVed)}.`);
   if (forsok.smeltetVed !== null) deler.push(`All snøen var smeltet etter ${formaterTid(forsok.smeltetVed)}.`);

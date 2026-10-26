@@ -36,6 +36,13 @@ tynt lag. Massen er alltid den samme. Cellene farges etter temperatur, partiklen
 vibrerer, og smeltevannet renner bort. Grafen viser hvor stor andel som har smeltet, og
 tidligere kjøringer blir liggende i grafen så de kan sammenlignes.
 
+Med én blokk er to celler merket med en ring: hjørnet øverst til venstre og midten av
+venstre side. Temperaturen står ved hver av dem. Etter Start viser piler hvor varmen
+kommer inn: to piler til hjørnet, én til sidemidten. Modellen stopper av seg selv når
+de første hjørnene når 0 °C (etter ca. 12 minutter i modellen med bare luft). Da står
+hjørnet på 0 °C, mens sidemidten fortsatt er ca. −2 °C. Sidemidten når 0 °C etter ca.
+40 minutter.
+
 Varmekilder: lufta er alltid med. Sol (på oversiden) og varmt underlag (+5 °C, under
 bitene) kan slås på.
 
@@ -48,7 +55,8 @@ at tabellen og simuleringen har samme overflate, volum og masse.
 
 ## Elevoppgaver (forutsi – observer – forklar)
 1. **Forutsi (én blokk):** Hvor begynner blokken å smelte? Skriv svaret og hvorfor.
-2. **Observer:** Følg fargene. Hvilke celler blir først lyseblå (0 °C)? Hvor lenge står
+2. **Observer:** Når modellen stopper, sammenlign de to merkede cellene. Hvilken har
+   nådd 0 °C? Hvor mange piler går inn til hver av dem? Følg så fargene: hvor lenge står
    temperaturen på 0 °C?
 3. **Forutsi (delt):** Smelter 64 små biter raskere, saktere eller like fort som én
    blokk? Begrunn.

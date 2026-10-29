@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-29",
+  "contact": [
+    {
+      "name": "kobber",
+      "effusivity": 37146.19765198048,
+      "semiInfiniteContact": 20.386419385999158,
+      "tableTarget": 20.4
+    },
+    {
+      "name": "aluminium",
+      "effusivity": 23998.12492675209,
+      "semiInfiniteContact": 20.588545772303082,
+      "tableTarget": 20.6
+    },
+    {
+      "name": "rustfritt_stal",
+      "effusivity": 7745.966692414834,
+      "semiInfiniteContact": 21.66522246025727,
+      "tableTarget": 21.7
+    },
+    {
+      "name": "glass",
+      "effusivity": 1449.137674618944,
+      "semiInfiniteContact": 25.718234236881163,
+      "tableTarget": 25.7
+    },
+    {
+      "name": "tre",
+      "effusivity": 391.1521443121589,
+      "semiInfiniteContact": 29.67460024649334,
+      "tableTarget": 29.7
+    },
+    {
+      "name": "isopor",
+      "effusivity": 35.874782229304195,
+      "semiInfiniteContact": 32.602700512214405,
+      "tableTarget": 32.6
+    }
+  ],
+  "snow": [
+    {
+      "underlag": false,
+      "time": 717,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "markedCorner": 0,
+      "markedSide": -2.0681995943704785,
+      "energyResidual": 5.9685589803848416e-12,
+      "sliceMass": 0.10752000000000017,
+      "fullMass": 1.7203200000000027
+    },
+    {
+      "underlag": true,
+      "time": 102,
+      "corners": [
+        -3.4370291871580982,
+        -3.4370291871580982,
+        0,
+        0
+      ],
+      "markedCorner": -3.4370291871580982,
+      "markedSide": -4.185567251812881,
+      "energyResidual": 2.8421709430404007e-13,
+      "sliceMass": 0.10752000000000017,
+      "fullMass": 1.7203200000000027
+    }
+  ],
+  "energy": [
+    {
+      "name": "lite",
+      "hot": 40,
+      "Ck": 10.8179456,
+      "Cw": 47.08352,
+      "independentEquilibrium": 15.605011283168626,
+      "modelEquilibrium": 15.605011283168624,
+      "reversibleFinalC": 15.377954639663926,
+      "independentMaxWork": 13.146912433138766,
+      "modelMaxWork": 13.146912433134275,
+      "initialWorkPercent": 4.050957831013301
+    },
+    {
+      "name": "lite",
+      "hot": 90,
+      "Ck": 10.8179456,
+      "Cw": 47.08352,
+      "independentEquilibrium": 24.94669675511633,
+      "modelEquilibrium": 24.946696755116328,
+      "reversibleFinalC": 23.47488869510562,
+      "independentMaxWork": 85.219843756513,
+      "modelMaxWork": 85.21984375650572,
+      "initialWorkPercent": 9.847045699290746
+    },
+    {
+      "name": "middels",
+      "hot": 40,
+      "Ck": 10.8179456,
+      "Cw": 67.14752,
+      "independentEquilibrium": 14.162591289649143,
+      "modelEquilibrium": 14.162591289649143,
+      "reversibleFinalC": 13.984282441424739,
+      "independentMaxWork": 13.901932372415502,
+      "modelMaxWork": 13.90193237242056,
+      "initialWorkPercent": 4.283602107845536
+    },
+    {
+      "name": "middels",
+      "hot": 90,
+      "Ck": 10.8179456,
+      "Cw": 67.14752,
+      "independentEquilibrium": 21.100243439064382,
+      "modelEquilibrium": 21.100243439064382,
+      "reversibleFinalC": 19.947109524261805,
+      "independentMaxWork": 89.90462256673379,
+      "modelMaxWork": 89.90462256673709,
+      "initialWorkPercent": 10.388365995149508
+    },
+    {
+      "name": "mye",
+      "hot": 40,
+      "Ck": 10.8179456,
+      "Cw": 120.65152,
+      "independentEquilibrium": 12.46854557838866,
+      "modelEquilibrium": 12.468545578388662,
+      "reversibleFinalC": 12.356081796908711,
+      "independentMaxWork": 14.785553250524003,
+      "modelMaxWork": 14.7855532505273,
+      "initialWorkPercent": 4.555872189054702
+    },
+    {
+      "name": "mye",
+      "hot": 90,
+      "Ck": 10.8179456,
+      "Cw": 120.65152,
+      "independentEquilibrium": 16.582788209036426,
+      "modelEquilibrium": 16.582788209036426,
+      "reversibleFinalC": 15.857456196836551,
+      "independentMaxWork": 95.35901202649018,
+      "modelMaxWork": 95.35901202651439,
+      "initialWorkPercent": 11.018613833028772
+    }
+  ],
+  "convergence": [
+    {
+      "dt": 0.0001,
+      "t": 9.999999999990033,
+      "left": 43.189397294658804,
+      "right": 32.362441143493974,
+      "residual": -3.183231456205249e-12
+    },
+    {
+      "dt": 0.001,
+      "t": 9.999999999999897,
+      "left": 43.18834139937934,
+      "right": 32.36308259987695,
+      "residual": -3.979039320256561e-13
+    },
+    {
+      "dt": 0.01,
+      "t": 9.999999999999831,
+      "left": 43.17777854258706,
+      "right": 32.36949953537848,
+      "residual": 5.115907697472721e-13
+    },
+    {
+      "dt": 0.1,
+      "t": 9.99999999999998,
+      "left": 43.07175875224656,
+      "right": 32.43390655801022,
+      "residual": 5.684341886080802e-14
+    }
+  ],
+  "contrast": [
+    {
+      "color": "#009E73",
+      "onWhite": 3.421139939945999
+    },
+    {
+      "color": "#CC79A7",
+      "onWhite": 3.06103403764584
+    },
+    {
+      "color": "#17487f",
+      "onWhite": 9.251758275453648
+    },
+    {
+      "color": "#5b616b",
+      "onWhite": 6.236979679136906
+    }
+  ],
+  "geometry": [
+    {
+      "id": "1",
+      "antall": 1,
+      "bredde": 16,
+      "hoyde": 16,
+      "lengde": 16,
+      "overflate": 1024,
+      "volum": 4096,
+      "perVolum": 0.25
+    },
+    {
+      "id": "4",
+      "antall": 4,
+      "bredde": 8,
+      "hoyde": 8,
+      "lengde": 16,
+      "overflate": 2048,
+      "volum": 4096,
+      "perVolum": 0.5
+    },
+    {
+      "id": "16",
+      "antall": 16,
+      "bredde": 4,
+      "hoyde": 4,
+      "lengde": 16,
+      "overflate": 4096,
+      "volum": 4096,
+      "perVolum": 1
+    },
+    {
+      "id": "64",
+      "antall": 64,
+      "bredde": 2,
+      "hoyde": 2,
+      "lengde": 16,
+      "overflate": 8192,
+      "volum": 4096,
+      "perVolum": 2
+    },
+    {
+      "id": "spredt",
+      "antall": 1,
+      "bredde": 64,
+      "hoyde": 4,
+      "lengde": 16,
+      "overflate": 2176,
+      "volum": 4096,
+      "perVolum": 0.53125
+    }
+  ]
+}

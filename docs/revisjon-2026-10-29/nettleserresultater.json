@@ -1,0 +1,2035 @@
+{
+  "date": "2026-10-29",
+  "environment": "Windows; separat Chrome uten utvidelser; ingen fysisk mobil/iPad",
+  "checks": [
+    {
+      "name": "Katalog: alle modell-, veilednings- og nedlastingslenker",
+      "status": "pass",
+      "evidence": [
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/varmeledning-partikler/",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/varmeledning-partikler/README.md",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/eksport/varmeledning-partikler.html",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/overflate-og-volum/",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/overflate-og-volum/README.md",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/eksport/overflate-og-volum.html",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/energi-som-sprer-seg/",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/modeller/naturfag/energi-som-sprer-seg/README.md",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/eksport/energi-som-sprer-seg.html",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/maler/fag/ny-modell/",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/docs/plan.html",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:8000/docs/designprinsipper.md",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "name": "varmeledning-partikler: start sperret før gjetning",
+      "status": "pass",
+      "evidence": {
+        "fane": "tapaa",
+        "taPaa": {
+          "venstre": "aluminium",
+          "hoyre": "tre",
+          "gjetning": null,
+          "fingerenBerorer": false,
+          "kjorer": false,
+          "kaldest": null,
+          "tid": 0,
+          "scener": [
+            {
+              "materiale": "aluminium",
+              "kontaktTemperatur": 20.02,
+              "varmestromUt": 19210
+            },
+            {
+              "materiale": "tre",
+              "kontaktTemperatur": 29.25,
+              "varmestromUt": 5550
+            }
+          ]
+        },
+        "isbit": {
+          "gjetning": null,
+          "kjorer": false,
+          "fart": 30,
+          "forstSmeltet": null,
+          "tid": 0,
+          "scener": [
+            {
+              "materiale": "aluminium",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            },
+            {
+              "materiale": "tre",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "varmeledning-partikler: bredde 1440",
+      "status": "pass",
+      "evidence": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "buttons": [
+          {
+            "text": "Ta på",
+            "top": 184.734375,
+            "height": 44
+          },
+          {
+            "text": "Isbit på kloss",
+            "top": 184.734375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 478.234375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 817.171875,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 817.171875,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "tapaa-lerret",
+            "width": 778,
+            "height": 378.75
+          },
+          {
+            "id": "tapaa-graf",
+            "width": 778,
+            "height": 333.421875
+          }
+        ]
+      }
+    },
+    {
+      "name": "varmeledning-partikler: bredde 768",
+      "status": "pass",
+      "evidence": {
+        "width": 768,
+        "scrollWidth": 768,
+        "buttons": [
+          {
+            "text": "Ta på",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Isbit på kloss",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 868.265625,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 920.9375,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 920.9375,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "tapaa-lerret",
+            "width": 560,
+            "height": 272.625
+          },
+          {
+            "id": "tapaa-graf",
+            "width": 702,
+            "height": 300.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "varmeledning-partikler: bredde 390",
+      "status": "pass",
+      "evidence": {
+        "width": 390,
+        "scrollWidth": 390,
+        "buttons": [
+          {
+            "text": "Ta på",
+            "top": 201.375,
+            "height": 44
+          },
+          {
+            "text": "Isbit på kloss",
+            "top": 201.375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 810.25,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1149.1875,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1149.1875,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "tapaa-lerret",
+            "width": 324,
+            "height": 157.734375
+          },
+          {
+            "id": "tapaa-graf",
+            "width": 324,
+            "height": 138.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "varmeledning-partikler: bredde 320",
+      "status": "pass",
+      "evidence": {
+        "width": 320,
+        "scrollWidth": 320,
+        "buttons": [
+          {
+            "text": "Ta på",
+            "top": 229.421875,
+            "height": 44
+          },
+          {
+            "text": "Isbit på kloss",
+            "top": 229.421875,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 876.890625,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1240.0625,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1240.0625,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "tapaa-lerret",
+            "width": 254,
+            "height": 123.65625
+          },
+          {
+            "id": "tapaa-graf",
+            "width": 254,
+            "height": 108.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "varmeledning-partikler: mindre bevegelse ved stillstand",
+      "status": "pass",
+      "evidence": {
+        "prefersReducedMotion": true,
+        "canvasChangesWhileNotRunning": true
+      }
+    },
+    {
+      "name": "overflate-og-volum: start sperret før gjetning",
+      "status": "pass",
+      "evidence": {
+        "oppdeling": "1",
+        "sol": false,
+        "underlag": false,
+        "gjetning": null,
+        "kjorer": false,
+        "ferdig": false,
+        "overflatePerVolum": 0.25,
+        "forsok": {
+          "oppdeling": "1",
+          "sol": false,
+          "underlag": false,
+          "tid": 0,
+          "smeltetAndel": 0,
+          "smeltetVed": null,
+          "hjorneNullVed": null,
+          "midtNullVed": null
+        },
+        "kjoringer": []
+      }
+    },
+    {
+      "name": "overflate-og-volum: bredde 1440",
+      "status": "pass",
+      "evidence": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "buttons": [
+          {
+            "text": "Tøm grafen",
+            "top": 1092.9375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 418.234375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 855.03125,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 855.03125,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 778,
+            "height": 389
+          },
+          {
+            "id": "graf",
+            "width": 778,
+            "height": 333.421875
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflate-og-volum: bredde 768",
+      "status": "pass",
+      "evidence": {
+        "width": 768,
+        "scrollWidth": 768,
+        "buttons": [
+          {
+            "text": "Tøm grafen",
+            "top": 1700.828125,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 790.140625,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 941.9375,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 941.9375,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 560,
+            "height": 280
+          },
+          {
+            "id": "graf",
+            "width": 702,
+            "height": 300.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflate-og-volum: bredde 390",
+      "status": "pass",
+      "evidence": {
+        "width": 390,
+        "scrollWidth": 390,
+        "buttons": [
+          {
+            "text": "Tøm grafen",
+            "top": 2025.515625,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 772.859375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1209.65625,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1209.65625,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 324,
+            "height": 162
+          },
+          {
+            "id": "graf",
+            "width": 324,
+            "height": 138.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflate-og-volum: bredde 320",
+      "status": "pass",
+      "evidence": {
+        "width": 320,
+        "scrollWidth": 320,
+        "buttons": [
+          {
+            "text": "Tøm grafen",
+            "top": 2097.171875,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 762.09375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1198.890625,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1198.890625,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 254,
+            "height": 127
+          },
+          {
+            "id": "graf",
+            "width": 254,
+            "height": 108.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflate-og-volum: mindre bevegelse ved stillstand",
+      "status": "pass",
+      "evidence": {
+        "prefersReducedMotion": true,
+        "canvasChangesWhileNotRunning": true
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: start sperret før gjetning",
+      "status": "pass",
+      "evidence": {
+        "fane": "kloss",
+        "vannmengde": "middels",
+        "gjetning": null,
+        "kjorer": false,
+        "tid": 0,
+        "energiIAltProsent": 100,
+        "varmeIKarProsent": 100,
+        "kanGjoreArbeidProsent": 10.4,
+        "sluttTemperatur": 21.1,
+        "ferdig": false,
+        "klossTemperatur": 90,
+        "iKlossenProsent": 100,
+        "iVannetProsent": 0,
+        "klossTemperaturNa": 90
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: bredde 1440",
+      "status": "pass",
+      "evidence": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "buttons": [
+          {
+            "text": "Varm kloss",
+            "top": 184.734375,
+            "height": 44
+          },
+          {
+            "text": "Dyppekoker",
+            "top": 184.734375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 573.234375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 897.578125,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 897.578125,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 778,
+            "height": 409.46875
+          },
+          {
+            "id": "graf",
+            "width": 778,
+            "height": 333.421875
+          }
+        ]
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: bredde 768",
+      "status": "pass",
+      "evidence": {
+        "width": 768,
+        "scrollWidth": 768,
+        "buttons": [
+          {
+            "text": "Varm kloss",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Dyppekoker",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 935.640625,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 902.921875,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 902.921875,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 560,
+            "height": 294.734375
+          },
+          {
+            "id": "graf",
+            "width": 702,
+            "height": 300.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: bredde 390",
+      "status": "pass",
+      "evidence": {
+        "width": 390,
+        "scrollWidth": 390,
+        "buttons": [
+          {
+            "text": "Varm kloss",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Dyppekoker",
+            "top": 168.734375,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 884.09375,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1208.4375,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1208.4375,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 324,
+            "height": 170.515625
+          },
+          {
+            "id": "graf",
+            "width": 324,
+            "height": 138.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: bredde 320",
+      "status": "pass",
+      "evidence": {
+        "width": 320,
+        "scrollWidth": 320,
+        "buttons": [
+          {
+            "text": "Varm kloss",
+            "top": 196.78125,
+            "height": 44
+          },
+          {
+            "text": "Dyppekoker",
+            "top": 196.78125,
+            "height": 44
+          },
+          {
+            "text": "Lås gjetningen",
+            "top": 923.796875,
+            "height": 44
+          },
+          {
+            "text": "Start",
+            "top": 1271.078125,
+            "height": 44
+          },
+          {
+            "text": "Nullstill",
+            "top": 1271.078125,
+            "height": 44
+          }
+        ],
+        "canvas": [
+          {
+            "id": "lerret",
+            "width": 254,
+            "height": 133.671875
+          },
+          {
+            "id": "graf",
+            "width": 254,
+            "height": 108.84375
+          }
+        ]
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: mindre bevegelse ved stillstand",
+      "status": "pass",
+      "evidence": {
+        "prefersReducedMotion": true,
+        "canvasChangesWhileNotRunning": true
+      }
+    },
+    {
+      "name": "Varmeledning: alle materialvalg og Mer",
+      "status": "pass",
+      "evidence": [
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "kobber",
+            "hoyre": "kobber",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.01,
+                "varmestromUt": 19222
+              },
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.01,
+                "varmestromUt": 19222
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "aluminium",
+            "hoyre": "aluminium",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "kontaktTemperatur": 20.02,
+                "varmestromUt": 19210
+              },
+              {
+                "materiale": "aluminium",
+                "kontaktTemperatur": 20.02,
+                "varmestromUt": 19210
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "rustfritt_stal",
+            "hoyre": "rustfritt_stal",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "rustfritt_stal",
+                "kontaktTemperatur": 20.31,
+                "varmestromUt": 18777
+              },
+              {
+                "materiale": "rustfritt_stal",
+                "kontaktTemperatur": 20.31,
+                "varmestromUt": 18777
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "glass",
+            "hoyre": "glass",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "glass",
+                "kontaktTemperatur": 23.51,
+                "varmestromUt": 14044
+              },
+              {
+                "materiale": "glass",
+                "kontaktTemperatur": 23.51,
+                "varmestromUt": 14044
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "tre",
+            "hoyre": "tre",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "tre",
+                "kontaktTemperatur": 29.25,
+                "varmestromUt": 5550
+              },
+              {
+                "materiale": "tre",
+                "kontaktTemperatur": 29.25,
+                "varmestromUt": 5550
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "isopor",
+            "hoyre": "isopor",
+            "gjetning": null,
+            "fingerenBerorer": false,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "isopor",
+                "kontaktTemperatur": 31.94,
+                "varmestromUt": 1575
+              },
+              {
+                "materiale": "isopor",
+                "kontaktTemperatur": 31.94,
+                "varmestromUt": 1575
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Varmeledning: tastaturgjetning, start, pause, fortsett og slutt",
+      "status": "pass",
+      "evidence": {
+        "focus": "Din gjetning: Høyre: Tre (furu)",
+        "pause": {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "aluminium",
+            "hoyre": "tre",
+            "gjetning": "hoyre",
+            "fingerenBerorer": true,
+            "kjorer": false,
+            "kaldest": null,
+            "tid": 0.73,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "kontaktTemperatur": 20.39,
+                "varmestromUt": 11058
+              },
+              {
+                "materiale": "tre",
+                "kontaktTemperatur": 29.58,
+                "varmestromUt": 2962
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        "result": {
+          "fane": "tapaa",
+          "taPaa": {
+            "venstre": "aluminium",
+            "hoyre": "tre",
+            "gjetning": "hoyre",
+            "fingerenBerorer": true,
+            "kjorer": false,
+            "kaldest": "venstre",
+            "tid": 20,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "kontaktTemperatur": 21.53,
+                "varmestromUt": 2331
+              },
+              {
+                "materiale": "tre",
+                "kontaktTemperatur": 30.09,
+                "varmestromUt": 627
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 30,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        "text": "Du gjettet\nHøyre: Tre (furu)\nDet skjedde\nVenstre: Aluminium\n\nBegge klossene var 20 °C. Aluminium leder varmen raskere bort fra fingeren, så huden der blir kaldere. Det er varme som strømmer ut av fingeren – ikke kulde som strømmer inn.\n\nDu gjettet: Høyre: Tre (furu). Det skjedde: Venstre: Aluminium. Begge klossene var 20 °C. Aluminium leder varmen raskere bort fra fingeren, så huden der blir kaldere. Det er varme som strømmer ut av fingeren – ikke kulde som strømmer inn."
+      }
+    },
+    {
+      "name": "Varmeledning: nullstill og like materialer",
+      "status": "pass",
+      "evidence": {
+        "fane": "tapaa",
+        "taPaa": {
+          "venstre": "kobber",
+          "hoyre": "kobber",
+          "gjetning": "like",
+          "fingerenBerorer": true,
+          "kjorer": true,
+          "kaldest": "like",
+          "tid": 2.01,
+          "scener": [
+            {
+              "materiale": "kobber",
+              "kontaktTemperatur": 20.36,
+              "varmestromUt": 6314
+            },
+            {
+              "materiale": "kobber",
+              "kontaktTemperatur": 20.36,
+              "varmestromUt": 6314
+            }
+          ]
+        },
+        "isbit": {
+          "gjetning": null,
+          "kjorer": false,
+          "fart": 30,
+          "forstSmeltet": null,
+          "tid": 0,
+          "scener": [
+            {
+              "materiale": "aluminium",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            },
+            {
+              "materiale": "tre",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Varmeledning: tastaturfaner og isbitkontroller",
+      "status": "pass",
+      "evidence": {
+        "options": [
+          "10",
+          "30",
+          "120",
+          "600"
+        ],
+        "result": {
+          "fane": "isbit",
+          "taPaa": {
+            "venstre": "kobber",
+            "hoyre": "kobber",
+            "gjetning": "like",
+            "fingerenBerorer": true,
+            "kjorer": false,
+            "kaldest": "like",
+            "tid": 2.02,
+            "scener": [
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.36,
+                "varmestromUt": 6282
+              },
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.36,
+                "varmestromUt": 6282
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": "tre",
+            "kjorer": false,
+            "fart": 600,
+            "forstSmeltet": "aluminium",
+            "tid": 1391.35,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 1,
+                "klossTemperaturUnderIs": 9.88,
+                "smeltetVed": 509
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0.132,
+                "klossTemperaturUnderIs": 1.34,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        "reset": {
+          "fane": "isbit",
+          "taPaa": {
+            "venstre": "kobber",
+            "hoyre": "kobber",
+            "gjetning": "like",
+            "fingerenBerorer": true,
+            "kjorer": false,
+            "kaldest": "like",
+            "tid": 2.02,
+            "scener": [
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.36,
+                "varmestromUt": 6282
+              },
+              {
+                "materiale": "kobber",
+                "kontaktTemperatur": 20.36,
+                "varmestromUt": 6282
+              }
+            ]
+          },
+          "isbit": {
+            "gjetning": null,
+            "kjorer": false,
+            "fart": 600,
+            "forstSmeltet": null,
+            "tid": 0,
+            "scener": [
+              {
+                "materiale": "aluminium",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              },
+              {
+                "materiale": "tre",
+                "smeltetAndel": 0,
+                "klossTemperaturUnderIs": 20,
+                "smeltetVed": null
+              }
+            ]
+          }
+        },
+        "note": "Isbit prøvd underveis, full smelting av begge ikke avventet her."
+      }
+    },
+    {
+      "name": "Snø: alle oppdelinger, varmekilder og fart",
+      "status": "pass",
+      "evidence": {
+        "choices": [
+          {
+            "state": {
+              "oppdeling": "1",
+              "sol": false,
+              "underlag": false,
+              "gjetning": null,
+              "kjorer": false,
+              "ferdig": false,
+              "overflatePerVolum": 0.25,
+              "forsok": {
+                "oppdeling": "1",
+                "sol": false,
+                "underlag": false,
+                "tid": 0,
+                "smeltetAndel": 0,
+                "smeltetVed": null,
+                "hjorneNullVed": null,
+                "midtNullVed": null
+              },
+              "kjoringer": []
+            },
+            "text": "Én blokk, 16 × 16 × 16 cm. Overflate per volum: 0,25 cm² per cm³."
+          },
+          {
+            "state": {
+              "oppdeling": "4",
+              "sol": false,
+              "underlag": false,
+              "gjetning": null,
+              "kjorer": false,
+              "ferdig": false,
+              "overflatePerVolum": 0.5,
+              "forsok": {
+                "oppdeling": "4",
+                "sol": false,
+                "underlag": false,
+                "tid": 0,
+                "smeltetAndel": 0,
+                "smeltetVed": null,
+                "hjorneNullVed": null,
+                "midtNullVed": null
+              },
+              "kjoringer": []
+            },
+            "text": "4 staver, 8 × 8 cm og 16 cm lange. Overflate per volum: 0,5 cm² per cm³ – 2 ganger så mye som én blokk."
+          },
+          {
+            "state": {
+              "oppdeling": "16",
+              "sol": false,
+              "underlag": false,
+              "gjetning": null,
+              "kjorer": false,
+              "ferdig": false,
+              "overflatePerVolum": 1,
+              "forsok": {
+                "oppdeling": "16",
+                "sol": false,
+                "underlag": false,
+                "tid": 0,
+                "smeltetAndel": 0,
+                "smeltetVed": null,
+                "hjorneNullVed": null,
+                "midtNullVed": null
+              },
+              "kjoringer": []
+            },
+            "text": "16 staver, 4 × 4 cm og 16 cm lange. Overflate per volum: 1 cm² per cm³ – 4 ganger så mye som én blokk."
+          },
+          {
+            "state": {
+              "oppdeling": "64",
+              "sol": false,
+              "underlag": false,
+              "gjetning": null,
+              "kjorer": false,
+              "ferdig": false,
+              "overflatePerVolum": 2,
+              "forsok": {
+                "oppdeling": "64",
+                "sol": false,
+                "underlag": false,
+                "tid": 0,
+                "smeltetAndel": 0,
+                "smeltetVed": null,
+                "hjorneNullVed": null,
+                "midtNullVed": null
+              },
+              "kjoringer": []
+            },
+            "text": "64 staver, 2 × 2 cm og 16 cm lange. Overflate per volum: 2 cm² per cm³ – 8 ganger så mye som én blokk."
+          },
+          {
+            "state": {
+              "oppdeling": "spredt",
+              "sol": false,
+              "underlag": false,
+              "gjetning": null,
+              "kjorer": false,
+              "ferdig": false,
+              "overflatePerVolum": 0.53125,
+              "forsok": {
+                "oppdeling": "spredt",
+                "sol": false,
+                "underlag": false,
+                "tid": 0,
+                "smeltetAndel": 0,
+                "smeltetVed": null,
+                "hjorneNullVed": null,
+                "midtNullVed": null
+              },
+              "kjoringer": []
+            },
+            "text": "Et lag som er 4 cm tykt, 64 cm bredt og 16 cm langt. Overflate per volum: 0,531 cm² per cm³ – 2,1 ganger så mye som én blokk."
+          }
+        ],
+        "options": [
+          "600",
+          "3600",
+          "14400"
+        ]
+      }
+    },
+    {
+      "name": "Snø: automatisk observasjonspause, fortsett, nullstill",
+      "status": "pass",
+      "evidence": {
+        "oppdeling": "1",
+        "sol": false,
+        "underlag": false,
+        "gjetning": "sider",
+        "kjorer": false,
+        "ferdig": false,
+        "overflatePerVolum": 0.25,
+        "forsok": {
+          "oppdeling": "1",
+          "sol": false,
+          "underlag": false,
+          "tid": 720,
+          "smeltetAndel": 0,
+          "smeltetVed": null,
+          "hjorneNullVed": 720,
+          "midtNullVed": null
+        },
+        "kjoringer": []
+      }
+    },
+    {
+      "name": "Snø: varmt underlag og merkede celler ved automatisk pause",
+      "status": "pass",
+      "evidence": {
+        "state": {
+          "oppdeling": "1",
+          "sol": false,
+          "underlag": true,
+          "gjetning": "hjorner",
+          "kjorer": false,
+          "ferdig": false,
+          "overflatePerVolum": 0.25,
+          "forsok": {
+            "oppdeling": "1",
+            "sol": false,
+            "underlag": true,
+            "tid": 103,
+            "smeltetAndel": 0,
+            "smeltetVed": null,
+            "hjorneNullVed": 103,
+            "midtNullVed": null
+          },
+          "kjoringer": []
+        },
+        "text": "Én blokk. Etter 1 min 42 s er 0 % av snøen smeltet. Den merkede hjørnecellen er −3,4 °C. Den merkede cellen midt på siden er −4,2 °C. Hjørnene nådde 0 °C etter 1 min 42 s. Modellen har stoppet, så du kan se hvor snøen begynner å smelte. Trykk Fortsett for å se resten.",
+        "answer": "Du gjettet\nPå hjørnene\nDet skjedde\nPå hjørnene\n\nHjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde.\n\nDu gjettet: På hjørnene. Det skjedde: På hjørnene. Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde."
+      }
+    },
+    {
+      "name": "Snø: full kjøring, sammenligning og Tøm grafen",
+      "status": "pass",
+      "evidence": {
+        "first": {
+          "oppdeling": "64",
+          "sol": false,
+          "underlag": false,
+          "gjetning": "kortere",
+          "kjorer": false,
+          "ferdig": true,
+          "overflatePerVolum": 2,
+          "forsok": {
+            "oppdeling": "64",
+            "sol": false,
+            "underlag": false,
+            "tid": 15946,
+            "smeltetAndel": 1,
+            "smeltetVed": 15939,
+            "hjorneNullVed": null,
+            "midtNullVed": null
+          },
+          "kjoringer": [
+            {
+              "navn": "64 biter",
+              "smeltetid": 15939
+            }
+          ]
+        },
+        "second": {
+          "oppdeling": "spredt",
+          "sol": true,
+          "underlag": true,
+          "gjetning": "kortere",
+          "kjorer": false,
+          "ferdig": true,
+          "overflatePerVolum": 0.53125,
+          "forsok": {
+            "oppdeling": "spredt",
+            "sol": true,
+            "underlag": true,
+            "tid": 9794,
+            "smeltetAndel": 0.999,
+            "smeltetVed": 9794,
+            "hjorneNullVed": null,
+            "midtNullVed": null
+          },
+          "kjoringer": [
+            {
+              "navn": "64 biter",
+              "smeltetid": 15939
+            },
+            {
+              "navn": "Spredt utover + sol + underlag",
+              "smeltetid": 9794
+            }
+          ]
+        },
+        "cleared": {
+          "oppdeling": "spredt",
+          "sol": true,
+          "underlag": true,
+          "gjetning": "kortere",
+          "kjorer": false,
+          "ferdig": true,
+          "overflatePerVolum": 0.53125,
+          "forsok": {
+            "oppdeling": "spredt",
+            "sol": true,
+            "underlag": true,
+            "tid": 9794,
+            "smeltetAndel": 0.999,
+            "smeltetVed": 9794,
+            "hjorneNullVed": null,
+            "midtNullVed": null
+          },
+          "kjoringer": [
+            {
+              "navn": "64 biter",
+              "smeltetid": 15939
+            },
+            {
+              "navn": "Spredt utover + sol + underlag",
+              "smeltetid": 9794
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Energi: alle vannmengder, temperaturgrenser, fart og joule",
+      "status": "pass",
+      "evidence": [
+        {
+          "fane": "kloss",
+          "vannmengde": "lite",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 4.1,
+          "sluttTemperatur": 15.6,
+          "ferdig": false,
+          "klossTemperatur": 40,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 40
+        },
+        {
+          "fane": "kloss",
+          "vannmengde": "lite",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 9.8,
+          "sluttTemperatur": 24.9,
+          "ferdig": false,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 90
+        },
+        {
+          "fane": "kloss",
+          "vannmengde": "middels",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 4.3,
+          "sluttTemperatur": 14.2,
+          "ferdig": false,
+          "klossTemperatur": 40,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 40
+        },
+        {
+          "fane": "kloss",
+          "vannmengde": "middels",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 10.4,
+          "sluttTemperatur": 21.1,
+          "ferdig": false,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 90
+        },
+        {
+          "fane": "kloss",
+          "vannmengde": "mye",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 4.6,
+          "sluttTemperatur": 12.5,
+          "ferdig": false,
+          "klossTemperatur": 40,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 40
+        },
+        {
+          "fane": "kloss",
+          "vannmengde": "mye",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 11,
+          "sluttTemperatur": 16.6,
+          "ferdig": false,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 90
+        }
+      ]
+    },
+    {
+      "name": "Energi: varm kloss start, pause, fortsett, likevekt",
+      "status": "pass",
+      "evidence": {
+        "paused": {
+          "fane": "kloss",
+          "vannmengde": "lite",
+          "gjetning": "alt",
+          "kjorer": false,
+          "tid": 33,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 5.4,
+          "sluttTemperatur": 24.9,
+          "ferdig": false,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 73.4,
+          "iVannetProsent": 26.6,
+          "klossTemperaturNa": 68.7
+        },
+        "end": {
+          "fane": "kloss",
+          "vannmengde": "lite",
+          "gjetning": "alt",
+          "kjorer": false,
+          "tid": 3186,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 0,
+          "sluttTemperatur": 24.9,
+          "ferdig": true,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 18.7,
+          "iVannetProsent": 81.3,
+          "klossTemperaturNa": 25
+        }
+      }
+    },
+    {
+      "name": "Energi: dyppekoker, strøm av, likevekt og fanebytte",
+      "status": "pass",
+      "evidence": {
+        "off": {
+          "fane": "dyppekoker",
+          "vannmengde": "lite",
+          "gjetning": "alt",
+          "kjorer": true,
+          "tid": 300,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 4.6,
+          "sluttTemperatur": 24.4,
+          "ferdig": false,
+          "stromPaa": false,
+          "somStromProsent": 0,
+          "elementTemperatur": 73.4
+        },
+        "end": {
+          "fane": "dyppekoker",
+          "vannmengde": "lite",
+          "gjetning": "alt",
+          "kjorer": false,
+          "tid": 4094,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 0,
+          "sluttTemperatur": 24.4,
+          "ferdig": true,
+          "stromPaa": false,
+          "somStromProsent": 0,
+          "elementTemperatur": 24.5
+        },
+        "back": {
+          "fane": "kloss",
+          "vannmengde": "lite",
+          "gjetning": null,
+          "kjorer": false,
+          "tid": 0,
+          "energiIAltProsent": 100,
+          "varmeIKarProsent": 100,
+          "kanGjoreArbeidProsent": 9.8,
+          "sluttTemperatur": 24.9,
+          "ferdig": false,
+          "klossTemperatur": 90,
+          "iKlossenProsent": 100,
+          "iVannetProsent": 0,
+          "klossTemperaturNa": 90
+        }
+      }
+    },
+    {
+      "name": "varmeledning-partikler: eksport samsvarer med kilde",
+      "status": "pass",
+      "evidence": {
+        "identicalIgnoringDateAndLineEndings": true,
+        "generatedBytes": 103326,
+        "existingBytes": 103326
+      }
+    },
+    {
+      "name": "varmeledning-partikler: eksisterende og ny enkeltfil uten nett",
+      "status": "pass",
+      "evidence": [
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\eksport\\varmeledning-partikler.html",
+          "state": {
+            "fane": "tapaa",
+            "taPaa": {
+              "venstre": "aluminium",
+              "hoyre": "tre",
+              "gjetning": "venstre",
+              "fingerenBerorer": true,
+              "kjorer": true,
+              "kaldest": null,
+              "tid": 0.26,
+              "scener": [
+                {
+                  "materiale": "aluminium",
+                  "kontaktTemperatur": 20.32,
+                  "varmestromUt": 15295
+                },
+                {
+                  "materiale": "tre",
+                  "kontaktTemperatur": 29.43,
+                  "varmestromUt": 4286
+                }
+              ]
+            },
+            "isbit": {
+              "gjetning": null,
+              "kjorer": false,
+              "fart": 30,
+              "forstSmeltet": null,
+              "tid": 0,
+              "scener": [
+                {
+                  "materiale": "aluminium",
+                  "smeltetAndel": 0,
+                  "klossTemperaturUnderIs": 20,
+                  "smeltetVed": null
+                },
+                {
+                  "materiale": "tre",
+                  "smeltetAndel": 0,
+                  "klossTemperaturUnderIs": 20,
+                  "smeltetVed": null
+                }
+              ]
+            }
+          }
+        },
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\docs\\revisjon-2026-10-29\\enkeltfiler/varmeledning-partikler.html",
+          "state": {
+            "fane": "tapaa",
+            "taPaa": {
+              "venstre": "aluminium",
+              "hoyre": "tre",
+              "gjetning": "venstre",
+              "fingerenBerorer": true,
+              "kjorer": true,
+              "kaldest": null,
+              "tid": 0.26,
+              "scener": [
+                {
+                  "materiale": "aluminium",
+                  "kontaktTemperatur": 20.32,
+                  "varmestromUt": 15232
+                },
+                {
+                  "materiale": "tre",
+                  "kontaktTemperatur": 29.43,
+                  "varmestromUt": 4265
+                }
+              ]
+            },
+            "isbit": {
+              "gjetning": null,
+              "kjorer": false,
+              "fart": 30,
+              "forstSmeltet": null,
+              "tid": 0,
+              "scener": [
+                {
+                  "materiale": "aluminium",
+                  "smeltetAndel": 0,
+                  "klossTemperaturUnderIs": 20,
+                  "smeltetVed": null
+                },
+                {
+                  "materiale": "tre",
+                  "smeltetAndel": 0,
+                  "klossTemperaturUnderIs": 20,
+                  "smeltetVed": null
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "overflate-og-volum: eksport samsvarer med kilde",
+      "status": "pass",
+      "evidence": {
+        "identicalIgnoringDateAndLineEndings": true,
+        "generatedBytes": 96464,
+        "existingBytes": 96464
+      }
+    },
+    {
+      "name": "overflate-og-volum: eksisterende og ny enkeltfil uten nett",
+      "status": "pass",
+      "evidence": [
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\eksport\\overflate-og-volum.html",
+          "state": {
+            "oppdeling": "1",
+            "sol": false,
+            "underlag": false,
+            "gjetning": "hjorner",
+            "kjorer": false,
+            "ferdig": false,
+            "overflatePerVolum": 0.25,
+            "forsok": {
+              "oppdeling": "1",
+              "sol": false,
+              "underlag": false,
+              "tid": 720,
+              "smeltetAndel": 0,
+              "smeltetVed": null,
+              "hjorneNullVed": 720,
+              "midtNullVed": null
+            },
+            "kjoringer": []
+          }
+        },
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\docs\\revisjon-2026-10-29\\enkeltfiler/overflate-og-volum.html",
+          "state": {
+            "oppdeling": "1",
+            "sol": false,
+            "underlag": false,
+            "gjetning": "hjorner",
+            "kjorer": false,
+            "ferdig": false,
+            "overflatePerVolum": 0.25,
+            "forsok": {
+              "oppdeling": "1",
+              "sol": false,
+              "underlag": false,
+              "tid": 720,
+              "smeltetAndel": 0,
+              "smeltetVed": null,
+              "hjorneNullVed": 720,
+              "midtNullVed": null
+            },
+            "kjoringer": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "energi-som-sprer-seg: eksport samsvarer med kilde",
+      "status": "pass",
+      "evidence": {
+        "identicalIgnoringDateAndLineEndings": true,
+        "generatedBytes": 105160,
+        "existingBytes": 105160
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: eksisterende og ny enkeltfil uten nett",
+      "status": "pass",
+      "evidence": [
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\eksport\\energi-som-sprer-seg.html",
+          "state": {
+            "fane": "kloss",
+            "vannmengde": "middels",
+            "gjetning": "ingenting",
+            "kjorer": true,
+            "tid": 3,
+            "energiIAltProsent": 100,
+            "varmeIKarProsent": 100,
+            "kanGjoreArbeidProsent": 9.7,
+            "sluttTemperatur": 21.1,
+            "ferdig": false,
+            "klossTemperatur": 90,
+            "iKlossenProsent": 96.9,
+            "iVannetProsent": 3.1,
+            "klossTemperaturNa": 87.5
+          }
+        },
+        {
+          "file": "C:\\Users\\Martin Stranden\\Documents\\GitHub\\Undervisningsmodeller\\docs\\revisjon-2026-10-29\\enkeltfiler/energi-som-sprer-seg.html",
+          "state": {
+            "fane": "kloss",
+            "vannmengde": "middels",
+            "gjetning": "ingenting",
+            "kjorer": true,
+            "tid": 3,
+            "energiIAltProsent": 100,
+            "varmeIKarProsent": 100,
+            "kanGjoreArbeidProsent": 9.7,
+            "sluttTemperatur": 21.1,
+            "ferdig": false,
+            "klossTemperatur": 90,
+            "iKlossenProsent": 96.9,
+            "iVannetProsent": 3.1,
+            "klossTemperaturNa": 87.5
+          }
+        }
+      ]
+    },
+    {
+      "name": "varmeledning-partikler: emulert berøring på nettbrett",
+      "status": "pass",
+      "evidence": {
+        "fane": "tapaa",
+        "taPaa": {
+          "venstre": "aluminium",
+          "hoyre": "tre",
+          "gjetning": "venstre",
+          "fingerenBerorer": true,
+          "kjorer": true,
+          "kaldest": null,
+          "tid": 0.25,
+          "scener": [
+            {
+              "materiale": "aluminium",
+              "kontaktTemperatur": 20.32,
+              "varmestromUt": 15365
+            },
+            {
+              "materiale": "tre",
+              "kontaktTemperatur": 29.42,
+              "varmestromUt": 4309
+            }
+          ]
+        },
+        "isbit": {
+          "gjetning": null,
+          "kjorer": false,
+          "fart": 30,
+          "forstSmeltet": null,
+          "tid": 0,
+          "scener": [
+            {
+              "materiale": "aluminium",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            },
+            {
+              "materiale": "tre",
+              "smeltetAndel": 0,
+              "klossTemperaturUnderIs": 20,
+              "smeltetVed": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "overflate-og-volum: emulert berøring på nettbrett",
+      "status": "pass",
+      "evidence": {
+        "oppdeling": "1",
+        "sol": false,
+        "underlag": false,
+        "gjetning": "hjorner",
+        "kjorer": false,
+        "ferdig": false,
+        "overflatePerVolum": 0.25,
+        "forsok": {
+          "oppdeling": "1",
+          "sol": false,
+          "underlag": false,
+          "tid": 720,
+          "smeltetAndel": 0,
+          "smeltetVed": null,
+          "hjorneNullVed": 720,
+          "midtNullVed": null
+        },
+        "kjoringer": []
+      }
+    },
+    {
+      "name": "energi-som-sprer-seg: emulert berøring på nettbrett",
+      "status": "pass",
+      "evidence": {
+        "fane": "kloss",
+        "vannmengde": "middels",
+        "gjetning": "ingenting",
+        "kjorer": true,
+        "tid": 3,
+        "energiIAltProsent": 100,
+        "varmeIKarProsent": 100,
+        "kanGjoreArbeidProsent": 9.7,
+        "sluttTemperatur": 21.1,
+        "ferdig": false,
+        "klossTemperatur": 90,
+        "iKlossenProsent": 96.8,
+        "iVannetProsent": 3.2,
+        "klossTemperaturNa": 87.4
+      }
+    }
+  ],
+  "console": [
+    {
+      "url": "http://127.0.0.1:8000/",
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "externalRequests": [],
+  "browser": "156.0.8078.74"
+}

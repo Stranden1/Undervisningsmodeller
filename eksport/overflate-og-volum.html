@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/naturfag/overflate-og-volum/ (2026-10-26). Ikke rediger for hånd. -->
+<!-- Laget av verktoy/lag-enkeltfil.js fra modeller/naturfag/overflate-og-volum/ (2026-10-29). Ikke rediger for hånd. -->
 <html lang="nb">
 <head>
   <meta charset="utf-8">
@@ -1325,6 +1325,33 @@ function lagSnoforsok(data, { oppdeling, sol = false, underlag = false }) {
   const naddNull = (celler) =>
     celler.some(([x, y]) => !gitter.erTom(x, y) && gitter.temperatur(x, y) >= 0);
 
+  // To celler merkes i bildet, så eleven kan sammenligne et hjørne med midten av en side.
+  // De ligger på flaten der den sterkeste varmekilden virker. Da er det merkede hjørnet
+  // det som faktisk når 0 °C først, og sidecellen den som når 0 °C først av sidemidtene.
+  // Underlaget varmer mest, så sola, så lufta (se testene).
+  function velgMerkedeCeller() {
+    const { x, y, b, h } = blokk;
+    const mx = x + Math.floor(b / 2);
+    const my = y + Math.floor(h / 2);
+    if (underlag) return { flate: "under", hjorne: [x, y + h - 1], side: [mx, y + h - 1] };
+    if (sol) return { flate: "over", hjorne: [x, y], side: [mx, y] };
+    return { flate: "venstre", hjorne: [x, y], side: [x, my] };
+  }
+
+  /**
+   * Sidene der en celle får varme inn, og fra hva: [{ retning: [dx, dy], kilder: [...] }].
+   * Luft der nabocellen er tom, sol på oversiden av den øverste snøen, underlag under bunnen.
+   */
+  function varmeInn(cx, cy) {
+    const tom = (x, y) => x < 0 || y < 0 || x >= G.bredde || y >= G.hoyde || gitter.erTom(x, y);
+    const sider = [];
+    if (tom(cx - 1, cy)) sider.push({ retning: [-1, 0], kilder: ["luft"] });
+    if (tom(cx + 1, cy)) sider.push({ retning: [1, 0], kilder: ["luft"] });
+    if (tom(cx, cy - 1)) sider.push({ retning: [0, -1], kilder: solPerCelle > 0 ? ["luft", "sol"] : ["luft"] });
+    if (tom(cx, cy + 1)) sider.push({ retning: [0, 1], kilder: underlag ? ["underlag"] : ["luft"] });
+    return sider;
+  }
+
   /** Smeltevann renner bort, snøen synker ned i biten sin, og sola treffer den øverste cellen. */
   function etterSteg() {
     for (const b of biter) {
@@ -1384,9 +1411,9 @@ function lagSnoforsok(data, { oppdeling, sol = false, underlag = false }) {
     get midtNullVed() {
       return midtNullVed;
     },
-    // To celler som merkes i bildet for én blokk, så eleven kan sammenligne: hjørnet
-    // øverst til venstre og midten av venstre side. Begge er med når fasiten regnes ut.
-    merkedeCeller: blokk ? { hjorne: hjorner()[0], side: sidemidter()[1] } : null,
+    /** For én blokk: { flate: "venstre" | "over" | "under", hjorne: [x, y], side: [x, y] }. Ellers null. */
+    merkedeCeller: blokk ? velgMerkedeCeller() : null,
+    varmeInn,
     smeltetAndel,
     /** Masse snø som er igjen i gitteret (kg), smeltet eller ikke. */
     snoIgjen() {
@@ -1731,7 +1758,7 @@ const { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } = __moduler["felles/js/
 const { formaterTid, formaterGrader } = __moduler["felles/js/format.js"];
 const { GEOMETRI, OPPDELINGER, LUFT_T, UNDERLAG_T } = __moduler["modeller/naturfag/overflate-og-volum/modell.js"];
 
-const STORRELSE = { bredde: 760, hoyde: 380 };
+const STORRELSE = { bredde: 760, hoyde: 430 };
 
 const CELLE = 10;
 const X0 = (STORRELSE.bredde - GEOMETRI.bredde * CELLE) / 2;
@@ -1739,7 +1766,12 @@ const Y0 = 70;
 const SOLFARGE = "#9a6c00"; // mørk gul: 4,6:1 mot hvitt, så sol-teksten kan leses (#c98a00 hadde 2,9:1)
 const MERKEFARGE = "#1f2328";
 const VARMEFARGE = "#D55E00"; // rødoransje (Okabe–Ito), varm ende som fargeskalaen
-const MERKENAVN = { hjorne: "Hjørnecelle", side: "Midt på siden" };
+const SIDENAVN = { venstre: "Midt på siden", over: "Midt på oversiden", under: "Midt på undersiden" };
+
+/** Navnet på en merket celle, slik det står i bildet: "Hjørnecelle", "Midt på undersiden" … */
+function merkeNavn(merkede, nokkel) {
+  return nokkel === "hjorne" ? "Hjørnecelle" : SIDENAVN[merkede.flate];
+}
 
 /** "−4,2 °C", eller "0 °C – smelter" når cellen har nådd smeltepunktet. */
 function celleTemperatur(g, x, y) {
@@ -1759,13 +1791,15 @@ function tegnPil(ctx, x1, y1, x2, y2) {
 }
 
 /**
- * Ring rundt hjørnecellen og cellen midt på siden, med navn og temperatur. Når forsøket
- * er startet, viser piler hver side der cellen har luft (eller underlag) og får varme inn.
+ * Ring rundt hjørnecellen og sidecellen, med navn og temperatur. Når forsøket er startet,
+ * viser piler hver side der cellen får varme inn (fra modellens varmeInn).
+ * Navnet står til venstre for celler i venstre kant, ellers over eller under blokken.
  */
 function tegnMerkedeCeller(ctx, forsok, visVarme) {
   const g = forsok.gitter;
-  const tomUtenfor = (x, y) => x < 0 || y < 0 || x >= g.nx || y >= g.ny || g.erTom(x, y);
-  for (const [nokkel, [cx, cy]] of Object.entries(forsok.merkedeCeller)) {
+  const merkede = forsok.merkedeCeller;
+  for (const nokkel of ["hjorne", "side"]) {
+    const [cx, cy] = merkede[nokkel];
     if (g.erTom(cx, cy)) continue; // smeltet bort
     const mx = X0 + (cx + 0.5) * CELLE;
     const my = Y0 + (cy + 0.5) * CELLE;
@@ -1777,19 +1811,27 @@ function tegnMerkedeCeller(ctx, forsok, visVarme) {
     if (visVarme) {
       ctx.strokeStyle = VARMEFARGE;
       ctx.lineWidth = 2.5;
-      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-        if (!tomUtenfor(cx + dx, cy + dy)) continue;
+      for (const { retning: [dx, dy] } of forsok.varmeInn(cx, cy)) {
         tegnPil(ctx, mx + dx * 26, my + dy * 26, mx + dx * 10, my + dy * 10);
       }
     }
 
+    const navn = merkeNavn(merkede, nokkel);
+    const temperatur = celleTemperatur(g, cx, cy);
     ctx.fillStyle = MERKEFARGE;
-    ctx.textAlign = "right";
     ctx.textBaseline = "top";
+    let tx = mx - 34;
+    let ty = my - 18;
+    ctx.textAlign = "right";
+    if (nokkel === "side" && merkede.flate !== "venstre") {
+      ctx.textAlign = "center";
+      tx = mx;
+      ty = merkede.flate === "over" ? my - 66 : my + 32;
+    }
     ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillText(MERKENAVN[nokkel], mx - 34, my - 18);
+    ctx.fillText(navn, tx, ty);
     ctx.font = "15px system-ui, sans-serif";
-    ctx.fillText(celleTemperatur(g, cx, cy), mx - 34, my + 1);
+    ctx.fillText(temperatur, tx, ty + 19);
   }
 
   if (visVarme) {
@@ -1900,7 +1942,8 @@ function lagVisning(data) {
     const valg = OPPDELINGER.find((o) => o.id === forsok.oppdeling);
     const andel = forsok.smeltetAndel();
     const status = forsok.smeltetVed !== null ? "alt smeltet" : `${Math.round(andel * 100)} % smeltet`;
-    ctx.fillText(`${valg.navn} · ${status}`, bredde / 2, yBakke + 18);
+    // Lavt nok til at navnet på en merket celle på undersiden får plass over.
+    ctx.fillText(`${valg.navn} · ${status}`, bredde / 2, yBakke + 74);
     if (forsok.underlag) {
       ctx.font = "14px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
@@ -1923,15 +1966,15 @@ function beskriv(forsok) {
     const g = forsok.gitter;
     const tekst = (navn, [x, y]) =>
       g.erTom(x, y) ? `${navn} har smeltet bort` : `${navn} er ${celleTemperatur(g, x, y)}`;
-    deler.push(`${tekst("Den merkede hjørnecellen", m.hjorne)}. ${tekst("Den merkede cellen midt på siden", m.side)}.`);
+    deler.push(`${tekst("Den merkede hjørnecellen", m.hjorne)}. ${tekst(`Den merkede cellen ${SIDENAVN[m.flate].toLowerCase()}`, m.side)}.`);
   }
-  if (forsok.hjorneNullVed !== null) deler.push(`Hjørnene nådde 0 °C etter ${formaterTid(forsok.hjorneNullVed)}.`);
-  if (forsok.midtNullVed !== null) deler.push(`Midten av sidene nådde 0 °C etter ${formaterTid(forsok.midtNullVed)}.`);
+  if (forsok.hjorneNullVed !== null) deler.push(`Det første hjørnet nådde 0 °C etter ${formaterTid(forsok.hjorneNullVed)}.`);
+  if (forsok.midtNullVed !== null) deler.push(`Den første sidemidten nådde 0 °C etter ${formaterTid(forsok.midtNullVed)}.`);
   if (forsok.smeltetVed !== null) deler.push(`All snøen var smeltet etter ${formaterTid(forsok.smeltetVed)}.`);
   return deler.join(" ");
 }
 
-return { STORRELSE, lagVisning, beskriv };
+return { STORRELSE, merkeNavn, lagVisning, beskriv };
 })();
 // ---- felles/js/data.js ----
 __moduler["felles/js/data.js"] = await (async () => {
@@ -2594,6 +2637,16 @@ function maal(tving = false) {
 // Fasit
 // ---------------------------------------------------------------------------
 
+// Forklaringen gjelder de to merkede cellene, som ligger der den sterkeste varmekilden virker.
+const HJORNE_FORKLARING = {
+  venstre:
+    "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  over:
+    "Hjørnene øverst når 0 °C først. Sola varmer hele oversiden. Hjørnet får i tillegg varme fra lufta på siden, mens cellen midt på oversiden bare får varme ovenfra. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  under:
+    "Hjørnene nederst når 0 °C først. Det varme underlaget varmer hele undersiden, så bunnen smelter lenge før toppen. Hjørnet får i tillegg varme fra lufta på siden, så det når 0 °C litt før cellen midt på undersiden. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+};
+
 function sjekkResultat() {
   if (t.resultatVist) return;
   const f = t.forsok;
@@ -2607,7 +2660,7 @@ function sjekkResultat() {
     t.forutsi.visResultat(
       fasit,
       fasit === "hjorner"
-        ? "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde."
+        ? HJORNE_FORKLARING[f.merkedeCeller.flate]
         : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?"
     );
     tutor.sendHendelse("resultat", { oppdeling: "1", fasit, gjetning });
@@ -2743,13 +2796,33 @@ let animTid = 0;
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
 
+const SMAA_STEG = 10; // s modelltid, samme takt som modellen sjekker 0 °C
+
+/**
+ * Ett bilde med simulering. Før første 0 °C i én blokk regnes det i små steg, og vi
+ * stopper med en gang et hjørne eller en sidemidt når 0 °C. Ellers hopper ett bilde
+ * (ca. 60 s modelltid) forbi forskjellen: med varmt underlag er den bare ca. 20 s.
+ */
+function stegFram(dtOnsket) {
+  const f = t.forsok;
+  if (f.oppdeling !== "1" || t.resultatVist) return f.stegMedBudsjett(dtOnsket, MAKS_DELSTEG);
+  const antall = Math.ceil(dtOnsket / SMAA_STEG);
+  const budsjett = Math.max(1, Math.floor(MAKS_DELSTEG / antall));
+  let simulert = 0;
+  for (let i = 0; i < antall; i++) {
+    simulert += f.stegMedBudsjett(Math.min(SMAA_STEG, dtOnsket - simulert), budsjett);
+    if (f.hjorneNullVed !== null || f.midtNullVed !== null) break;
+  }
+  return simulert;
+}
+
 function animer(naa) {
   const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);
   forrige = naa;
   animTid += dtEkte;
 
   if (t.kjorer && dtEkte > 0) {
-    const simulert = t.forsok.stegMedBudsjett(dtEkte * t.fart, MAKS_DELSTEG);
+    const simulert = stegFram(dtEkte * t.fart);
     t.maaltFart = 0.9 * t.maaltFart + 0.1 * (simulert / dtEkte);
     // Referanseblokken regnes ferdig i bakgrunnen, litt hvert bilde.
     if (t.referanse && t.referanse.smeltetVed === null) t.referanse.steg(1800);

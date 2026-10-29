@@ -6,7 +6,7 @@ import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../../felles/
 import { formaterTid, formaterGrader } from "../../../felles/js/format.js";
 import { GEOMETRI, OPPDELINGER, LUFT_T, UNDERLAG_T } from "./modell.js";
 
-export const STORRELSE = { bredde: 760, hoyde: 380 };
+export const STORRELSE = { bredde: 760, hoyde: 430 };
 
 const CELLE = 10;
 const X0 = (STORRELSE.bredde - GEOMETRI.bredde * CELLE) / 2;
@@ -14,7 +14,12 @@ const Y0 = 70;
 const SOLFARGE = "#9a6c00"; // mørk gul: 4,6:1 mot hvitt, så sol-teksten kan leses (#c98a00 hadde 2,9:1)
 const MERKEFARGE = "#1f2328";
 const VARMEFARGE = "#D55E00"; // rødoransje (Okabe–Ito), varm ende som fargeskalaen
-const MERKENAVN = { hjorne: "Hjørnecelle", side: "Midt på siden" };
+const SIDENAVN = { venstre: "Midt på siden", over: "Midt på oversiden", under: "Midt på undersiden" };
+
+/** Navnet på en merket celle, slik det står i bildet: "Hjørnecelle", "Midt på undersiden" … */
+export function merkeNavn(merkede, nokkel) {
+  return nokkel === "hjorne" ? "Hjørnecelle" : SIDENAVN[merkede.flate];
+}
 
 /** "−4,2 °C", eller "0 °C – smelter" når cellen har nådd smeltepunktet. */
 function celleTemperatur(g, x, y) {
@@ -34,13 +39,15 @@ function tegnPil(ctx, x1, y1, x2, y2) {
 }
 
 /**
- * Ring rundt hjørnecellen og cellen midt på siden, med navn og temperatur. Når forsøket
- * er startet, viser piler hver side der cellen har luft (eller underlag) og får varme inn.
+ * Ring rundt hjørnecellen og sidecellen, med navn og temperatur. Når forsøket er startet,
+ * viser piler hver side der cellen får varme inn (fra modellens varmeInn).
+ * Navnet står til venstre for celler i venstre kant, ellers over eller under blokken.
  */
 function tegnMerkedeCeller(ctx, forsok, visVarme) {
   const g = forsok.gitter;
-  const tomUtenfor = (x, y) => x < 0 || y < 0 || x >= g.nx || y >= g.ny || g.erTom(x, y);
-  for (const [nokkel, [cx, cy]] of Object.entries(forsok.merkedeCeller)) {
+  const merkede = forsok.merkedeCeller;
+  for (const nokkel of ["hjorne", "side"]) {
+    const [cx, cy] = merkede[nokkel];
     if (g.erTom(cx, cy)) continue; // smeltet bort
     const mx = X0 + (cx + 0.5) * CELLE;
     const my = Y0 + (cy + 0.5) * CELLE;
@@ -52,19 +59,27 @@ function tegnMerkedeCeller(ctx, forsok, visVarme) {
     if (visVarme) {
       ctx.strokeStyle = VARMEFARGE;
       ctx.lineWidth = 2.5;
-      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-        if (!tomUtenfor(cx + dx, cy + dy)) continue;
+      for (const { retning: [dx, dy] } of forsok.varmeInn(cx, cy)) {
         tegnPil(ctx, mx + dx * 26, my + dy * 26, mx + dx * 10, my + dy * 10);
       }
     }
 
+    const navn = merkeNavn(merkede, nokkel);
+    const temperatur = celleTemperatur(g, cx, cy);
     ctx.fillStyle = MERKEFARGE;
-    ctx.textAlign = "right";
     ctx.textBaseline = "top";
+    let tx = mx - 34;
+    let ty = my - 18;
+    ctx.textAlign = "right";
+    if (nokkel === "side" && merkede.flate !== "venstre") {
+      ctx.textAlign = "center";
+      tx = mx;
+      ty = merkede.flate === "over" ? my - 66 : my + 32;
+    }
     ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillText(MERKENAVN[nokkel], mx - 34, my - 18);
+    ctx.fillText(navn, tx, ty);
     ctx.font = "15px system-ui, sans-serif";
-    ctx.fillText(celleTemperatur(g, cx, cy), mx - 34, my + 1);
+    ctx.fillText(temperatur, tx, ty + 19);
   }
 
   if (visVarme) {
@@ -175,7 +190,8 @@ export function lagVisning(data) {
     const valg = OPPDELINGER.find((o) => o.id === forsok.oppdeling);
     const andel = forsok.smeltetAndel();
     const status = forsok.smeltetVed !== null ? "alt smeltet" : `${Math.round(andel * 100)} % smeltet`;
-    ctx.fillText(`${valg.navn} · ${status}`, bredde / 2, yBakke + 18);
+    // Lavt nok til at navnet på en merket celle på undersiden får plass over.
+    ctx.fillText(`${valg.navn} · ${status}`, bredde / 2, yBakke + 74);
     if (forsok.underlag) {
       ctx.font = "14px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
@@ -198,10 +214,10 @@ export function beskriv(forsok) {
     const g = forsok.gitter;
     const tekst = (navn, [x, y]) =>
       g.erTom(x, y) ? `${navn} har smeltet bort` : `${navn} er ${celleTemperatur(g, x, y)}`;
-    deler.push(`${tekst("Den merkede hjørnecellen", m.hjorne)}. ${tekst("Den merkede cellen midt på siden", m.side)}.`);
+    deler.push(`${tekst("Den merkede hjørnecellen", m.hjorne)}. ${tekst(`Den merkede cellen ${SIDENAVN[m.flate].toLowerCase()}`, m.side)}.`);
   }
-  if (forsok.hjorneNullVed !== null) deler.push(`Hjørnene nådde 0 °C etter ${formaterTid(forsok.hjorneNullVed)}.`);
-  if (forsok.midtNullVed !== null) deler.push(`Midten av sidene nådde 0 °C etter ${formaterTid(forsok.midtNullVed)}.`);
+  if (forsok.hjorneNullVed !== null) deler.push(`Det første hjørnet nådde 0 °C etter ${formaterTid(forsok.hjorneNullVed)}.`);
+  if (forsok.midtNullVed !== null) deler.push(`Den første sidemidten nådde 0 °C etter ${formaterTid(forsok.midtNullVed)}.`);
   if (forsok.smeltetVed !== null) deler.push(`All snøen var smeltet etter ${formaterTid(forsok.smeltetVed)}.`);
   return deler.join(" ");
 }

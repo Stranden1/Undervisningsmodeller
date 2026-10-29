@@ -177,6 +177,16 @@ function maal(tving = false) {
 // Fasit
 // ---------------------------------------------------------------------------
 
+// Forklaringen gjelder de to merkede cellene, som ligger der den sterkeste varmekilden virker.
+const HJORNE_FORKLARING = {
+  venstre:
+    "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  over:
+    "Hjørnene øverst når 0 °C først. Sola varmer hele oversiden. Hjørnet får i tillegg varme fra lufta på siden, mens cellen midt på oversiden bare får varme ovenfra. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  under:
+    "Hjørnene nederst når 0 °C først. Det varme underlaget varmer hele undersiden, så bunnen smelter lenge før toppen. Hjørnet får i tillegg varme fra lufta på siden, så det når 0 °C litt før cellen midt på undersiden. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+};
+
 function sjekkResultat() {
   if (t.resultatVist) return;
   const f = t.forsok;
@@ -190,7 +200,7 @@ function sjekkResultat() {
     t.forutsi.visResultat(
       fasit,
       fasit === "hjorner"
-        ? "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde."
+        ? HJORNE_FORKLARING[f.merkedeCeller.flate]
         : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?"
     );
     tutor.sendHendelse("resultat", { oppdeling: "1", fasit, gjetning });
@@ -326,13 +336,33 @@ let animTid = 0;
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
 
+const SMAA_STEG = 10; // s modelltid, samme takt som modellen sjekker 0 °C
+
+/**
+ * Ett bilde med simulering. Før første 0 °C i én blokk regnes det i små steg, og vi
+ * stopper med en gang et hjørne eller en sidemidt når 0 °C. Ellers hopper ett bilde
+ * (ca. 60 s modelltid) forbi forskjellen: med varmt underlag er den bare ca. 20 s.
+ */
+function stegFram(dtOnsket) {
+  const f = t.forsok;
+  if (f.oppdeling !== "1" || t.resultatVist) return f.stegMedBudsjett(dtOnsket, MAKS_DELSTEG);
+  const antall = Math.ceil(dtOnsket / SMAA_STEG);
+  const budsjett = Math.max(1, Math.floor(MAKS_DELSTEG / antall));
+  let simulert = 0;
+  for (let i = 0; i < antall; i++) {
+    simulert += f.stegMedBudsjett(Math.min(SMAA_STEG, dtOnsket - simulert), budsjett);
+    if (f.hjorneNullVed !== null || f.midtNullVed !== null) break;
+  }
+  return simulert;
+}
+
 function animer(naa) {
   const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);
   forrige = naa;
   animTid += dtEkte;
 
   if (t.kjorer && dtEkte > 0) {
-    const simulert = t.forsok.stegMedBudsjett(dtEkte * t.fart, MAKS_DELSTEG);
+    const simulert = stegFram(dtEkte * t.fart);
     t.maaltFart = 0.9 * t.maaltFart + 0.1 * (simulert / dtEkte);
     // Referanseblokken regnes ferdig i bakgrunnen, litt hvert bilde.
     if (t.referanse && t.referanse.smeltetVed === null) t.referanse.steg(1800);

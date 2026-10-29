@@ -128,6 +128,33 @@ export function lagSnoforsok(data, { oppdeling, sol = false, underlag = false })
   const naddNull = (celler) =>
     celler.some(([x, y]) => !gitter.erTom(x, y) && gitter.temperatur(x, y) >= 0);
 
+  // To celler merkes i bildet, så eleven kan sammenligne et hjørne med midten av en side.
+  // De ligger på flaten der den sterkeste varmekilden virker. Da er det merkede hjørnet
+  // det som faktisk når 0 °C først, og sidecellen den som når 0 °C først av sidemidtene.
+  // Underlaget varmer mest, så sola, så lufta (se testene).
+  function velgMerkedeCeller() {
+    const { x, y, b, h } = blokk;
+    const mx = x + Math.floor(b / 2);
+    const my = y + Math.floor(h / 2);
+    if (underlag) return { flate: "under", hjorne: [x, y + h - 1], side: [mx, y + h - 1] };
+    if (sol) return { flate: "over", hjorne: [x, y], side: [mx, y] };
+    return { flate: "venstre", hjorne: [x, y], side: [x, my] };
+  }
+
+  /**
+   * Sidene der en celle får varme inn, og fra hva: [{ retning: [dx, dy], kilder: [...] }].
+   * Luft der nabocellen er tom, sol på oversiden av den øverste snøen, underlag under bunnen.
+   */
+  function varmeInn(cx, cy) {
+    const tom = (x, y) => x < 0 || y < 0 || x >= G.bredde || y >= G.hoyde || gitter.erTom(x, y);
+    const sider = [];
+    if (tom(cx - 1, cy)) sider.push({ retning: [-1, 0], kilder: ["luft"] });
+    if (tom(cx + 1, cy)) sider.push({ retning: [1, 0], kilder: ["luft"] });
+    if (tom(cx, cy - 1)) sider.push({ retning: [0, -1], kilder: solPerCelle > 0 ? ["luft", "sol"] : ["luft"] });
+    if (tom(cx, cy + 1)) sider.push({ retning: [0, 1], kilder: underlag ? ["underlag"] : ["luft"] });
+    return sider;
+  }
+
   /** Smeltevann renner bort, snøen synker ned i biten sin, og sola treffer den øverste cellen. */
   function etterSteg() {
     for (const b of biter) {
@@ -187,9 +214,9 @@ export function lagSnoforsok(data, { oppdeling, sol = false, underlag = false })
     get midtNullVed() {
       return midtNullVed;
     },
-    // To celler som merkes i bildet for én blokk, så eleven kan sammenligne: hjørnet
-    // øverst til venstre og midten av venstre side. Begge er med når fasiten regnes ut.
-    merkedeCeller: blokk ? { hjorne: hjorner()[0], side: sidemidter()[1] } : null,
+    /** For én blokk: { flate: "venstre" | "over" | "under", hjorne: [x, y], side: [x, y] }. Ellers null. */
+    merkedeCeller: blokk ? velgMerkedeCeller() : null,
+    varmeInn,
     smeltetAndel,
     /** Masse snø som er igjen i gitteret (kg), smeltet eller ikke. */
     snoIgjen() {

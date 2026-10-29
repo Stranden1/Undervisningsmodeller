@@ -53,20 +53,43 @@ test("Hjørnene når 0 °C før midten av en side", (t) => {
   }
 });
 
-test("De merkede cellene i bildet: hjørnet har luft på to sider, sidemidten på én, og hjørnet når 0 °C først", () => {
-  for (const kilder of [{}, { sol: true }, { underlag: true }]) {
+test("De merkede cellene er de som når 0 °C først, så pause, markering og forklaring gjelder samme celle", (t) => {
+  // Fanger feilen fra revisjonen 29.10.2026: med varmt underlag stoppet modellen fordi et
+  // nedre hjørne nådde 0 °C, mens det merkede øvre hjørnet fortsatt var −3,4 °C.
+  const forventetFlate = { "{}": "venstre", '{"sol":true}': "over", '{"underlag":true}': "under", '{"sol":true,"underlag":true}': "under" };
+  for (const kilder of [{}, { sol: true }, { underlag: true }, { sol: true, underlag: true }]) {
+    const navn = JSON.stringify(kilder);
     const f = lagSnoforsok(data, { oppdeling: "1", ...kilder });
-    const { hjorne, side } = f.merkedeCeller;
-    assert.equal(f.gitter.antallLuftflater(...hjorne), 2);
-    assert.equal(f.gitter.antallLuftflater(...side), 1);
+    const { flate, hjorne, side } = f.merkedeCeller;
+    assert.equal(flate, forventetFlate[navn], navn);
+
+    // Hjørnet får varme gjennom to sider, sidecellen gjennom én. Luftsidene stemmer med motoren.
+    const inn = (c) => f.varmeInn(...c);
+    assert.equal(inn(hjorne).length, 2, navn);
+    assert.equal(inn(side).length, 1, navn);
+    for (const c of [hjorne, side]) {
+      const luft = inn(c).filter((s) => s.kilder.includes("luft")).length;
+      assert.equal(luft, f.gitter.antallLuftflater(...c), navn);
+    }
+
+    // Samme oppdateringstakt som modellen selv (hvert 10. s).
     let hjorneNull = null;
     let sideNull = null;
-    while (sideNull === null) {
-      f.steg(30);
+    let merketVedPause = null;
+    while (sideNull === null || f.midtNullVed === null) {
+      f.steg(10);
       if (hjorneNull === null && f.gitter.temperatur(...hjorne) >= 0) hjorneNull = f.tid;
-      if (f.gitter.temperatur(...side) >= 0) sideNull = f.tid;
+      if (sideNull === null && f.gitter.temperatur(...side) >= 0) sideNull = f.tid;
+      // Kontrolleren stopper så snart hjorneNullVed eller midtNullVed er satt.
+      if (merketVedPause === null && (f.hjorneNullVed !== null || f.midtNullVed !== null)) {
+        merketVedPause = f.gitter.temperatur(...hjorne);
+      }
     }
-    assert.ok(hjorneNull !== null && hjorneNull < sideNull, JSON.stringify(kilder));
+    t.diagnostic(`${navn}: merket hjørne ${hjorneNull} s, merket side ${sideNull} s`);
+    assert.equal(hjorneNull, f.hjorneNullVed, navn);
+    assert.equal(sideNull, f.midtNullVed, navn);
+    assert.ok(hjorneNull < sideNull, navn);
+    assert.ok(merketVedPause >= 0, `${navn}: merket hjørne var ${merketVedPause.toFixed(2)} °C ved pausen`);
   }
   // Delt snø har ingen merkede celler.
   assert.equal(lagSnoforsok(data, { oppdeling: "4" }).merkedeCeller, null);

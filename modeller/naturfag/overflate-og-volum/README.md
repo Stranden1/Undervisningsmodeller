@@ -36,12 +36,24 @@ tynt lag. Massen er alltid den samme. Cellene farges etter temperatur, partiklen
 vibrerer, og smeltevannet renner bort. Grafen viser hvor stor andel som har smeltet, og
 tidligere kjøringer blir liggende i grafen så de kan sammenlignes.
 
-Med én blokk er to celler merket med en ring: hjørnet øverst til venstre og midten av
-venstre side. Temperaturen står ved hver av dem. Etter Start viser piler hvor varmen
-kommer inn: to piler til hjørnet, én til sidemidten. Modellen stopper av seg selv når
-de første hjørnene når 0 °C (etter ca. 12 minutter i modellen med bare luft). Da står
-hjørnet på 0 °C, mens sidemidten fortsatt er ca. −2 °C. Sidemidten når 0 °C etter ca.
-40 minutter.
+Med én blokk er to celler merket med en ring: et hjørne og midten av en side.
+Temperaturen står ved hver av dem. Etter Start viser piler hvor varmen kommer inn: to
+piler til hjørnet, én til sidemidten. Modellen stopper av seg selv når det første
+hjørnet når 0 °C, og forklaringen gjelder de to merkede cellene.
+
+Hvilke celler som merkes, avhenger av varmekilden. Cellene ligger alltid på flaten der
+smeltingen begynner:
+
+| Varmekilde | Merkede celler | Hjørnet når 0 °C | Sidemidten når 0 °C | Sidemidten ved stopp |
+|---|---|---|---|---|
+| Bare luft | øverst til venstre og midt på venstre side | ca. 12 min | ca. 40 min | ca. −2 °C |
+| Sol | øverst til venstre og midt på oversiden | ca. 5 min | ca. 8 min | ca. −1 °C |
+| Varmt underlag (med eller uten sol) | nederst til venstre og midt på undersiden | ca. 1 min 40 s | ca. 2 min | ca. −0,4 °C |
+
+Med underlag er forskjellen liten: underlaget varmer hele bunnen, og hjørnet får bare
+litt ekstra fra lufta på siden. Det er et godt spørsmål til elevene hvorfor bunnen
+smelter først her, og toppen først med sol. Før første stopp regner modellen i små
+steg, ellers ville den hoppet forbi forskjellen.
 
 Varmekilder: lufta er alltid med. Sol (på oversiden) og varmt underlag (+5 °C, under
 bitene) kan slås på.
@@ -57,7 +69,8 @@ at tabellen og simuleringen har samme overflate, volum og masse.
 1. **Forutsi (én blokk):** Hvor begynner blokken å smelte? Skriv svaret og hvorfor.
 2. **Observer:** Når modellen stopper, sammenlign de to merkede cellene. Hvilken har
    nådd 0 °C? Hvor mange piler går inn til hver av dem? Følg så fargene: hvor lenge står
-   temperaturen på 0 °C?
+   temperaturen på 0 °C? Prøv igjen med varmt underlag: hvor begynner smeltingen nå, og
+   hvorfor?
 3. **Forutsi (delt):** Smelter 64 små biter raskere, saktere eller like fort som én
    blokk? Begrunn.
 4. **Observer:** Kjør flere oppdelinger og sammenlign kurvene. Se på tallet "overflate

@@ -2,7 +2,7 @@
 
 Dette er revisjonsfiler, ikke endringer i modellene. Codex laget dem 29.10.2026 ut fra Git `8958ff8`. Rapportene ligger i denne mappa: [prosjektrevisjon](prosjektrevisjon.md), [modellgjennomgang](modellgjennomgang.md), [inspirasjon og research](inspirasjon-og-research.md), [idébank](idebank.md) og [utviklingsplan](utviklingsplan.md).
 
-**Status:** Funnene er vurdert av eieren og Claude 29.10.2026. Utviklingsplanen og idébanken er forslag, ikke vedtatt retning. Særlig er utvidelse til barneskolen og nye fag (brøk, tiere, norsk, KRLE) ikke bestemt. Prosjektets ramme står i `AGENTS.md`. Rettet etter revisjonen: F01 (commit `2a8e01e`).
+**Status:** Funnene er vurdert av eieren og Claude 29.10.2026. Utviklingsplanen og idébanken er forslag, ikke vedtatt retning. Særlig er utvidelse til barneskolen og nye fag (brøk, tiere, norsk, KRLE) ikke bestemt. Prosjektets ramme står i `AGENTS.md`. Rettet etter revisjonen: F01, F02, F04, F06, F07 og F08, varmepiler fra varmt til kaldt, og «Tenk etter»-spørsmål etter resultatet. Delvis rettet: F03 (grafene, varmeledning og energi er lesbare på mobil; snømodellen gjenstår) og F05 (k og c har en etterprøvbar kilde for de fleste materialene; tettheter, isopor og smeltevarmen er merket «ikke kontrollert» eller «MANGLER KILDE»). Se `git log` for commitene.
 
 ## Miljø og kjøringer
 

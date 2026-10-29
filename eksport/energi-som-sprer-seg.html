@@ -325,6 +325,15 @@ select {
   padding: 0 var(--rom-4);
 }
 
+/* Én linje under fanene som sier hva et fanebytte gjør med forsøket. */
+.fane-hjelp {
+  max-width: 1200px;
+  margin: calc(-1 * var(--rom-3)) auto var(--rom-3);
+  padding: 0 var(--rom-4);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
 .faner [role="tab"] {
   font: inherit;
   font-weight: 600;
@@ -552,6 +561,7 @@ select {
     <button role="tab" id="fane-kloss" aria-selected="true" aria-controls="panel">Varm kloss</button>
     <button role="tab" id="fane-dyppekoker" aria-selected="false" aria-controls="panel" tabindex="-1">Dyppekoker</button>
   </div>
+  <p class="fane-hjelp">Bytter du forsøk, begynner det nye forsøket fra start.</p>
 
   <main id="panel" class="modell" role="tabpanel" aria-labelledby="fane-kloss">
     <div class="scene kort">
@@ -2805,10 +2815,15 @@ function velgFane(navn, fokus = false) {
   }
   $("panel").setAttribute("aria-labelledby", `fane-${navn}`);
   if (navn === t.fane) return;
-  // Et nytt forsøk i den andre fanen. Det som kjørte, stoppes.
+  // Begge fanene deler kar og graf, så et fanebytte starter et nytt forsøk. Det som
+  // kjørte, stoppes. Det står i hjelpeteksten under fanene, og leses opp her.
+  const forrige = t.startet ? $(`fane-${t.fane}`).textContent : null;
   t.fane = navn;
   bygg();
-  tutor.sendHendelse("fane", { fane: navn });
+  if (forrige) {
+    settBeskrivelse($("beskrivelse"), `Nytt forsøk: ${$(`fane-${navn}`).textContent}. Forsøket med ${forrige.toLowerCase()} er nullstilt.`, true);
+  }
+  tutor.sendHendelse("fane", { fane: navn, nullstilt: forrige !== null });
 }
 
 faneKnapper.forEach((knapp, i) => {

@@ -325,6 +325,15 @@ select {
   padding: 0 var(--rom-4);
 }
 
+/* Én linje under fanene som sier hva et fanebytte gjør med forsøket. */
+.fane-hjelp {
+  max-width: 1200px;
+  margin: calc(-1 * var(--rom-3)) auto var(--rom-3);
+  padding: 0 var(--rom-4);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
 .faner [role="tab"] {
   font: inherit;
   font-weight: 600;
@@ -2744,14 +2753,17 @@ $("nullstill").addEventListener("click", () => {
   tutor.sendHendelse("nullstill");
 });
 
+// Tømmer både grafen og listen over kjøringer som tutoren ser, så de stemmer overens.
 $("tom-graf").addEventListener("click", () => {
   graf.tomAlt();
   serieNavn.length = 0;
+  kjoringer.length = 0;
   if (t.startet && !t.ferdig) {
     nyKurve();
     maal(true);
   }
   graf.tegn();
+  tutor.sendHendelse("tom-graf");
 });
 
 for (const el of [glider, solValg, underlagValg]) {

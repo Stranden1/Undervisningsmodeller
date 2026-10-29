@@ -258,10 +258,15 @@ function velgFane(navn, fokus = false) {
   }
   $("panel").setAttribute("aria-labelledby", `fane-${navn}`);
   if (navn === t.fane) return;
-  // Et nytt forsøk i den andre fanen. Det som kjørte, stoppes.
+  // Begge fanene deler kar og graf, så et fanebytte starter et nytt forsøk. Det som
+  // kjørte, stoppes. Det står i hjelpeteksten under fanene, og leses opp her.
+  const forrige = t.startet ? $(`fane-${t.fane}`).textContent : null;
   t.fane = navn;
   bygg();
-  tutor.sendHendelse("fane", { fane: navn });
+  if (forrige) {
+    settBeskrivelse($("beskrivelse"), `Nytt forsøk: ${$(`fane-${navn}`).textContent}. Forsøket med ${forrige.toLowerCase()} er nullstilt.`, true);
+  }
+  tutor.sendHendelse("fane", { fane: navn, nullstilt: forrige !== null });
 }
 
 faneKnapper.forEach((knapp, i) => {

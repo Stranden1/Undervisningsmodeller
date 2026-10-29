@@ -325,6 +325,15 @@ select {
   padding: 0 var(--rom-4);
 }
 
+/* Én linje under fanene som sier hva et fanebytte gjør med forsøket. */
+.fane-hjelp {
+  max-width: 1200px;
+  margin: calc(-1 * var(--rom-3)) auto var(--rom-3);
+  padding: 0 var(--rom-4);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
 .faner [role="tab"] {
   font: inherit;
   font-weight: 600;
@@ -549,6 +558,7 @@ select {
     <button role="tab" id="fane-tapaa" aria-selected="true" aria-controls="panel-tapaa">Ta på</button>
     <button role="tab" id="fane-isbit" aria-selected="false" aria-controls="panel-isbit" tabindex="-1">Isbit på kloss</button>
   </div>
+  <p class="fane-hjelp">Bytter du forsøk, settes det andre på pause. Det venter til du kommer tilbake.</p>
 
   <main>
   <!-- ================= Ta på ================= -->

@@ -276,14 +276,17 @@ $("nullstill").addEventListener("click", () => {
   tutor.sendHendelse("nullstill");
 });
 
+// Tømmer både grafen og listen over kjøringer som tutoren ser, så de stemmer overens.
 $("tom-graf").addEventListener("click", () => {
   graf.tomAlt();
   serieNavn.length = 0;
+  kjoringer.length = 0;
   if (t.startet && !t.ferdig) {
     nyKurve();
     maal(true);
   }
   graf.tegn();
+  tutor.sendHendelse("tom-graf");
 });
 
 for (const el of [glider, solValg, underlagValg]) {

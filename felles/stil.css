@@ -317,6 +317,15 @@ select {
   padding: 0 var(--rom-4);
 }
 
+/* Én linje under fanene som sier hva et fanebytte gjør med forsøket. */
+.fane-hjelp {
+  max-width: 1200px;
+  margin: calc(-1 * var(--rom-3)) auto var(--rom-3);
+  padding: 0 var(--rom-4);
+  font-size: 0.9rem;
+  color: var(--tekst-dempet);
+}
+
 .faner [role="tab"] {
   font: inherit;
   font-weight: 600;

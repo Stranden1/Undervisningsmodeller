@@ -24,6 +24,11 @@ her er det praktiske.
 - Rolig animasjon. Ingen blinking eller pynt.
 - Få partikler som standard. Må gå jevnt på en billig Chromebook og en iPad.
 - Vis alltid hvor fort tiden går i modellen ("1 s = 10 s simulert") når den ikke er sanntid.
+- Bildet beveger seg bare mens modellen går. Før start, i pause og når forsøket er ferdig
+  står partiklene helt stille (WCAG 2.2.2). Kontrolleren har en egen klokke for
+  partikkelbevegelsen som bare går mens modellen kjører.
+- Har brukeren slått på «redusert bevegelse» i maskinen, står partiklene stille hele
+  tiden (`felles/js/partikler.js`). Temperaturen vises fortsatt med farger og tall.
 
 ## Tastatur
 - Alle knapper og glidebrytere er vanlige HTML-elementer, så Tab og piltaster virker.

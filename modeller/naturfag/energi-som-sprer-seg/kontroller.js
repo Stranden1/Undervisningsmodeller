@@ -367,6 +367,9 @@ const tutor = koblTilTutor({
 
 let forrige = null;
 let animTid = 0;
+// Klokka for partikkelbevegelsen går bare mens modellen kjører. Før start, i pause og
+// etter at forsøket er ferdig står bildet helt stille (WCAG 2.2.2).
+let bevegelsesTid = 0;
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
 
@@ -376,6 +379,7 @@ function animer(naa) {
   animTid += dtEkte;
 
   if (t.kjorer && dtEkte > 0) {
+    bevegelsesTid += dtEkte;
     settFart();
     const simulert = t.kar.stegMedBudsjett(dtEkte * t.fart, MAKS_DELSTEG);
     t.maaltFart = 0.9 * t.maaltFart + 0.1 * (simulert / dtEkte);
@@ -400,7 +404,7 @@ function animer(naa) {
     graf.tegn();
   }
 
-  visning.tegn(ctx, t.kar, { tid: animTid, fane: t.fane });
+  visning.tegn(ctx, t.kar, { tid: bevegelsesTid, fane: t.fane });
 
   if (animTid - sisteTekst > 0.2) {
     sisteTekst = animTid;

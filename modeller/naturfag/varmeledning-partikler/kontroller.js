@@ -448,6 +448,10 @@ const tutor = koblTilTutor({
 
 let forrige = null;
 let animTid = 0;
+// Klokka for partikkelbevegelsen går bare mens modellen kjører. Før start, i pause og
+// etter at forsøket er ferdig står bildet helt stille (WCAG 2.2.2).
+// Hver fane har sin egen klokke.
+const bevegelsesTid = { tapaa: 0, isbit: 0 };
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
 
@@ -457,12 +461,14 @@ function animer(naa) {
   animTid += dtEkte;
 
   if (aktivFane === "tapaa") {
+    if (tp.kjorer) bevegelsesTid.tapaa += dtEkte;
     stegTaPaa(dtEkte);
-    tp.visning.tegn(tp.ctx, tp.modell, { berort: tp.berort, tid: animTid });
+    tp.visning.tegn(tp.ctx, tp.modell, { berort: tp.berort, tid: bevegelsesTid.tapaa });
     if (tp.kjorer || tp.berort) tp.graf.tegn();
   } else {
+    if (ib.kjorer) bevegelsesTid.isbit += dtEkte;
     stegIsbit(dtEkte);
-    ib.visning.tegn(ib.ctx, ib.modell, { tid: animTid });
+    ib.visning.tegn(ib.ctx, ib.modell, { tid: bevegelsesTid.isbit });
     if (ib.kjorer) ib.graf.tegn();
   }
 

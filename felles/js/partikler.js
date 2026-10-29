@@ -8,8 +8,16 @@
 
 export const FORSTERKNING = { minT: -20, maksT: 40, minUtslag: 0.25, maksUtslag: 3.2 };
 
-const redusertBevegelse =
-  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+// Har brukeren slått på «redusert bevegelse» i maskinen eller nettleseren, står partiklene
+// helt stille. Temperaturen vises fortsatt med farger og tall. Innstillingen leses på
+// nytt hver gang, så det virker også om den endres mens siden er åpen.
+const bevegelsesValg =
+  typeof window !== "undefined" ? window.matchMedia?.("(prefers-reduced-motion: reduce)") ?? null : null;
+
+/** Ønsker brukeren redusert bevegelse? */
+export function redusertBevegelse() {
+  return bevegelsesValg?.matches ?? false;
+}
 
 /**
  * Utslag i piksler for en temperatur (forsterket, se over).
@@ -81,14 +89,13 @@ export function lagVaeske(plasser, spredning, fro = 1) {
     flytt(tid, temperaturFor, erLedig, forsterkning = {}) {
       const dt = forrige === null ? 0 : Math.min(0.1, Math.max(0, tid - forrige));
       forrige = tid;
-      if (dt === 0) return;
+      if (dt === 0 || redusertBevegelse()) return;
       const { minT, maksT } = { ...FORSTERKNING, ...forsterkning };
-      const demping = redusertBevegelse ? 0.15 : 1;
       for (const p of partikler) {
         const T = temperaturFor(p);
         if (T === null || Number.isNaN(T)) continue;
         const andel = Math.min(1, Math.max(0, (T - minT) / (maksT - minT)));
-        const fart = (VANDRING.min + andel * (VANDRING.maks - VANDRING.min)) * demping;
+        const fart = VANDRING.min + andel * (VANDRING.maks - VANDRING.min);
         // Retningen endrer seg litt hele tiden, så banen blir en tilfeldig vandring.
         p.retning += (tilfeldig() - 0.5) * 5 * Math.sqrt(dt);
         const nyX = p.x + Math.cos(p.retning) * fart * dt;
@@ -108,20 +115,21 @@ export function lagVaeske(plasser, spredning, fro = 1) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {object[]} partikler fra lagPartikler
  * @param {(p: object) => number | null} temperaturFor  temperatur for partikkelens celle (null = ikke tegn)
- * @param {number} tid  sekunder (ekte tid, for jevn bevegelse)
+ * @param {number} tid  sekunder (ekte tid, for jevn bevegelse). Står tiden stille, står
+ *   partiklene stille, så kontrolleren lar den bare gå mens modellen kjører.
  * @param {{ radius?: number, farge?: (p: object) => string, forsterkning?: object }} [valg]
  */
 export function tegnPartikler(ctx, partikler, temperaturFor, tid, valg = {}) {
   const radius = valg.radius ?? 2.4;
-  const fart = redusertBevegelse ? 0.15 : 1;
+  const stille = redusertBevegelse();
   const forsterkning = { ...FORSTERKNING, ...valg.forsterkning };
   for (const p of partikler) {
     const T = temperaturFor(p);
     if (T === null || Number.isNaN(T)) continue;
-    const A = utslag(T, forsterkning);
+    const A = stille ? 0 : utslag(T, forsterkning);
     // Varmere partikler svinger også litt raskere.
     const andel = Math.min(1, Math.max(0, (T - forsterkning.minT) / (forsterkning.maksT - forsterkning.minT)));
-    const w = (10 + 15 * andel) * fart;
+    const w = 10 + 15 * andel;
     const x = p.x + A * (Math.sin(w * p.fx * tid + p.px) + 0.5 * Math.sin(1.7 * w * p.fy * tid + p.py)) / 1.5;
     const y = p.y + A * (Math.sin(w * p.fy * tid + p.py) + 0.5 * Math.sin(1.3 * w * p.fx * tid + p.px)) / 1.5;
     ctx.fillStyle = valg.farge ? valg.farge(p) : "rgba(31,35,40,0.7)";

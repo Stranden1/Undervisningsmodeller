@@ -101,7 +101,7 @@ export function lagVisning(data) {
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {object} forsok fra lagSnoforsok
-   * @param {{ tid: number, visVarme?: boolean }} vis  ekte tid (for jevn vibrasjon), og om
+   * @param {{ tid: number, visVarme?: boolean }} vis  tid for partikkelbevegelsen (står stille i pause), og om
    *   pilene for varme inn skal vises (først etter at eleven har gjettet og startet)
    */
   function tegn(ctx, forsok, { tid, visVarme = false }) {

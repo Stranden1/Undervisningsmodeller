@@ -61,7 +61,7 @@ export function lagVisning() {
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {object} kar  fra lagKar eller lagDyppekoker
-   * @param {{ tid: number, fane: "kloss" | "dyppekoker" }} vis  ekte tid (for jevn vibrasjon) og fane
+   * @param {{ tid: number, fane: "kloss" | "dyppekoker" }} vis  tid for partikkelbevegelsen (står stille i pause) og fane
    */
   function tegn(ctx, kar, { tid, fane }) {
     const { bredde, hoyde } = STORRELSE;

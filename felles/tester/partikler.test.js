@@ -4,7 +4,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { lagVaeske } from "../js/partikler.js";
+import { lagVaeske, lagPartikler, tegnPartikler } from "../js/partikler.js";
 
 // Et kar på 100 × 100 px med en fast kloss i midten (40–60). Prikkene må holde seg utenfor.
 const erLedig = (x, y) => x > 0 && x < 100 && y > 0 && y < 100 && !(x > 40 && x < 60 && y > 40 && y < 60);
@@ -32,4 +32,26 @@ test("Væskeprikkene har ingen fast plass, men blir inne i væsken", () => {
 
 test("Væskeprikkene vandrer raskere når det er varmt", () => {
   assert.ok(vandring(90, 10) > 2 * vandring(10, 10));
+});
+
+// Pause (WCAG 2.2.2): kontrolleren lar tiden stå stille, og da skal bildet stå stille.
+test("Når tiden står stille, står væskeprikkene og de vibrerende prikkene stille", () => {
+  const v = lagVaeske(plasser, 3, 1);
+  let siste = 0;
+  for (let t = 0; t <= 2; t += 1 / 60) {
+    v.flytt(t, () => 50, erLedig);
+    siste = t;
+  }
+  const foer = v.partikler.map((p) => [p.x, p.y]);
+  for (let i = 0; i < 120; i++) v.flytt(siste, () => 50, erLedig); // 120 bilder i pause, samme tid
+  v.partikler.forEach((p, i) => assert.deepEqual([p.x, p.y], foer[i]));
+
+  // Samme tid gir nøyaktig samme tegning.
+  const tegnet = () => {
+    const punkter = [];
+    const ctx = { beginPath() {}, fill() {}, arc: (x, y) => punkter.push([x, y]) };
+    tegnPartikler(ctx, lagPartikler([{ x: 10, y: 10 }, { x: 20, y: 10 }]), () => 30, 5.3);
+    return punkter;
+  };
+  assert.deepEqual(tegnet(), tegnet());
 });

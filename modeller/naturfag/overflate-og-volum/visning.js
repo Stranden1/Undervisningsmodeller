@@ -206,6 +206,36 @@ export function lagVisning(data) {
 }
 
 /** Tekst om hva som skjer (for skjermleser og som hjelp). */
+// Forklaringen når hjørnene når 0 °C først. Den avhenger av hvor de merkede cellene
+// er, og de velges ut fra varmekildene (se velgMerkedeCeller i modell.js).
+const HJORNE_FORKLARING = {
+  venstre:
+    "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  over:
+    "Hjørnene øverst når 0 °C først. Sola varmer hele oversiden. Hjørnet får i tillegg varme fra lufta på siden, mens cellen midt på oversiden bare får varme ovenfra. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+  under:
+    "Hjørnene nederst når 0 °C først. Det varme underlaget varmer hele undersiden, så bunnen smelter lenge før toppen. Hjørnet får i tillegg varme fra lufta på siden, så det når 0 °C litt før cellen midt på undersiden. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
+};
+
+/**
+ * Resultatet for én blokk: hvor nådde snøen 0 °C først, og forklaringen eleven får.
+ * Ligger her og ikke i kontroller.js, så testene kan sjekke at teksten stemmer med
+ * det som faktisk skjedde. null før noen merket celle har nådd 0 °C.
+ * @returns {{ fasit: "hjorner" | "sider" | "overalt", forklaring: string } | null}
+ */
+export function resultatEnBlokk(forsok) {
+  const { hjorneNullVed: h, midtNullVed: m } = forsok;
+  if (h === null && m === null) return null;
+  let fasit = "overalt";
+  if (m === null || h < m) fasit = "hjorner";
+  else if (h === null || m < h) fasit = "sider";
+  const forklaring =
+    fasit === "hjorner"
+      ? HJORNE_FORKLARING[forsok.merkedeCeller.flate]
+      : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?";
+  return { fasit, forklaring };
+}
+
 export function beskriv(forsok) {
   const valg = OPPDELINGER.find((o) => o.id === forsok.oppdeling);
   const deler = [`${valg.navn}. Etter ${formaterTid(forsok.tid)} er ${Math.round(forsok.smeltetAndel() * 100)} % av snøen smeltet.`];

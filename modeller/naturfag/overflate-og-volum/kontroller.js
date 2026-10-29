@@ -2,7 +2,7 @@
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
 import { lagSnoforsok, overflateOgVolum, OPPDELINGER, SNO } from "./modell.js";
-import { lagVisning, beskriv, STORRELSE } from "./visning.js";
+import { lagVisning, beskriv, STORRELSE, resultatEnBlokk } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
 import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
@@ -178,30 +178,18 @@ function maal(tving = false) {
 // ---------------------------------------------------------------------------
 
 // Forklaringen gjelder de to merkede cellene, som ligger der den sterkeste varmekilden virker.
-const HJORNE_FORKLARING = {
-  venstre:
-    "Hjørnene når 0 °C først. En hjørnecelle har luft på to sider og får varme inn fra begge. En celle midt på en side får bare fra én. (I en ekte terning har hjørnet luft på tre sider.) Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
-  over:
-    "Hjørnene øverst når 0 °C først. Sola varmer hele oversiden. Hjørnet får i tillegg varme fra lufta på siden, mens cellen midt på oversiden bare får varme ovenfra. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
-  under:
-    "Hjørnene nederst når 0 °C først. Det varme underlaget varmer hele undersiden, så bunnen smelter lenge før toppen. Hjørnet får i tillegg varme fra lufta på siden, så det når 0 °C litt før cellen midt på undersiden. Hjørnet er ikke tynnere – det har mer overflate per snømengde.",
-};
-
 function sjekkResultat() {
   if (t.resultatVist) return;
   const f = t.forsok;
   const gjetning = t.forutsi.gjetning();
   if (f.oppdeling === "1") {
-    if (f.hjorneNullVed === null && f.midtNullVed === null) return;
-    let fasit = "overalt";
-    if (f.midtNullVed === null || f.hjorneNullVed < f.midtNullVed) fasit = "hjorner";
-    else if (f.hjorneNullVed === null || f.midtNullVed < f.hjorneNullVed) fasit = "sider";
+    const resultat = resultatEnBlokk(f);
+    if (!resultat) return;
+    const { fasit } = resultat;
     t.resultatVist = true;
     t.forutsi.visResultat(
       fasit,
-      fasit === "hjorner"
-        ? HJORNE_FORKLARING[f.merkedeCeller.flate]
-        : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?",
+      resultat.forklaring,
       [
         "Tell pilene inn til de to merkede cellene. Hvilken får varme fra flest kanter?",
         "Hvorfor blir fingrer og ører kalde før resten av kroppen når det er kaldt ute?",

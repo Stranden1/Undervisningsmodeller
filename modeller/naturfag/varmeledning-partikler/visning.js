@@ -4,7 +4,7 @@ import { temperaturFarge, tegnFargeskala } from "../../../felles/js/fargeskala.j
 import { tegnPartikler } from "../../../felles/js/partikler.js";
 import { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
 import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
-import { TA_PAA_GEOMETRI, ISBIT_GEOMETRI } from "./modell.js";
+import { TA_PAA_GEOMETRI, ISBIT_GEOMETRI, ROMTEMPERATUR } from "./modell.js";
 
 export { formaterTid };
 
@@ -253,7 +253,8 @@ export function beskrivTaPaa(data, taPaa, berort) {
   const navnA = navnISetning(data, a.materiale);
   const navnB = navnISetning(data, b.materiale);
   if (!berort) {
-    return `Fingeren (33 °C) er klar over to klosser: ${navnA} til venstre og ${navnB} til høyre. Begge klossene er 20 °C.`;
+    const hud = formaterGrader(data.konstanter.hudtemperatur.verdi, 0);
+    return `Fingeren (${hud}) er klar over to klosser: ${navnA} til venstre og ${navnB} til høyre. Begge klossene er ${formaterGrader(ROMTEMPERATUR, 0)}.`;
   }
   return (
     `Etter ${taPaa.tid.toFixed(1).replace(".", ",")} s: huden mot ${navnA} er ${formaterGrader(a.kontaktTemperatur())}, ` +

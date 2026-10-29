@@ -1815,7 +1815,7 @@ const { temperaturFarge, tegnFargeskala } = __moduler["felles/js/fargeskala.js"]
 const { tegnPartikler } = __moduler["felles/js/partikler.js"];
 const { tegnCeller, lagGitterPartikler, PARTIKKELFARGE } = __moduler["felles/js/gittertegning.js"];
 const { formaterGrader, formaterTid } = __moduler["felles/js/format.js"];
-const { TA_PAA_GEOMETRI, ISBIT_GEOMETRI } = __moduler["modeller/naturfag/varmeledning-partikler/modell.js"];
+const { TA_PAA_GEOMETRI, ISBIT_GEOMETRI, ROMTEMPERATUR } = __moduler["modeller/naturfag/varmeledning-partikler/modell.js"];
 
 
 
@@ -2064,7 +2064,8 @@ function beskrivTaPaa(data, taPaa, berort) {
   const navnA = navnISetning(data, a.materiale);
   const navnB = navnISetning(data, b.materiale);
   if (!berort) {
-    return `Fingeren (33 °C) er klar over to klosser: ${navnA} til venstre og ${navnB} til høyre. Begge klossene er 20 °C.`;
+    const hud = formaterGrader(data.konstanter.hudtemperatur.verdi, 0);
+    return `Fingeren (${hud}) er klar over to klosser: ${navnA} til venstre og ${navnB} til høyre. Begge klossene er ${formaterGrader(ROMTEMPERATUR, 0)}.`;
   }
   return (
     `Etter ${taPaa.tid.toFixed(1).replace(".", ",")} s: huden mot ${navnA} er ${formaterGrader(a.kontaktTemperatur())}, ` +

@@ -5,6 +5,11 @@ her er det praktiske.
 
 ## Sideoppsett
 - Scenen (lerretet) til venstre, panelet til høyre. På smal skjerm stables de.
+- Teksten i tegningen og grafen skal være minst 11 skjermpiksler, også på mobil. Det
+  holder ikke at tegningen passer i bredden: krymper den, krymper teksten også.
+  Grafen (`felles/js/graf.js`) tegnes derfor i den bredden den faktisk har. En scene
+  som blir for liten under 560 skjermpiksler, får et eget smalt oppsett: to klosser
+  står over hverandre, eller merkelappene flyttes under tegningen.
 - Panelet har alltid samme rekkefølge: **Gjett først** → kontroller → tall/graf →
   **Hva modellen forenkler**.
 - Start-knappen er låst til eleven har låst en gjetning (`felles/js/forutsi.js`).
@@ -32,4 +37,5 @@ her er det praktiske.
 
 ## Tastatur
 - Alle knapper og glidebrytere er vanlige HTML-elementer, så Tab og piltaster virker.
-- Fokus vises med en tydelig gul ramme.
+- Fokus vises med en tydelig mørkeblå ramme (`--fokus` i `felles/stil.css`). Den gule
+  rammen som sto her før, var for svak mot lys bakgrunn.

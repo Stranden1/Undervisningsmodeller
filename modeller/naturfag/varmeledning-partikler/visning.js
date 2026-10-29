@@ -11,6 +11,27 @@ export { formaterTid };
 export const TA_PAA_STORRELSE = { bredde: 760, hoyde: 370 };
 export const ISBIT_STORRELSE = { bredde: 760, hoyde: 330 };
 
+// På smal skjerm (mobil) står de to klossene over hverandre i stedet for side om
+// side. Da blir alt dobbelt så stort, og teksten kan leses (F03). Fargeskalaen
+// flyttes til bunnen, så den ikke kommer i veien for fingeren.
+export const TA_PAA_STABLET = { bredde: 380, hoyde: 2 * 370 + 30 };
+export const ISBIT_STABLET = { bredde: 390, hoyde: 2 * 330 };
+
+/**
+ * Når klossene står over hverandre, finnes ikke venstre og høyre i bildet. Gjetningen
+ * og menyene sier likevel «Venstre» og «Høyre», så klossene får det som påskrift.
+ */
+function sidenavn(ctx, i) {
+  if (ctx.logiskBredde >= 760) return "";
+  return i === 0 ? "Venstre kloss: " : "Høyre kloss: ";
+}
+
+/** Flytt tegningen av scene nr. i hvis klossene står over hverandre. */
+function flyttScene(ctx, i, kolonne, rad) {
+  ctx.save();
+  if (ctx.logiskBredde < 760) ctx.translate(-i * kolonne, i * rad);
+}
+
 export function materialNavn(data, nokkel) {
   return data.materialer[nokkel]?.navn ?? nokkel;
 }
@@ -62,12 +83,13 @@ export function lagTaPaaVisning(data) {
    * @param {{ berort: boolean, tid: number }} vis  berort = fingeren ligger på klossen
    */
   function tegn(ctx, taPaa, { berort, tid }) {
-    const { bredde, hoyde } = TA_PAA_STORRELSE;
-    ctx.clearRect(0, 0, bredde, hoyde);
+    const stablet = ctx.logiskBredde < TA_PAA_STORRELSE.bredde;
+    ctx.clearRect(0, 0, ctx.logiskBredde, ctx.logiskHoyde);
     if (!partikler) partikler = taPaa.scener.map((s, i) => lagGitterPartikler(s.gitter, TP_CELLE, 7 + i));
     const loft = berort ? 0 : 28; // fingeren svever over klossen før start
 
     taPaa.scener.forEach((scene, i) => {
+      flyttScene(ctx, i, 390, TA_PAA_STORRELSE.hoyde);
       const x0 = sceneX(i);
       const g = scene.gitter;
       const forskyv = (y) => (y < G.hudRader ? -loft : 0);
@@ -122,16 +144,17 @@ export function lagTaPaaVisning(data) {
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       const yBunn = TP_TOPP + (G.hudRader + G.klossRader) * TP_CELLE;
-      ctx.fillText(materialNavn(data, scene.materiale), x0 + (G.bredde * TP_CELLE) / 2, yBunn + 10);
+      ctx.fillText(sidenavn(ctx, i) + materialNavn(data, scene.materiale), x0 + (G.bredde * TP_CELLE) / 2, yBunn + 10);
       ctx.font = "15px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
       const hjorne = g.temperatur(1, g.ny - 2);
       ctx.fillText(`Termometer i klossen: ${formaterGrader(hjorne)}`, x0 + (G.bredde * TP_CELLE) / 2, yBunn + 34);
       ctx.fillStyle = "#1f2328";
       ctx.fillText(`Finger, ${formaterGrader(data.konstanter.hudtemperatur.verdi, 0)}`, fingerX + fingerB / 2, 66 - loft);
+      ctx.restore();
     });
 
-    tegnFargeskala(ctx, bredde / 2 - 75, 10, 150, 8);
+    tegnFargeskala(ctx, ctx.logiskBredde / 2 - 75, stablet ? 2 * TA_PAA_STORRELSE.hoyde + 6 : 10, 150, 8);
   }
 
   return {
@@ -159,11 +182,11 @@ export function lagIsbitVisning(data) {
   }
 
   function tegn(ctx, isbit, { tid }) {
-    const { bredde, hoyde } = ISBIT_STORRELSE;
-    ctx.clearRect(0, 0, bredde, hoyde);
+    ctx.clearRect(0, 0, ctx.logiskBredde, ctx.logiskHoyde);
     if (!partikler) partikler = isbit.scener.map((s, i) => lagGitterPartikler(s.gitter, IB_CELLE, 3 + i));
 
     isbit.scener.forEach((scene, i) => {
+      flyttScene(ctx, i, 380, ISBIT_STORRELSE.hoyde);
       const x0 = sceneX(i);
       const g = scene.gitter;
       const yKloss = IB_TOPP + G.isRader * IB_CELLE;
@@ -199,7 +222,7 @@ export function lagIsbitVisning(data) {
       ctx.fillStyle = "#1f2328";
       ctx.font = "600 18px system-ui, sans-serif";
       const yBunn = yKloss + G.klossRader * IB_CELLE;
-      ctx.fillText(materialNavn(data, scene.materiale), x0 + breddePx / 2, yBunn + 10);
+      ctx.fillText(sidenavn(ctx, i) + materialNavn(data, scene.materiale), x0 + breddePx / 2, yBunn + 10);
       ctx.font = "15px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
       const andel = scene.smeltetAndel();
@@ -207,9 +230,10 @@ export function lagIsbitVisning(data) {
       ctx.fillText(tekst, x0 + breddePx / 2, 14);
       const T = scene.klossTemperaturUnderIs();
       if (T !== null) ctx.fillText(`Klossen under isen: ${formaterGrader(T)}`, x0 + breddePx / 2, yBunn + 34);
+      ctx.restore();
     });
 
-    tegnFargeskala(ctx, bredde / 2 - 75, hoyde - 30, 150, 8);
+    tegnFargeskala(ctx, ctx.logiskBredde / 2 - 75, ctx.logiskHoyde - 30, 150, 8);
   }
 
   return {

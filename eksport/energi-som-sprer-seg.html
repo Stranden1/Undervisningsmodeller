@@ -1890,6 +1890,9 @@ const { formaterGrader, formaterTid } = __moduler["felles/js/format.js"];
 const { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass, varmeUtAvDelen } = __moduler["modeller/naturfag/energi-som-sprer-seg/modell.js"];
 
 const STORRELSE = { bredde: 760, hoyde: 400 };
+// Smal skjerm (mobil): merkelappene står under karet i stedet for til høyre. Da kan
+// tegningen være smalere, og teksten blir stor nok til å lese (F03).
+const SMAL_STORRELSE = { bredde: 400, hoyde: 500 };
 
 const CELLE = 14; // samme cellestørrelse for alle kar, så mer vann faktisk ser større ut
 const VEGG = 7;
@@ -1952,7 +1955,9 @@ function lagVisning() {
    * @param {{ tid: number, fane: "kloss" | "dyppekoker" }} vis  tid for partikkelbevegelsen (står stille i pause) og fane
    */
   function tegn(ctx, kar, { tid, fane }) {
-    const { bredde, hoyde } = STORRELSE;
+    const bredde = ctx.logiskBredde;
+    const hoyde = ctx.logiskHoyde;
+    const smal = bredde < STORRELSE.bredde;
     ctx.clearRect(0, 0, bredde, hoyde);
     const g = kar.gitter;
     if (kar !== forrigeKar) {
@@ -1964,7 +1969,7 @@ function lagVisning() {
     const karB = g.nx * CELLE;
     const karH = g.ny * CELLE;
     const x0 = Math.round((bredde - karB) / 2);
-    const y0 = Y0;
+    const y0 = smal ? Y0 + 20 : Y0; // plass til to linjer over ledningen
 
     // Isolert kar: tykk vegg rundt og lokk på
     ctx.fillStyle = VEGGFARGE;
@@ -2002,7 +2007,7 @@ function lagVisning() {
     ctx.setLineDash([]);
 
     tegnVarmepiler(ctx, varmeUtAvDelen(g, k), kx, ky, k.side * CELLE, fane === "dyppekoker" ? 12 : 0);
-    if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0);
+    if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0, smal);
 
     // Overskrift
     ctx.fillStyle = "#5b616b";
@@ -2011,20 +2016,28 @@ function lagVisning() {
     ctx.textAlign = "left";
     ctx.fillText("Varmeisolert kar: ingen varme går inn eller ut", 12, 12);
 
-    // Merkelapper til høyre for karet
-    const lx = x0 + karB + VEGG + 18;
-    ctx.textAlign = "left";
-    ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillStyle = "#1f2328";
-    ctx.fillText(delen.navn, lx, y0 + karH / 2 - 34);
-    ctx.font = "15px system-ui, sans-serif";
-    ctx.fillText(formaterGrader(delen.temperatur(r)), lx, y0 + karH / 2 - 14);
-    ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillText("Vannet", lx, y0 + karH / 2 + 14);
-    ctx.font = "15px system-ui, sans-serif";
+    // Merkelapper til høyre for karet (smal skjerm: under karet, se lenger ned)
     const [vMin, vMaks] = vannSpenn(kar, k);
     const vannTekst = r.likevekt ? formaterGrader(r.minTemperatur) : `${formaterGrader(vMin)} – ${formaterGrader(vMaks)}`;
-    ctx.fillText(vannTekst, lx, y0 + karH / 2 + 34);
+    ctx.fillStyle = "#1f2328";
+    if (smal) {
+      ctx.textAlign = "center";
+      ctx.font = "15px system-ui, sans-serif";
+      const yTekst = y0 + karH + VEGG + 44;
+      ctx.fillText(`${delen.navn}: ${formaterGrader(delen.temperatur(r))}`, bredde / 2, yTekst);
+      ctx.fillText(`Vannet: ${vannTekst}`, bredde / 2, yTekst + 22);
+    } else {
+      const lx = x0 + karB + VEGG + 18;
+      ctx.textAlign = "left";
+      ctx.font = "600 15px system-ui, sans-serif";
+      ctx.fillText(delen.navn, lx, y0 + karH / 2 - 34);
+      ctx.font = "15px system-ui, sans-serif";
+      ctx.fillText(formaterGrader(delen.temperatur(r)), lx, y0 + karH / 2 - 14);
+      ctx.font = "600 15px system-ui, sans-serif";
+      ctx.fillText("Vannet", lx, y0 + karH / 2 + 14);
+      ctx.font = "15px system-ui, sans-serif";
+      ctx.fillText(vannTekst, lx, y0 + karH / 2 + 34);
+    }
 
     // Under karet
     ctx.textAlign = "center";
@@ -2107,7 +2120,7 @@ function tegnVarmepiler(ctx, ut, kx, ky, s, oppForskyvning) {
 }
 
 /** Ledning fra elementet opp gjennom lokket, med en merkelapp: strøm på eller av. */
-function tegnLedning(ctx, r, x, yElement, yKar) {
+function tegnLedning(ctx, r, x, yElement, yKar, smal) {
   const paa = r.paa;
   const topp = yKar - VEGG - 16;
   ctx.strokeStyle = paa ? STROMFARGE : "#9aa0a8";
@@ -2120,8 +2133,14 @@ function tegnLedning(ctx, r, x, yElement, yKar) {
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = paa ? STROMFARGE : "#5b616b";
-  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % ikke tilført ennå` : "Strøm av";
-  ctx.fillText(tekst, x + 10, topp + 4);
+  const igjen = `${Math.round(r.somStrom * 100)} % ikke tilført ennå`;
+  if (!paa) ctx.fillText("Strøm av", x + 10, topp + 4);
+  else if (!smal) ctx.fillText(`Strøm på – ${igjen}`, x + 10, topp + 4);
+  else {
+    // Smal tegning: én linje blir for lang, så teksten deles i to.
+    ctx.fillText("Strøm på", x + 10, topp - 8);
+    ctx.fillText(igjen, x + 10, topp + 8);
+  }
 }
 
 /** Kaldeste og varmeste vann (alt utenom delen i midten). */
@@ -2167,7 +2186,7 @@ function beskriv(kar, fane) {
   );
 }
 
-return { STORRELSE, lagVisning, beskriv };
+return { STORRELSE, SMAL_STORRELSE, lagVisning, beskriv };
 })();
 // ---- felles/js/data.js ----
 __moduler["felles/js/data.js"] = await (async () => {
@@ -2504,9 +2523,23 @@ __moduler["felles/js/graf.js"] = await (async () => {
 const { klargjorLerret } = __moduler["felles/js/lerret.js"];
 
 function lagGraf(canvas, oppsett) {
-  const B = oppsett.bredde ?? 560;
+  const STORST = oppsett.bredde ?? 560;
   const H = oppsett.hoyde ?? 240;
+  let B = STORST;
   const ctx = klargjorLerret(canvas, B, H);
+
+  // På en smal skjerm tegnes grafen i den bredden den faktisk har, i stedet for å
+  // krympe hele bildet. Da blir teksten 12 skjermpiksler også på mobil (F03).
+  // Høyden er den samme, så grafen blir litt høyere i forhold til bredden.
+  function tilpassBredde() {
+    const vist = Math.round(canvas.clientWidth);
+    const ny = Math.max(260, Math.min(STORST, vist));
+    if (!vist || ny === B) return;
+    B = ny;
+    klargjorLerret(canvas, B, H);
+    tegn();
+  }
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(tilpassBredde).observe(canvas);
   const marg = { v: 52, h: 16, o: 28, u: 40 };
   const serier = oppsett.serier.map((s) => ({ ...s }));
   const xFormat = oppsett.xFormat ?? ((x) => String(Math.round(x)));
@@ -2676,7 +2709,7 @@ __moduler["modeller/naturfag/energi-som-sprer-seg/kontroller.js"] = await (async
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
 const { lagKar, lagDyppekoker, VANNMENGDER, KAR } = __moduler["modeller/naturfag/energi-som-sprer-seg/modell.js"];
-const { lagVisning, beskriv, STORRELSE } = __moduler["modeller/naturfag/energi-som-sprer-seg/visning.js"];
+const { lagVisning, beskriv, STORRELSE, SMAL_STORRELSE } = __moduler["modeller/naturfag/energi-som-sprer-seg/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
 const { settBeskrivelse } = __moduler["felles/js/beskrivelse.js"];
@@ -2785,6 +2818,15 @@ const FANER = {
 };
 
 const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
+// Smal skjerm: smalere tegning med merkelappene under karet. Under 560 skjermpiksler
+// ville teksten i den brede tegningen blitt mindre enn 11 piksler.
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(() => {
+    const plass = ctx.canvas.parentElement.clientWidth;
+    const str = plass < 560 ? SMAL_STORRELSE : STORRELSE;
+    if (plass && ctx.logiskBredde !== str.bredde) klargjorLerret(ctx.canvas, str.bredde, str.hoyde);
+  }).observe(ctx.canvas.parentElement);
+}
 const visning = lagVisning();
 let graf = null;
 

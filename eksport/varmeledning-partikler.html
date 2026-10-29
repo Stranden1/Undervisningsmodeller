@@ -1822,6 +1822,27 @@ const { TA_PAA_GEOMETRI, ISBIT_GEOMETRI } = __moduler["modeller/naturfag/varmele
 const TA_PAA_STORRELSE = { bredde: 760, hoyde: 370 };
 const ISBIT_STORRELSE = { bredde: 760, hoyde: 330 };
 
+// På smal skjerm (mobil) står de to klossene over hverandre i stedet for side om
+// side. Da blir alt dobbelt så stort, og teksten kan leses (F03). Fargeskalaen
+// flyttes til bunnen, så den ikke kommer i veien for fingeren.
+const TA_PAA_STABLET = { bredde: 380, hoyde: 2 * 370 + 30 };
+const ISBIT_STABLET = { bredde: 390, hoyde: 2 * 330 };
+
+/**
+ * Når klossene står over hverandre, finnes ikke venstre og høyre i bildet. Gjetningen
+ * og menyene sier likevel «Venstre» og «Høyre», så klossene får det som påskrift.
+ */
+function sidenavn(ctx, i) {
+  if (ctx.logiskBredde >= 760) return "";
+  return i === 0 ? "Venstre kloss: " : "Høyre kloss: ";
+}
+
+/** Flytt tegningen av scene nr. i hvis klossene står over hverandre. */
+function flyttScene(ctx, i, kolonne, rad) {
+  ctx.save();
+  if (ctx.logiskBredde < 760) ctx.translate(-i * kolonne, i * rad);
+}
+
 function materialNavn(data, nokkel) {
   return data.materialer[nokkel]?.navn ?? nokkel;
 }
@@ -1873,12 +1894,13 @@ function lagTaPaaVisning(data) {
    * @param {{ berort: boolean, tid: number }} vis  berort = fingeren ligger på klossen
    */
   function tegn(ctx, taPaa, { berort, tid }) {
-    const { bredde, hoyde } = TA_PAA_STORRELSE;
-    ctx.clearRect(0, 0, bredde, hoyde);
+    const stablet = ctx.logiskBredde < TA_PAA_STORRELSE.bredde;
+    ctx.clearRect(0, 0, ctx.logiskBredde, ctx.logiskHoyde);
     if (!partikler) partikler = taPaa.scener.map((s, i) => lagGitterPartikler(s.gitter, TP_CELLE, 7 + i));
     const loft = berort ? 0 : 28; // fingeren svever over klossen før start
 
     taPaa.scener.forEach((scene, i) => {
+      flyttScene(ctx, i, 390, TA_PAA_STORRELSE.hoyde);
       const x0 = sceneX(i);
       const g = scene.gitter;
       const forskyv = (y) => (y < G.hudRader ? -loft : 0);
@@ -1933,16 +1955,17 @@ function lagTaPaaVisning(data) {
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       const yBunn = TP_TOPP + (G.hudRader + G.klossRader) * TP_CELLE;
-      ctx.fillText(materialNavn(data, scene.materiale), x0 + (G.bredde * TP_CELLE) / 2, yBunn + 10);
+      ctx.fillText(sidenavn(ctx, i) + materialNavn(data, scene.materiale), x0 + (G.bredde * TP_CELLE) / 2, yBunn + 10);
       ctx.font = "15px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
       const hjorne = g.temperatur(1, g.ny - 2);
       ctx.fillText(`Termometer i klossen: ${formaterGrader(hjorne)}`, x0 + (G.bredde * TP_CELLE) / 2, yBunn + 34);
       ctx.fillStyle = "#1f2328";
       ctx.fillText(`Finger, ${formaterGrader(data.konstanter.hudtemperatur.verdi, 0)}`, fingerX + fingerB / 2, 66 - loft);
+      ctx.restore();
     });
 
-    tegnFargeskala(ctx, bredde / 2 - 75, 10, 150, 8);
+    tegnFargeskala(ctx, ctx.logiskBredde / 2 - 75, stablet ? 2 * TA_PAA_STORRELSE.hoyde + 6 : 10, 150, 8);
   }
 
   return {
@@ -1970,11 +1993,11 @@ function lagIsbitVisning(data) {
   }
 
   function tegn(ctx, isbit, { tid }) {
-    const { bredde, hoyde } = ISBIT_STORRELSE;
-    ctx.clearRect(0, 0, bredde, hoyde);
+    ctx.clearRect(0, 0, ctx.logiskBredde, ctx.logiskHoyde);
     if (!partikler) partikler = isbit.scener.map((s, i) => lagGitterPartikler(s.gitter, IB_CELLE, 3 + i));
 
     isbit.scener.forEach((scene, i) => {
+      flyttScene(ctx, i, 380, ISBIT_STORRELSE.hoyde);
       const x0 = sceneX(i);
       const g = scene.gitter;
       const yKloss = IB_TOPP + G.isRader * IB_CELLE;
@@ -2010,7 +2033,7 @@ function lagIsbitVisning(data) {
       ctx.fillStyle = "#1f2328";
       ctx.font = "600 18px system-ui, sans-serif";
       const yBunn = yKloss + G.klossRader * IB_CELLE;
-      ctx.fillText(materialNavn(data, scene.materiale), x0 + breddePx / 2, yBunn + 10);
+      ctx.fillText(sidenavn(ctx, i) + materialNavn(data, scene.materiale), x0 + breddePx / 2, yBunn + 10);
       ctx.font = "15px system-ui, sans-serif";
       ctx.fillStyle = "#5b616b";
       const andel = scene.smeltetAndel();
@@ -2018,9 +2041,10 @@ function lagIsbitVisning(data) {
       ctx.fillText(tekst, x0 + breddePx / 2, 14);
       const T = scene.klossTemperaturUnderIs();
       if (T !== null) ctx.fillText(`Klossen under isen: ${formaterGrader(T)}`, x0 + breddePx / 2, yBunn + 34);
+      ctx.restore();
     });
 
-    tegnFargeskala(ctx, bredde / 2 - 75, hoyde - 30, 150, 8);
+    tegnFargeskala(ctx, ctx.logiskBredde / 2 - 75, ctx.logiskHoyde - 30, 150, 8);
   }
 
   return {
@@ -2058,7 +2082,7 @@ function beskrivIsbit(data, isbit) {
   return `Etter ${formaterTid(isbit.tid)}: ${deler.join(", ")}.`;
 }
 
-return { TA_PAA_STORRELSE, ISBIT_STORRELSE, materialNavn, lagTaPaaVisning, lagIsbitVisning, beskrivTaPaa, beskrivIsbit, formaterTid };
+return { TA_PAA_STORRELSE, ISBIT_STORRELSE, TA_PAA_STABLET, ISBIT_STABLET, materialNavn, lagTaPaaVisning, lagIsbitVisning, beskrivTaPaa, beskrivIsbit, formaterTid };
 })();
 // ---- felles/js/data.js ----
 __moduler["felles/js/data.js"] = await (async () => {
@@ -2395,9 +2419,23 @@ __moduler["felles/js/graf.js"] = await (async () => {
 const { klargjorLerret } = __moduler["felles/js/lerret.js"];
 
 function lagGraf(canvas, oppsett) {
-  const B = oppsett.bredde ?? 560;
+  const STORST = oppsett.bredde ?? 560;
   const H = oppsett.hoyde ?? 240;
+  let B = STORST;
   const ctx = klargjorLerret(canvas, B, H);
+
+  // På en smal skjerm tegnes grafen i den bredden den faktisk har, i stedet for å
+  // krympe hele bildet. Da blir teksten 12 skjermpiksler også på mobil (F03).
+  // Høyden er den samme, så grafen blir litt høyere i forhold til bredden.
+  function tilpassBredde() {
+    const vist = Math.round(canvas.clientWidth);
+    const ny = Math.max(260, Math.min(STORST, vist));
+    if (!vist || ny === B) return;
+    B = ny;
+    klargjorLerret(canvas, B, H);
+    tegn();
+  }
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(tilpassBredde).observe(canvas);
   const marg = { v: 52, h: 16, o: 28, u: 40 };
   const serier = oppsett.serier.map((s) => ({ ...s }));
   const xFormat = oppsett.xFormat ?? ((x) => String(Math.round(x)));
@@ -2567,7 +2605,7 @@ __moduler["modeller/naturfag/varmeledning-partikler/kontroller.js"] = await (asy
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
 const { lagTaPaa, lagIsbit, kaldestKloss, forstSmeltet, TA_PAA_MATERIALER, ROMTEMPERATUR } = __moduler["modeller/naturfag/varmeledning-partikler/modell.js"];
-const { lagTaPaaVisning, lagIsbitVisning, TA_PAA_STORRELSE, ISBIT_STORRELSE, beskrivTaPaa, beskrivIsbit, formaterTid, materialNavn } = __moduler["modeller/naturfag/varmeledning-partikler/visning.js"];
+const { lagTaPaaVisning, lagIsbitVisning, TA_PAA_STORRELSE, ISBIT_STORRELSE, TA_PAA_STABLET, ISBIT_STABLET, beskrivTaPaa, beskrivIsbit, formaterTid, materialNavn } = __moduler["modeller/naturfag/varmeledning-partikler/visning.js"];
 const { hentMaterialer } = __moduler["felles/js/data.js"];
 const { formaterTall } = __moduler["felles/js/format.js"];
 const { lagForutsi } = __moduler["felles/js/forutsi.js"];
@@ -3009,6 +3047,20 @@ let animTid = 0;
 const bevegelsesTid = { tapaa: 0, isbit: 0 };
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
+
+// Smal skjerm: klossene stables over hverandre, så tegningen blir stor nok til å lese.
+// Under 560 skjermpiksler ville teksten side om side blitt mindre enn 11 piksler.
+function tilpassLerret(o, bred, stablet) {
+  const canvas = o.ctx.canvas;
+  const plass = canvas.parentElement.clientWidth;
+  if (!plass) return; // fanen er skjult
+  const str = plass < 560 ? stablet : bred;
+  if (o.ctx.logiskBredde !== str.bredde) klargjorLerret(canvas, str.bredde, str.hoyde);
+}
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(() => tilpassLerret(tp, TA_PAA_STORRELSE, TA_PAA_STABLET)).observe(tp.ctx.canvas.parentElement);
+  new ResizeObserver(() => tilpassLerret(ib, ISBIT_STORRELSE, ISBIT_STABLET)).observe(ib.ctx.canvas.parentElement);
+}
 
 function animer(naa) {
   const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);

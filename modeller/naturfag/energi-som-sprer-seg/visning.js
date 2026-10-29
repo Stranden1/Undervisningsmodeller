@@ -7,6 +7,9 @@ import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
 import { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass, varmeUtAvDelen } from "./modell.js";
 
 export const STORRELSE = { bredde: 760, hoyde: 400 };
+// Smal skjerm (mobil): merkelappene står under karet i stedet for til høyre. Da kan
+// tegningen være smalere, og teksten blir stor nok til å lese (F03).
+export const SMAL_STORRELSE = { bredde: 400, hoyde: 500 };
 
 const CELLE = 14; // samme cellestørrelse for alle kar, så mer vann faktisk ser større ut
 const VEGG = 7;
@@ -69,7 +72,9 @@ export function lagVisning() {
    * @param {{ tid: number, fane: "kloss" | "dyppekoker" }} vis  tid for partikkelbevegelsen (står stille i pause) og fane
    */
   function tegn(ctx, kar, { tid, fane }) {
-    const { bredde, hoyde } = STORRELSE;
+    const bredde = ctx.logiskBredde;
+    const hoyde = ctx.logiskHoyde;
+    const smal = bredde < STORRELSE.bredde;
     ctx.clearRect(0, 0, bredde, hoyde);
     const g = kar.gitter;
     if (kar !== forrigeKar) {
@@ -81,7 +86,7 @@ export function lagVisning() {
     const karB = g.nx * CELLE;
     const karH = g.ny * CELLE;
     const x0 = Math.round((bredde - karB) / 2);
-    const y0 = Y0;
+    const y0 = smal ? Y0 + 20 : Y0; // plass til to linjer over ledningen
 
     // Isolert kar: tykk vegg rundt og lokk på
     ctx.fillStyle = VEGGFARGE;
@@ -119,7 +124,7 @@ export function lagVisning() {
     ctx.setLineDash([]);
 
     tegnVarmepiler(ctx, varmeUtAvDelen(g, k), kx, ky, k.side * CELLE, fane === "dyppekoker" ? 12 : 0);
-    if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0);
+    if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0, smal);
 
     // Overskrift
     ctx.fillStyle = "#5b616b";
@@ -128,20 +133,28 @@ export function lagVisning() {
     ctx.textAlign = "left";
     ctx.fillText("Varmeisolert kar: ingen varme går inn eller ut", 12, 12);
 
-    // Merkelapper til høyre for karet
-    const lx = x0 + karB + VEGG + 18;
-    ctx.textAlign = "left";
-    ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillStyle = "#1f2328";
-    ctx.fillText(delen.navn, lx, y0 + karH / 2 - 34);
-    ctx.font = "15px system-ui, sans-serif";
-    ctx.fillText(formaterGrader(delen.temperatur(r)), lx, y0 + karH / 2 - 14);
-    ctx.font = "600 15px system-ui, sans-serif";
-    ctx.fillText("Vannet", lx, y0 + karH / 2 + 14);
-    ctx.font = "15px system-ui, sans-serif";
+    // Merkelapper til høyre for karet (smal skjerm: under karet, se lenger ned)
     const [vMin, vMaks] = vannSpenn(kar, k);
     const vannTekst = r.likevekt ? formaterGrader(r.minTemperatur) : `${formaterGrader(vMin)} – ${formaterGrader(vMaks)}`;
-    ctx.fillText(vannTekst, lx, y0 + karH / 2 + 34);
+    ctx.fillStyle = "#1f2328";
+    if (smal) {
+      ctx.textAlign = "center";
+      ctx.font = "15px system-ui, sans-serif";
+      const yTekst = y0 + karH + VEGG + 44;
+      ctx.fillText(`${delen.navn}: ${formaterGrader(delen.temperatur(r))}`, bredde / 2, yTekst);
+      ctx.fillText(`Vannet: ${vannTekst}`, bredde / 2, yTekst + 22);
+    } else {
+      const lx = x0 + karB + VEGG + 18;
+      ctx.textAlign = "left";
+      ctx.font = "600 15px system-ui, sans-serif";
+      ctx.fillText(delen.navn, lx, y0 + karH / 2 - 34);
+      ctx.font = "15px system-ui, sans-serif";
+      ctx.fillText(formaterGrader(delen.temperatur(r)), lx, y0 + karH / 2 - 14);
+      ctx.font = "600 15px system-ui, sans-serif";
+      ctx.fillText("Vannet", lx, y0 + karH / 2 + 14);
+      ctx.font = "15px system-ui, sans-serif";
+      ctx.fillText(vannTekst, lx, y0 + karH / 2 + 34);
+    }
 
     // Under karet
     ctx.textAlign = "center";
@@ -224,7 +237,7 @@ function tegnVarmepiler(ctx, ut, kx, ky, s, oppForskyvning) {
 }
 
 /** Ledning fra elementet opp gjennom lokket, med en merkelapp: strøm på eller av. */
-function tegnLedning(ctx, r, x, yElement, yKar) {
+function tegnLedning(ctx, r, x, yElement, yKar, smal) {
   const paa = r.paa;
   const topp = yKar - VEGG - 16;
   ctx.strokeStyle = paa ? STROMFARGE : "#9aa0a8";
@@ -237,8 +250,14 @@ function tegnLedning(ctx, r, x, yElement, yKar) {
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = paa ? STROMFARGE : "#5b616b";
-  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % ikke tilført ennå` : "Strøm av";
-  ctx.fillText(tekst, x + 10, topp + 4);
+  const igjen = `${Math.round(r.somStrom * 100)} % ikke tilført ennå`;
+  if (!paa) ctx.fillText("Strøm av", x + 10, topp + 4);
+  else if (!smal) ctx.fillText(`Strøm på – ${igjen}`, x + 10, topp + 4);
+  else {
+    // Smal tegning: én linje blir for lang, så teksten deles i to.
+    ctx.fillText("Strøm på", x + 10, topp - 8);
+    ctx.fillText(igjen, x + 10, topp + 8);
+  }
 }
 
 /** Kaldeste og varmeste vann (alt utenom delen i midten). */

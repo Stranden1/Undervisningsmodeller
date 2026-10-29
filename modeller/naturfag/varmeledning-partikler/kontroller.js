@@ -14,6 +14,8 @@ import {
   lagIsbitVisning,
   TA_PAA_STORRELSE,
   ISBIT_STORRELSE,
+  TA_PAA_STABLET,
+  ISBIT_STABLET,
   beskrivTaPaa,
   beskrivIsbit,
   formaterTid,
@@ -460,6 +462,20 @@ let animTid = 0;
 const bevegelsesTid = { tapaa: 0, isbit: 0 };
 let sisteTekst = 0;
 let sisteBeskrivelse = 0;
+
+// Smal skjerm: klossene stables over hverandre, så tegningen blir stor nok til å lese.
+// Under 560 skjermpiksler ville teksten side om side blitt mindre enn 11 piksler.
+function tilpassLerret(o, bred, stablet) {
+  const canvas = o.ctx.canvas;
+  const plass = canvas.parentElement.clientWidth;
+  if (!plass) return; // fanen er skjult
+  const str = plass < 560 ? stablet : bred;
+  if (o.ctx.logiskBredde !== str.bredde) klargjorLerret(canvas, str.bredde, str.hoyde);
+}
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(() => tilpassLerret(tp, TA_PAA_STORRELSE, TA_PAA_STABLET)).observe(tp.ctx.canvas.parentElement);
+  new ResizeObserver(() => tilpassLerret(ib, ISBIT_STORRELSE, ISBIT_STABLET)).observe(ib.ctx.canvas.parentElement);
+}
 
 function animer(naa) {
   const dtEkte = forrige === null ? 0 : Math.min(0.1, (naa - forrige) / 1000);

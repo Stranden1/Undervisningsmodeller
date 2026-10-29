@@ -2,7 +2,7 @@
 // Kobler modell (fysikk) og visning (tegning) sammen. Ingen fysikk her.
 
 import { lagKar, lagDyppekoker, VANNMENGDER, KAR } from "./modell.js";
-import { lagVisning, beskriv, STORRELSE } from "./visning.js";
+import { lagVisning, beskriv, STORRELSE, SMAL_STORRELSE } from "./visning.js";
 import { hentMaterialer } from "../../../felles/js/data.js";
 import { lagForutsi } from "../../../felles/js/forutsi.js";
 import { settBeskrivelse } from "../../../felles/js/beskrivelse.js";
@@ -111,6 +111,15 @@ const FANER = {
 };
 
 const ctx = klargjorLerret($("lerret"), STORRELSE.bredde, STORRELSE.hoyde);
+// Smal skjerm: smalere tegning med merkelappene under karet. Under 560 skjermpiksler
+// ville teksten i den brede tegningen blitt mindre enn 11 piksler.
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(() => {
+    const plass = ctx.canvas.parentElement.clientWidth;
+    const str = plass < 560 ? SMAL_STORRELSE : STORRELSE;
+    if (plass && ctx.logiskBredde !== str.bredde) klargjorLerret(ctx.canvas, str.bredde, str.hoyde);
+  }).observe(ctx.canvas.parentElement);
+}
 const visning = lagVisning();
 let graf = null;
 

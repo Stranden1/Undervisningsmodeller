@@ -11,9 +11,23 @@
 import { klargjorLerret } from "./lerret.js";
 
 export function lagGraf(canvas, oppsett) {
-  const B = oppsett.bredde ?? 560;
+  const STORST = oppsett.bredde ?? 560;
   const H = oppsett.hoyde ?? 240;
+  let B = STORST;
   const ctx = klargjorLerret(canvas, B, H);
+
+  // På en smal skjerm tegnes grafen i den bredden den faktisk har, i stedet for å
+  // krympe hele bildet. Da blir teksten 12 skjermpiksler også på mobil (F03).
+  // Høyden er den samme, så grafen blir litt høyere i forhold til bredden.
+  function tilpassBredde() {
+    const vist = Math.round(canvas.clientWidth);
+    const ny = Math.max(260, Math.min(STORST, vist));
+    if (!vist || ny === B) return;
+    B = ny;
+    klargjorLerret(canvas, B, H);
+    tegn();
+  }
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(tilpassBredde).observe(canvas);
   const marg = { v: 52, h: 16, o: 28, u: 40 };
   const serier = oppsett.serier.map((s) => ({ ...s }));
   const xFormat = oppsett.xFormat ?? ((x) => String(Math.round(x)));

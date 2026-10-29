@@ -10,6 +10,9 @@
 
 import { klargjorLerret } from "./lerret.js";
 
+/** Én størrelsesvakt per lerret. */
+const vakter = new WeakMap();
+
 export function lagGraf(canvas, oppsett) {
   const STORST = oppsett.bredde ?? 560;
   const H = oppsett.hoyde ?? 240;
@@ -27,7 +30,13 @@ export function lagGraf(canvas, oppsett) {
     klargjorLerret(canvas, B, H);
     tegn();
   }
-  if (typeof ResizeObserver !== "undefined") new ResizeObserver(tilpassBredde).observe(canvas);
+  if (typeof ResizeObserver !== "undefined") {
+    // Lages en ny graf på samme lerret (nytt forsøk), skal den gamle slutte å tegne.
+    vakter.get(canvas)?.disconnect();
+    const vakt = new ResizeObserver(tilpassBredde);
+    vakt.observe(canvas);
+    vakter.set(canvas, vakt);
+  }
   const marg = { v: 52, h: 16, o: 28, u: 40 };
   const serier = oppsett.serier.map((s) => ({ ...s }));
   const xFormat = oppsett.xFormat ?? ((x) => String(Math.round(x)));

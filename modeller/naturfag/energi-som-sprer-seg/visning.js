@@ -150,8 +150,8 @@ export function lagVisning() {
     let status;
     if (r.likevekt) status = `Alt har samme temperatur: ${formaterGrader(kar.blandingstemperatur)}`;
     else if (r.tid === 0) status = "Gjett først, trykk så Start";
-    else if (fane === "dyppekoker" && r.paa) status = "Strømmen blir til varme i elementet";
-    else status = "Varmen sprer seg";
+    else if (fane === "dyppekoker" && r.paa) status = "Strømmen varmer opp elementet";
+    else status = "Energien sprer seg";
     ctx.fillText(status, bredde / 2, y0 + karH + VEGG + 14);
 
     // Forklaring til pilene
@@ -237,7 +237,7 @@ function tegnLedning(ctx, r, x, yElement, yKar) {
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = paa ? STROMFARGE : "#5b616b";
-  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % igjen å levere` : "Strøm av";
+  const tekst = paa ? `Strøm på – ${Math.round(r.somStrom * 100)} % ikke tilført ennå` : "Strøm av";
   ctx.fillText(tekst, x + 10, topp + 4);
 }
 
@@ -266,20 +266,20 @@ export function beskriv(kar, fane) {
 
   if (fane === "dyppekoker") {
     if (r.tid === 0) {
-      return `Vannet og varmeelementet er ${formaterGrader(VANN_START, 0)}. All energien er ennå strøm, og alt av den kan gjøre arbeid.`;
+      return `Vannet og varmeelementet er ${formaterGrader(VANN_START, 0)}. Ingen energi er tilført ennå. Energien strømmen skal gi, kan i prinsippet gjøre arbeid uten tap.`;
     }
-    const strom = r.paa ? `${pst(r.somStrom)} av energien er ennå ikke levert som strøm, ` : "Strømmen er slått av. ";
+    const strom = r.paa ? `${pst(r.somStrom)} av energien er ikke tilført ennå, ` : "Strømmen er slått av. ";
     return (
       `Etter ${formaterTid(r.tid)} er elementet ${formaterGrader(r.elementTemperatur)}. ${strom}` +
-      `${pst(r.varmeIKaret)} er varme i karet – til sammen ${pst(r.energiIAlt)}. ${arbeid}${slutt}`
+      `${pst(r.varmeIKaret)} er i karet – til sammen ${pst(r.energiIAlt)}. ${arbeid}${slutt}`
     );
   }
 
   if (r.tid === 0) {
-    return `Kobberklossen er ${formaterGrader(kar.klossT, 0)}, vannet er ${formaterGrader(VANN_START, 0)}. All varmen er i klossen.`;
+    return `Kobberklossen er ${formaterGrader(kar.klossT, 0)}, vannet er ${formaterGrader(VANN_START, 0)}. All den ekstra energien er i klossen.`;
   }
   return (
     `Etter ${formaterTid(r.tid)} er klossen ${formaterGrader(r.klossTemperatur)}. ` +
-    `${pst(r.iKlossen)} av varmen er i klossen og ${pst(r.iVannet)} i vannet – til sammen ${pst(r.varmeIKaret)}. ${arbeid}${slutt}`
+    `${pst(r.iKlossen)} av den ekstra energien er i klossen og ${pst(r.iVannet)} i vannet – til sammen ${pst(r.varmeIKaret)}. ${arbeid}${slutt}`
   );
 }

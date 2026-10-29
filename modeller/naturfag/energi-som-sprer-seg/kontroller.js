@@ -38,16 +38,16 @@ const FANER = {
     lag: (vannmengde) => lagKar(data, { vannmengde, klossT: Number($("klosst").value) }),
     oppsett: "Vannet er alltid 10 °C ved start. Karet er varmeisolert: ingen varme går inn eller ut.",
     hundre:
-      "100 % = varmen klossen hadde ekstra ved start, fordi den var varmere enn vannet. Vannet hadde også energi fra før, men den regner vi ikke med.",
-    yTekst: "% av varmen klossen hadde",
+      "100 % = energien klossen hadde ekstra ved start, fordi den var varmere enn vannet (10 °C). Vannet hadde også energi fra før, men den regner vi ikke med.",
+    yTekst: "% av klossens ekstra energi",
     soyler: [
-      { navn: "Varme i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.total },
+      { navn: "Ekstra energi i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.total },
       { navn: "i klossen", verdi: (r) => r.iKlossen, farge: FARGE.kloss, strek: [6, 4] },
       { navn: "i vannet", verdi: (r) => r.iVannet, farge: FARGE.vann, strek: [2, 3] },
     ],
-    joule: (r) => `Varme i karet: ${formaterTall(r.varmeJoule, 0)} J · kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
+    joule: (r) => `Ekstra energi i karet: ${formaterTall(r.varmeJoule, 0)} J · kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
     forutsi: (kar) => ({
-      sporsmal: `En kobberkloss på ${kar.klossT} °C legges i vann på 10 °C i et lukket kar. Når alt har fått samme temperatur: hvor mye av varmen fra klossen finnes fortsatt i karet?`,
+      sporsmal: `En kobberkloss på ${kar.klossT} °C legges i vann på 10 °C i et lukket kar. Klossen har ekstra energi fordi den er varmere enn vannet. Når alt har fått samme temperatur: hvor mye av den ekstra energien finnes fortsatt i karet?`,
       valg: [
         { id: "ingenting", tekst: "Ingenting – den er brukt opp" },
         { id: "litt", tekst: "Litt – resten har forsvunnet" },
@@ -58,7 +58,7 @@ const FANER = {
     fasit: (kar, r) => ({
       id: "alt",
       tekst:
-        `All varmen er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
+        `All den ekstra energien er fortsatt i karet: ${prosent(r.varmeIKaret)}. Energi blir ikke brukt opp. ` +
         `Men den er spredt fra den lille klossen til alt vannet, så temperaturen ble bare ` +
         `${formaterGrader(kar.blandingstemperatur)}. Det som forsvant, var muligheten til å få arbeid ut av temperaturforskjellene i karet: ` +
         `fra ${prosent(t.startArbeid, 1)} til ${prosent(r.kanGjoreArbeid, 1)}. Energien har fått lavere kvalitet.`,
@@ -70,19 +70,19 @@ const FANER = {
     lag: (vannmengde) => lagDyppekoker(data, { vannmengde }),
     oppsett: "Vannet er 10 °C ved start. Dyppekokeren får strøm i 5 minutter og slås så av. Karet er varmeisolert.",
     hundre:
-      "100 % = energien strømmen gir. Det er like mye som kobberklossen på 90 °C hadde ekstra. Vannets energi fra før regner vi ikke med.",
+      "100 % = energien strømmen tilfører karet. Det er like mye som kobberklossen på 90 °C hadde ekstra. Vannets energi fra før regner vi ikke med.",
     yTekst: "% av energien fra strømmen",
     soyler: [
       { navn: "Energi i alt", verdi: (r) => r.energiIAlt, farge: FARGE.total },
-      { navn: "som strøm", verdi: (r) => r.somStrom, farge: FARGE.strom, strek: [6, 4] },
-      { navn: "som varme i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.varme, strek: [2, 3] },
+      { navn: "ikke tilført ennå", verdi: (r) => r.somStrom, farge: FARGE.strom, strek: [6, 4] },
+      { navn: "i karet", verdi: (r) => r.varmeIKaret, farge: FARGE.varme, strek: [2, 3] },
     ],
     joule: (r) =>
-      `Strøm levert: ${formaterTall(r.stromLevertJoule, 0)} J · varme i karet: ${formaterTall(r.varmeJoule, 0)} J · ` +
+      `Tilført med strøm: ${formaterTall(r.stromLevertJoule, 0)} J · i karet: ${formaterTall(r.varmeJoule, 0)} J · ` +
       `kan gjøre arbeid: ${formaterTall(r.kanGjoreArbeidJoule, 1)} J.`,
     forutsi: () => ({
       sporsmal:
-        "Strøm kan i prinsippet gjøre arbeid uten tap: 100 %. Dyppekokeren gjør strømmen om til varme i vannet. Når alt i karet har fått samme temperatur: hvor mye av energien kan fortsatt gjøre arbeid i karet?",
+        "Elektrisk energi kan i prinsippet gjøre arbeid uten tap: 100 %. Dyppekokeren bruker den til å varme opp vannet. Når alt i karet har fått samme temperatur: hvor mye av energien kan fortsatt gjøre arbeid i karet?",
       valg: [
         { id: "alt", tekst: "Fortsatt 100 % – energien er jo bevart" },
         { id: "halve", tekst: "Omtrent halvparten" },
@@ -93,11 +93,11 @@ const FANER = {
     fasit: (kar, r) => ({
       id: "ingenting",
       tekst:
-        `Ved start var all energien strøm, og alt kunne gjøre arbeid. Da strømmen ble slått av, kunne bare ` +
+        `Ved start var ingen energi tilført ennå, og all energien strømmen skulle gi, kunne gjøre arbeid. Da strømmen ble slått av, kunne bare ` +
         `${prosent(t.arbeidVedAvslaaing ?? 0, 1)} fortsatt bli arbeid. Nå er det ${prosent(r.kanGjoreArbeid, 1)}, ` +
         `fordi det ikke finnes noen temperaturforskjell igjen i karet. ` +
-        `Energien i alt er fortsatt ${prosent(r.energiIAlt)} – den er blitt varme spredt i hele karet, ` +
-        `${formaterGrader(kar.blandingstemperatur)}. Strøm er energi av høy kvalitet. Lunkent vann har lav kvalitet.`,
+        `Energien i alt er fortsatt ${prosent(r.energiIAlt)} – den er spredt i hele karet, som lunkent vann på ` +
+        `${formaterGrader(kar.blandingstemperatur)}. Elektrisk energi har høy kvalitet. Energien i lunkent vann har lav kvalitet.`,
     }),
   },
 };

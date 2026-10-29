@@ -56,8 +56,15 @@ viser det klossen faktisk mister per sekund.
 Strømmen gir like mye energi som kobberklossen på 90 °C har, så fanene kan sammenlignes.
 
 **Energiregnskapet** vises som søyler og som graf over tid, i prosent:
-- *Varme i karet* / *Energi i alt* står på 100 % hele tiden. Energien er bevart.
-- Delsøylene viser hvor energien er: i klossen og i vannet, eller som strøm og som varme.
+- *Ekstra energi i karet* / *Energi i alt* står på 100 % hele tiden. Energien er bevart.
+- Delsøylene viser hvor energien er: i klossen og i vannet, eller «ikke tilført ennå»
+  og «i karet».
+
+**Ordbruk (endret 29.10.2026 etter revisjonen, F02).** *Varme* brukes bare om energi som
+går fra varmt til kaldt (pilene), ikke om noe som ligger lagret. Det som er lagret, heter
+*energi*. I kloss-fanen følger vi energien klossen har **ekstra** fordi den er varmere enn
+vannet (over 10 °C-nivået). I dyppekokerfanen står det «ikke tilført ennå» i stedet for
+«strøm som er igjen», så strøm ikke ser ut som et stoff som ligger lagret i ledningen.
 - *Kan gjøre arbeid* er det aller meste en perfekt maskin kunne fått ut. For varme kommer
   det av temperaturforskjellene i karet. Det synker mot 0 når alt får samme temperatur.
 
@@ -83,13 +90,13 @@ meste skjer de første minuttene. Skjermen viser hele tiden hvor fort tiden går
 forsøk tar ca. ett minutt. Under "Mer" kan farten endres og tall vises i joule.
 
 ## Elevoppgaver (forutsi – observer – forklar)
-1. **Forutsi (varm kloss):** Når alt har fått samme temperatur, hvor mye av varmen fra
-   klossen finnes fortsatt i karet? Skriv svaret og hvorfor.
-2. **Observer:** Følg søylene. Hva skjer med "Varme i karet" mens klossen blir kald? Hva
+1. **Forutsi (varm kloss):** Når alt har fått samme temperatur, hvor mye av den ekstra
+   energien fra klossen finnes fortsatt i karet? Skriv svaret og hvorfor.
+2. **Observer:** Følg søylene. Hva skjer med "Ekstra energi i karet" mens klossen blir kald? Hva
    skjer med "Kan gjøre arbeid"?
 3. **Forklar:** Hvor ble energien av? Bruk ordene *partikler*, *temperatur* og *varme*.
 4. **Variabler:** Kjør med lite og mye vann. Hva skjer med sluttemperaturen? Hva skjer
-   med varmen i karet? Hvilken variabel endret du, og hva målte du?
+   med energien i karet? Hvilken variabel endret du, og hva målte du?
 5. **Forutsi (dyppekoker):** Strøm kan gjøre arbeid uten tap. Hvor mye kan energien gjøre
    når den er blitt lunkent vann?
 6. **Forklar:** Energien er bevart. Hvorfor sier vi likevel at vi "sparer energi" når vi
@@ -145,8 +152,8 @@ i praksis.
   (temperaturer i kelvin, C = varmekapasitet per celle). Det er arbeidet en perfekt
   maskin får ut når den jevner ut alle temperaturforskjellene uten å lage ny entropi.
   Tallet kan bare synke når varme leder av seg selv. Testene sjekker det for hvert steg.
-- Dyppekokeren: strømmen som ennå ikke er levert, regnes som 100 % arbeid. Testene
-  sjekker at strøm igjen + varme i karet alltid er 100 %.
+- Dyppekokeren: energien som ennå ikke er tilført, regnes som 100 % arbeid. Testene
+  sjekker at «ikke tilført ennå» + «i karet» alltid er 100 %.
 
 ## Kilder
 - Materialverdier (kobber, vann, rustfritt stål): `felles/data/materialer.json`.

@@ -201,7 +201,11 @@ function sjekkResultat() {
       fasit,
       fasit === "hjorner"
         ? HJORNE_FORKLARING[f.merkedeCeller.flate]
-        : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?"
+        : "Se på fargene: hvor kom varmen inn, og hvor mye overflate hadde de cellene som smeltet først?",
+      [
+        "Tell pilene inn til de to merkede cellene. Hvilken får varme fra flest kanter?",
+        "Hvorfor blir fingrer og ører kalde før resten av kroppen når det er kaldt ute?",
+      ]
     );
     tutor.sendHendelse("resultat", { oppdeling: "1", fasit, gjetning });
     // Ved vanlig fart skjer dette etter under ett sekund. Stopp, så eleven rekker å se
@@ -225,7 +229,11 @@ function sjekkResultat() {
   t.forutsi.visResultat(
     fasit,
     `${valgt().navn}: ${formaterTid(f.smeltetVed)}. Én blokk med samme varmekilder: ${formaterTid(t.referanse.smeltetVed)}. ` +
-      `Samme mengde snø, men ${formaterTall(overflate, 1)} ganger så mye overflate per volum. Varmen kommer inn gjennom overflaten, så mer overflate gir raskere smelting.`
+      `Samme mengde snø, men ${formaterTall(overflate, 1)} ganger så mye overflate per volum. Varmen kommer inn gjennom overflaten, så mer overflate gir raskere smelting.`,
+    [
+      "Se på tallet «overflate per volum». Ble smeltetiden like mange ganger kortere som overflaten ble større? Hva kan grunnen være?",
+      "Hvorfor deler vi poteter i små biter når de skal koke fort?",
+    ]
   );
   tutor.sendHendelse("resultat", { oppdeling: f.oppdeling, fasit, gjetning });
 }

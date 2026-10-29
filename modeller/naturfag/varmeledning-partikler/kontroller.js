@@ -205,7 +205,10 @@ function stegTaPaa(dtEkte) {
       fasit === "like"
         ? "Klossene leder varme omtrent like godt, så huden blir omtrent like kald mot begge."
         : `Begge klossene var ${ROMTEMPERATUR} °C. ${materialNavn(data, scene.materiale)} leder varmen raskere bort fra fingeren, så huden der blir kaldere. Det er varme som strømmer ut av fingeren – ikke kulde som strømmer inn.`;
-    tp.forutsi.visResultat(fasit, forklaring);
+    tp.forutsi.visResultat(fasit, forklaring, [
+      "Se på grafen: hvor mange grader falt temperaturen i huden mot hver kloss?",
+      "Hvorfor kjennes et flisgulv kaldere enn et teppe, selv om begge har samme temperatur?",
+    ]);
     tutor.sendHendelse("resultat", { fane: "tapaa", fasit, gjetning: tp.forutsi.gjetning() });
   }
   if (tp.modell.tid >= TA_PAA_VARIGHET - 1e-9) {
@@ -334,7 +337,10 @@ function stegIsbit(dtEkte) {
       forst === "aluminium"
         ? "Aluminium leder varme svært godt, så varme fra hele klossen strømmer inn i isen. Se at aluminiumen under isen ble kald – den ga fra seg varme. Treet leder så dårlig at isen nesten bare får varme fra lufta."
         : "Her smeltet isbiten på tre først. Se på grafen og fargene: hvor kom varmen fra?";
-    ib.forutsi.visResultat(forst, forklaring);
+    ib.forutsi.visResultat(forst, forklaring, [
+      "Se på fargene i klossene rett under isen. Hvilken kloss ble kaldest der? Hva forteller det om hvor varmen kom fra?",
+      "Hvorfor tiner frossen mat raskere på en metallbenk enn på et trebord?",
+    ]);
     tutor.sendHendelse("resultat", { fane: "isbit", fasit: forst, gjetning: ib.forutsi.gjetning() });
   }
   if (ib.modell.scener.every((s) => s.smeltetVed !== null)) {

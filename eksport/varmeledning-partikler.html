@@ -404,6 +404,15 @@ select {
 .sammenligning dt { color: var(--tekst-dempet); }
 .sammenligning dd { margin: 0; font-weight: 600; }
 
+/* Spørsmål etter resultatet (forutsi – observer – forklar) */
+.tenk-etter {
+  margin-top: var(--rom-3);
+  padding-top: var(--rom-2);
+  border-top: 1px solid var(--linje);
+}
+.tenk-etter p { margin: 0; }
+.tenk-etter ol { margin: var(--rom-1) 0 0; padding-left: 1.4em; }
+
 /* ---------- Tall ---------- */
 
 .tall {
@@ -2080,7 +2089,13 @@ __moduler["felles/js/forutsi.js"] = await (async () => {
 //     valg: [ { id: "al", tekst: "På aluminium" }, { id: "tre", tekst: "På tre" } ],
 //     vedLaas: (valgId) => { /* nå kan Play slås på */ },
 //   });
-//   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.");
+//   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.", [
+//     "Se på klossene under isen: hvilken ble kaldest?",   // observer
+//     "Hvorfor tiner frossen mat fort på en metallbenk?",  // overføring
+//   ]);
+//
+// Spørsmålene under "Tenk etter" er ment for samtale eller papir, ikke skrivefelt.
+// Eleven skal begrunne svaret sitt, ikke bare lese fasiten.
 //
 // Skjermleser: låsing flytter fokus til gjetningen, og resultatet og en ny runde
 // leses opp gjennom en skjult statuslinje. Statuslinja må finnes før teksten
@@ -2200,8 +2215,8 @@ function lagForutsi(element, { sporsmal, valg, vedLaas }) {
     /** Valgt id, eller null hvis eleven ikke har låst ennå. */
     gjetning: () => gjetning,
     erLaast: () => gjetning !== null,
-    /** Vis gjetningen ved siden av det som faktisk skjedde. */
-    visResultat(fasitId, forklaring = "") {
+    /** Vis gjetningen ved siden av det som faktisk skjedde, og spørsmål å tenke over. */
+    visResultat(fasitId, forklaring = "", tenkEtter = []) {
       const haddeFokus = innhold.contains(document.activeElement);
       innhold.innerHTML = "";
       const liste = document.createElement("dl");
@@ -2223,13 +2238,28 @@ function lagForutsi(element, { sporsmal, valg, vedLaas }) {
         p.textContent = forklaring;
         innhold.append(p);
       }
+      if (tenkEtter.length) {
+        const boks = document.createElement("div");
+        boks.className = "tenk-etter";
+        const tittel = document.createElement("p");
+        tittel.innerHTML = "<strong>Tenk etter</strong> – svar muntlig eller på papir:";
+        const ol = document.createElement("ol");
+        for (const s of tenkEtter) {
+          const li = document.createElement("li");
+          li.textContent = s;
+          ol.append(li);
+        }
+        boks.append(tittel, ol);
+        innhold.append(boks);
+      }
       // Fokus flyttes bare hvis det sto på gjetningen, som nå er borte. Ellers kan
       // eleven være et annet sted på siden, og da holder det å lese opp.
       if (haddeFokus) {
         liste.tabIndex = -1;
         liste.focus();
       }
-      lesOpp(`Du gjettet: ${tekstFor(gjetning)}. Det skjedde: ${tekstFor(fasitId)}. ${forklaring}`);
+      const sporsmal = tenkEtter.length ? ` Tenk etter: ${tenkEtter.join(" ")}` : "";
+      lesOpp(`Du gjettet: ${tekstFor(gjetning)}. Det skjedde: ${tekstFor(fasitId)}. ${forklaring}${sporsmal}`);
     },
     /** Start på nytt med samme spørsmål. */
     nullstill: tegnSporsmal,
@@ -2724,7 +2754,10 @@ function stegTaPaa(dtEkte) {
       fasit === "like"
         ? "Klossene leder varme omtrent like godt, så huden blir omtrent like kald mot begge."
         : `Begge klossene var ${ROMTEMPERATUR} °C. ${materialNavn(data, scene.materiale)} leder varmen raskere bort fra fingeren, så huden der blir kaldere. Det er varme som strømmer ut av fingeren – ikke kulde som strømmer inn.`;
-    tp.forutsi.visResultat(fasit, forklaring);
+    tp.forutsi.visResultat(fasit, forklaring, [
+      "Se på grafen: hvor mange grader falt temperaturen i huden mot hver kloss?",
+      "Hvorfor kjennes et flisgulv kaldere enn et teppe, selv om begge har samme temperatur?",
+    ]);
     tutor.sendHendelse("resultat", { fane: "tapaa", fasit, gjetning: tp.forutsi.gjetning() });
   }
   if (tp.modell.tid >= TA_PAA_VARIGHET - 1e-9) {
@@ -2853,7 +2886,10 @@ function stegIsbit(dtEkte) {
       forst === "aluminium"
         ? "Aluminium leder varme svært godt, så varme fra hele klossen strømmer inn i isen. Se at aluminiumen under isen ble kald – den ga fra seg varme. Treet leder så dårlig at isen nesten bare får varme fra lufta."
         : "Her smeltet isbiten på tre først. Se på grafen og fargene: hvor kom varmen fra?";
-    ib.forutsi.visResultat(forst, forklaring);
+    ib.forutsi.visResultat(forst, forklaring, [
+      "Se på fargene i klossene rett under isen. Hvilken kloss ble kaldest der? Hva forteller det om hvor varmen kom fra?",
+      "Hvorfor tiner frossen mat raskere på en metallbenk enn på et trebord?",
+    ]);
     tutor.sendHendelse("resultat", { fane: "isbit", fasit: forst, gjetning: ib.forutsi.gjetning() });
   }
   if (ib.modell.scener.every((s) => s.smeltetVed !== null)) {

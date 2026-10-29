@@ -79,6 +79,13 @@ at tabellen og simuleringen har samme overflate, volum og masse.
    snø smelter raskere, og hvorfor hjørnene smelter først.
 6. **Variabler:** Hvilken variabel endret du? Hvilke holdt du like? Hva målte du?
 
+**I modellen:** Etter resultatet viser modellen to «Tenk etter»-spørsmål, ett for å
+observere og ett for å overføre til en ny situasjon. De er ment for samtale eller papir:
+- Én blokk: «Tell pilene inn til de to merkede cellene. Hvilken får varme fra flest
+  kanter?» og «Hvorfor blir fingrer og ører kalde før resten av kroppen når det er kaldt ute?»
+- Delt snø: «Ble smeltetiden like mange ganger kortere som overflaten ble større?» og
+  «Hvorfor deler vi poteter i små biter når de skal koke fort?»
+
 ### Samme prinsipp i andre fag
 - **Kjemi – pulver mot klump:** En sukkerbit løses saktere enn strøsukker, og
   jernpulver reagerer (brenner) mye raskere enn en jernspiker. Reaksjonen skjer på

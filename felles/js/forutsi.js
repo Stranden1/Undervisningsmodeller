@@ -9,7 +9,13 @@
 //     valg: [ { id: "al", tekst: "På aluminium" }, { id: "tre", tekst: "På tre" } ],
 //     vedLaas: (valgId) => { /* nå kan Play slås på */ },
 //   });
-//   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.");
+//   forutsi.visResultat("al", "Isbiten på aluminium smeltet først.", [
+//     "Se på klossene under isen: hvilken ble kaldest?",   // observer
+//     "Hvorfor tiner frossen mat fort på en metallbenk?",  // overføring
+//   ]);
+//
+// Spørsmålene under "Tenk etter" er ment for samtale eller papir, ikke skrivefelt.
+// Eleven skal begrunne svaret sitt, ikke bare lese fasiten.
 //
 // Skjermleser: låsing flytter fokus til gjetningen, og resultatet og en ny runde
 // leses opp gjennom en skjult statuslinje. Statuslinja må finnes før teksten
@@ -129,8 +135,8 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
     /** Valgt id, eller null hvis eleven ikke har låst ennå. */
     gjetning: () => gjetning,
     erLaast: () => gjetning !== null,
-    /** Vis gjetningen ved siden av det som faktisk skjedde. */
-    visResultat(fasitId, forklaring = "") {
+    /** Vis gjetningen ved siden av det som faktisk skjedde, og spørsmål å tenke over. */
+    visResultat(fasitId, forklaring = "", tenkEtter = []) {
       const haddeFokus = innhold.contains(document.activeElement);
       innhold.innerHTML = "";
       const liste = document.createElement("dl");
@@ -152,13 +158,28 @@ export function lagForutsi(element, { sporsmal, valg, vedLaas }) {
         p.textContent = forklaring;
         innhold.append(p);
       }
+      if (tenkEtter.length) {
+        const boks = document.createElement("div");
+        boks.className = "tenk-etter";
+        const tittel = document.createElement("p");
+        tittel.innerHTML = "<strong>Tenk etter</strong> – svar muntlig eller på papir:";
+        const ol = document.createElement("ol");
+        for (const s of tenkEtter) {
+          const li = document.createElement("li");
+          li.textContent = s;
+          ol.append(li);
+        }
+        boks.append(tittel, ol);
+        innhold.append(boks);
+      }
       // Fokus flyttes bare hvis det sto på gjetningen, som nå er borte. Ellers kan
       // eleven være et annet sted på siden, og da holder det å lese opp.
       if (haddeFokus) {
         liste.tabIndex = -1;
         liste.focus();
       }
-      lesOpp(`Du gjettet: ${tekstFor(gjetning)}. Det skjedde: ${tekstFor(fasitId)}. ${forklaring}`);
+      const sporsmal = tenkEtter.length ? ` Tenk etter: ${tenkEtter.join(" ")}` : "";
+      lesOpp(`Du gjettet: ${tekstFor(gjetning)}. Det skjedde: ${tekstFor(fasitId)}. ${forklaring}${sporsmal}`);
     },
     /** Start på nytt med samme spørsmål. */
     nullstill: tegnSporsmal,

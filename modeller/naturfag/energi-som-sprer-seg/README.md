@@ -103,6 +103,13 @@ forsøk tar ca. ett minutt. Under "Mer" kan farten endres og tall vises i joule.
    slår av lyset? (Tips: kvalitet.)
 7. **Drøft:** Kan vannet varme opp klossen igjen av seg selv? Hva måtte til?
 
+**I modellen:** Etter resultatet viser modellen to «Tenk etter»-spørsmål, ett for å
+observere og ett for å overføre til en ny situasjon. De er ment for samtale eller papir:
+- Varm kloss: «Se på søylen «Ekstra energi i karet» mens klossen ble kald. Endret den
+  seg?» og «En kopp varm te blir stående til den har romtemperatur. Hvor ble energien av?»
+- Dyppekoker: «Hvor mye av energien fra strømmen er fortsatt i karet?» og «Hvorfor sier vi
+  likevel at vi «sparer energi» når vi slår av lyset?»
+
 ### Elevforsøk som passer til modellen
 Varmt metallodd i kaldt vann i et isoporbeger (enkel kalorimetri): varm et lodd eller en
 mutter i kokende vann, flytt det over i et isoporbeger med kaldt springvann, rør om og

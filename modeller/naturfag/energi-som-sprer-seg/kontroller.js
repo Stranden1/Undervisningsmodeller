@@ -55,6 +55,10 @@ const FANER = {
         { id: "mer", tekst: "Mer enn klossen hadde" },
       ],
     }),
+    tenkEtter: [
+      "Se på søylen «Ekstra energi i karet» mens klossen ble kald. Endret den seg? Hva betyr det?",
+      "En kopp varm te blir stående til den har romtemperatur. Hvor ble energien fra teen av?",
+    ],
     fasit: (kar, r) => ({
       id: "alt",
       tekst:
@@ -90,6 +94,10 @@ const FANER = {
         { id: "ingenting", tekst: "Ingenting" },
       ],
     }),
+    tenkEtter: [
+      "Se på søylene etter at strømmen ble slått av. Hvor mye av energien fra strømmen er fortsatt i karet?",
+      "Energien er bevart. Hvorfor sier vi likevel at vi «sparer energi» når vi slår av lyset?",
+    ],
     fasit: (kar, r) => ({
       id: "ingenting",
       tekst:
@@ -239,7 +247,7 @@ function oppdaterTekst(beskrivOgsa = false, lesOpp = true) {
 
 function visFasit() {
   const { id, tekst } = fane().fasit(t.kar, t.kar.regnskap());
-  t.forutsi.visResultat(id, tekst);
+  t.forutsi.visResultat(id, tekst, fane().tenkEtter);
 }
 
 // ---------------------------------------------------------------------------

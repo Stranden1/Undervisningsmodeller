@@ -57,6 +57,13 @@ går raskere enn i virkeligheten, og hvor mye raskere står på skjermen.
 5. **Overføring:** Hvorfor kjennes et flisgulv kaldere enn et teppe på badet? Hvorfor er
    isopor godt i en kjølebag? Hva tror du skjer hvis fingeren og klossen begge er 33 °C?
 
+**I modellen:** Etter resultatet viser modellen to «Tenk etter»-spørsmål, ett for å
+observere og ett for å overføre til en ny situasjon. De er ment for samtale eller papir:
+- Ta på: «Se på grafen: hvor mange grader falt temperaturen i huden mot hver kloss?» og
+  «Hvorfor kjennes et flisgulv kaldere enn et teppe, selv om begge har samme temperatur?»
+- Isbit: «Se på fargene i klossene rett under isen. Hvilken kloss ble kaldest der?» og
+  «Hvorfor tiner frossen mat raskere på en metallbenk enn på et trebord?»
+
 ### Samtaletips
 - Be elevene beskrive hva de kjenner, og spør: "Er det klossen eller fingeren din du
   kjenner temperaturen til?"

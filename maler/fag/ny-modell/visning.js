@@ -1,11 +1,15 @@
 // MAL: tegner tilstanden. Inneholder ingen fysikk – bare lesing av tilstand.
 
+import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
+
 /**
  * @param {CanvasRenderingContext2D} ctx
  * @param {{ tid: number, temperatur: number, omgivelse: number }} tilstand
  */
 export function tegn(ctx, tilstand) {
-  const { width: b, height: h } = ctx.canvas;
+  // Logiske piksler fra klargjorLerret, ikke lerretets faktiske piksler.
+  const b = ctx.logiskBredde;
+  const h = ctx.logiskHoyde;
   ctx.clearRect(0, 0, b, h);
 
   // En søyle som viser temperaturen mellom 0 og 100 °C.
@@ -28,7 +32,7 @@ export function tegn(ctx, tilstand) {
   ctx.fillStyle = "#1f2328";
   ctx.font = "16px system-ui, sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText(`${tilstand.temperatur.toFixed(1)} °C`, b / 2 + 45, h - 40 - sovleH + 5);
+  ctx.fillText(formaterGrader(tilstand.temperatur), b / 2 + 45, h - 40 - sovleH + 5);
   ctx.fillStyle = "#5b616b";
   ctx.textAlign = "right";
   ctx.fillText(`rommet ${tilstand.omgivelse} °C`, b / 2 - 65, yOmg + 5);
@@ -36,5 +40,5 @@ export function tegn(ctx, tilstand) {
 
 /** Kort tekst om hva som skjer, for skjermleser og som hjelp. */
 export function beskriv(tilstand) {
-  return `Etter ${tilstand.tid.toFixed(0)} sekunder er temperaturen ${tilstand.temperatur.toFixed(1)} °C.`;
+  return `Etter ${formaterTid(tilstand.tid)} er temperaturen ${formaterGrader(tilstand.temperatur)}.`;
 }

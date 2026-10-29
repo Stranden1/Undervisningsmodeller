@@ -47,6 +47,24 @@ export function klossPlass(vannmengdeId) {
   return { x: Math.floor((nx - KAR.kloss) / 2), y: Math.floor((ny - KAR.kloss) / 2), side: KAR.kloss };
 }
 
+/**
+ * Varme per sekund (W) som strømmer ut av delen i midten (klossen eller elementet),
+ * per side. Positiv = fra delen ut i vannet. Summen over kantcellene på hver side.
+ * Gjelder snittet (`KAR.dx` tykt), så tallene er små; visningen bruker dem bare relativt.
+ * @param {object} gitter  kar.gitter
+ * @param {{ x: number, y: number, side: number }} plass  fra klossPlass eller elementPlass
+ */
+export function varmeUtAvDelen(gitter, { x, y, side }) {
+  const ut = { venstre: 0, hoyre: 0, opp: 0, ned: 0 };
+  for (let i = 0; i < side; i++) {
+    ut.venstre += gitter.varmestromMellom(x, y + i, x - 1, y + i);
+    ut.hoyre += gitter.varmestromMellom(x + side - 1, y + i, x + side, y + i);
+    ut.opp += gitter.varmestromMellom(x + i, y, x + i, y - 1);
+    ut.ned += gitter.varmestromMellom(x + i, y + side - 1, x + i, y + side);
+  }
+  return ut;
+}
+
 /** Varmekapasiteten til én celle (J/K): tetthet · spesifikk varmekapasitet · volum. */
 function cellekapasitet(data, nokkel) {
   const m = data.materialer[nokkel];

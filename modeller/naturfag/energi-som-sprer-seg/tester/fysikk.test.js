@@ -12,6 +12,8 @@ import {
   LIKEVEKT_GRENSE,
   KLOSS_T_MIN,
   KLOSS_T_MAKS,
+  klossPlass,
+  varmeUtAvDelen,
 } from "../modell.js";
 
 const data = JSON.parse(readFileSync(new URL("../../../../felles/data/materialer.json", import.meta.url), "utf8"));
@@ -129,4 +131,31 @@ test("Lett nok for en billig Chromebook", (t) => {
 test("Klossens temperatur utenfor 40–90 °C avvises", () => {
   assert.throws(() => lagKar(data, { klossT: 120 }), RangeError);
   assert.throws(() => lagKar(data, { klossT: 20 }), RangeError);
+});
+
+test("Varmepilene viser den faktiske varmestrømmen ut av klossen", () => {
+  const sum = (ut) => ut.venstre + ut.hoyre + ut.opp + ut.ned;
+  const kar = lagKar(data, { vannmengde: "middels", klossT: KLOSS_T_MAKS });
+  const k = klossPlass("middels");
+  const energiIKlossen = () => {
+    let E = 0;
+    for (let y = k.y; y < k.y + k.side; y++) for (let x = k.x; x < k.x + k.side; x++) E += kar.gitter.energi(x, y);
+    return E;
+  };
+  kar.steg(5);
+  // Summen av pilene er det klossen mister per sekund (sjekket over et kort tidssteg).
+  const q = sum(varmeUtAvDelen(kar.gitter, k));
+  const foer = energiIKlossen();
+  kar.steg(0.05);
+  const tapt = (foer - energiIKlossen()) / 0.05;
+  assert.ok(q > 0, "varmen skal gå ut av klossen");
+  assert.ok(Math.abs(tapt - q) / q < 0.05, `piler ${q.toFixed(3)} W, klossen mistet ${tapt.toFixed(3)} W`);
+
+  // Varmere kloss gir større piler. Ved likevekt er det ingen piler.
+  const kald = lagKar(data, { vannmengde: "middels", klossT: KLOSS_T_MIN });
+  kald.steg(5);
+  assert.ok(sum(varmeUtAvDelen(kald.gitter, k)) < q);
+  tilLikevekt(kar);
+  const ut = varmeUtAvDelen(kar.gitter, k);
+  for (const side of Object.values(ut)) assert.ok(Math.abs(side) < 0.02, `${side} W ved likevekt`);
 });

@@ -44,6 +44,11 @@ varmere det er der de er. I metallet vibrerer de på faste plasser, som i et fas
 I vannet vandrer de også rundt hverandre, som i en væske. To faner, begge med "gjett
 først" før Start virker.
 
+Oransje piler på hver side av klossen (eller varmeelementet) viser varmen som går fra
+varmt til kaldt. Pilene er store når temperaturforskjellen er stor, blir mindre etter
+hvert og forsvinner når alt har samme temperatur. En test sjekker at pilene til sammen
+viser det klossen faktisk mister per sekund.
+
 **Varm kloss.** En kobberkloss (2,8 cm) ligger midt i vannet. Eleven velger vannmengde
 (lite, middels, mye) og klossens temperatur (40–90 °C).
 

@@ -4,7 +4,7 @@ import { tegnFargeskala } from "../../../felles/js/fargeskala.js";
 import { tegnPartikler, lagPartikler, lagVaeske } from "../../../felles/js/partikler.js";
 import { tegnCeller, PARTIKKELFARGE } from "../../../felles/js/gittertegning.js";
 import { formaterGrader, formaterTid } from "../../../felles/js/format.js";
-import { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass } from "./modell.js";
+import { VANN_START, KLOSS_T_MAKS, klossPlass, elementPlass, varmeUtAvDelen } from "./modell.js";
 
 export const STORRELSE = { bredde: 760, hoyde: 400 };
 
@@ -13,6 +13,11 @@ const VEGG = 7;
 const Y0 = 52;
 const VEGGFARGE = "#b9b4a8";
 const STROMFARGE = "#a8487f"; // samme som "som strøm" i søylene og grafen
+const VARMEFARGE = "#b35c00"; // samme som varmepilene i «Varmeledning med partikler»
+// Største varmestrøm per side i modellen: kobberkloss på 90 °C rett etter start (ca. 2,6 W
+// i snittet). Pilene måles mot denne, så en kloss på 40 °C får mindre piler enn en på 90 °C.
+const VARME_MAKS = 2.7;
+const VARME_MIN = 0.02; // under ca. 1 % av maks vises ingen pil
 
 // Vibrasjonen forsterkes over hele området modellen bruker (10–90 °C). Se "Hva modellen forenkler".
 const FORSTERKNING = { minT: VANN_START, maksT: KLOSS_T_MAKS, minUtslag: 0.3, maksUtslag: 3.4 };
@@ -113,6 +118,7 @@ export function lagVisning() {
     ctx.strokeRect(kx + 0.5, ky + 0.5, k.side * CELLE - 1, k.side * CELLE - 1);
     ctx.setLineDash([]);
 
+    tegnVarmepiler(ctx, varmeUtAvDelen(g, k), kx, ky, k.side * CELLE, fane === "dyppekoker" ? 12 : 0);
     if (fane === "dyppekoker") tegnLedning(ctx, r, kx + (k.side * CELLE) / 2, ky, y0);
 
     // Overskrift
@@ -148,10 +154,73 @@ export function lagVisning() {
     else status = "Varmen sprer seg";
     ctx.fillText(status, bredde / 2, y0 + karH + VEGG + 14);
 
+    // Forklaring til pilene
+    ctx.strokeStyle = VARMEFARGE;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(12, hoyde - 22);
+    ctx.lineTo(32, hoyde - 22);
+    ctx.stroke();
+    ctx.fillStyle = VARMEFARGE;
+    ctx.beginPath();
+    ctx.moveTo(38, hoyde - 22);
+    ctx.lineTo(30, hoyde - 27);
+    ctx.lineTo(30, hoyde - 17);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#1f2328";
+    ctx.font = "14px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("varme: fra varmt til kaldt", 44, hoyde - 22);
+
     tegnFargeskala(ctx, bredde - 170, hoyde - 30, 150, 8, VANN_START, KLOSS_T_MAKS);
   }
 
   return { tegn };
+}
+
+/**
+ * Én pil midt på hver side av delen, fra varmt mot kaldt. Lengde og tykkelse følger
+ * varmestrømmen gjennom den siden (kvadratrot, så små strømmer fortsatt synes). Når
+ * temperaturen er lik, er det ingen varmestrøm og ingen piler.
+ */
+function tegnVarmepiler(ctx, ut, kx, ky, s, oppForskyvning) {
+  const midt = { x: kx + s / 2, y: ky + s / 2 };
+  const sider = [
+    { q: ut.venstre, kant: [kx, midt.y], retning: [-1, 0] },
+    { q: ut.hoyre, kant: [kx + s, midt.y], retning: [1, 0] },
+    { q: ut.opp, kant: [midt.x + oppForskyvning, ky], retning: [0, -1] }, // til siden for ledningen
+    { q: ut.ned, kant: [midt.x, ky + s], retning: [0, 1] },
+  ];
+  ctx.strokeStyle = VARMEFARGE;
+  ctx.fillStyle = VARMEFARGE;
+  for (const { q, kant, retning } of sider) {
+    if (Math.abs(q) < VARME_MIN) continue;
+    const styrke = Math.sqrt(Math.min(1, Math.abs(q) / VARME_MAKS));
+    const lengde = 12 + 30 * styrke;
+    const bredde = 1.5 + 3 * styrke;
+    // Positiv q: ut av delen. Negativ: inn i delen (vannet er varmest).
+    const fortegn = q > 0 ? 1 : -1;
+    const [dx, dy] = retning;
+    const a = [kant[0] + dx * 3, kant[1] + dy * 3];
+    const b = [kant[0] + dx * (3 + lengde), kant[1] + dy * (3 + lengde)];
+    const [fra, til] = fortegn > 0 ? [a, b] : [b, a];
+    const ux = (til[0] - fra[0]) / lengde;
+    const uy = (til[1] - fra[1]) / lengde;
+    ctx.lineWidth = bredde;
+    ctx.beginPath();
+    ctx.moveTo(fra[0], fra[1]);
+    ctx.lineTo(til[0] - ux * 6, til[1] - uy * 6);
+    ctx.stroke();
+    const hode = 5 + bredde;
+    ctx.beginPath();
+    ctx.moveTo(til[0], til[1]);
+    ctx.lineTo(til[0] - ux * 8 - uy * hode, til[1] - uy * 8 + ux * hode);
+    ctx.lineTo(til[0] - ux * 8 + uy * hode, til[1] - uy * 8 - ux * hode);
+    ctx.closePath();
+    ctx.fill();
+  }
 }
 
 /** Ledning fra elementet opp gjennom lokket, med en merkelapp: strøm på eller av. */
